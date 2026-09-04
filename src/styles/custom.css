@@ -96,6 +96,7 @@ svg {
 a {
   color: inherit;
   text-decoration: none;
+  -webkit-tap-highlight-color: transparent;
 }
 
 button {
@@ -104,6 +105,16 @@ button {
   background: none;
   border: 0;
   cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Decorative art (wind leaves) hangs past the right edge. body's
+   overflow-x: hidden does not stop phone browsers widening the layout
+   viewport to fit it, which pushed the fixed header off the right edge
+   and let the page pan sideways; clip it here instead. clip does not make
+   a scroll container, so the sticky project overview still works. */
+.site-page {
+  overflow-x: clip;
 }
 
 ul,
@@ -121,25 +132,37 @@ ol {
   color: var(--dark-green);
 }
 
+/* Headings run 0.5px looser than the font's default (0.035vw at 1440) */
+.h1,
+.h2,
+.h3,
+.h4,
+.h5 {
+  letter-spacing: 0.11vw !important;
+}
+
 .h1 {
   font-size: 7.639vw;
   font-weight: 600;
   line-height: 0.9;
-  letter-spacing: 0;
 }
 
 .h2 {
   font-size: 4.167vw;
   font-weight: 600;
   line-height: 1;
-  letter-spacing: 0;
+}
+
+.h3 {
+  font-size: 2.222vw; /* 32px */
+  font-weight: 600;
+  line-height: 1.25; /* 40px */
 }
 
 .h4 {
   font-size: 1.667vw; /* 24px */
   font-weight: 600;
   line-height: 1.25; /* 30px */
-  letter-spacing: 0;
 }
 
 .body {
@@ -180,6 +203,23 @@ ol {
 
   &:hover .button-arrow::before {
     transform: rotate(-30deg);
+  }
+
+  /* Arrow first and pointing left (e.g. "back" links) */
+  &.is-reverse {
+    flex-direction: row-reverse;
+
+    & .button-pill {
+      padding-inline: 3.125vw 1.25vw;
+    }
+
+    & .button-arrow::before {
+      transform: rotate(180deg);
+    }
+
+    &:hover .button-arrow::before {
+      transform: rotate(210deg);
+    }
   }
 }
 
@@ -275,6 +315,18 @@ ol {
 }
 
 /* --------------------------------------------------------------------------
+   Menu (phones only, see src/components/Header.js and initMenu in custom.js)
+   The hamburger sits in .site-actions; .site-menu and .menu-backdrop are
+   siblings of the header. All three are laid out in the mobile block below
+   and toggled by html.menu-open.
+   -------------------------------------------------------------------------- */
+.menu-toggle,
+.menu-backdrop,
+.site-menu {
+  display: none;
+}
+
+/* --------------------------------------------------------------------------
    Embla slider — required structural rules
    -------------------------------------------------------------------------- */
 .embla {
@@ -341,6 +393,9 @@ ol {
 .has-parallax .parallax-frame {
   position: relative;
   overflow: hidden;
+  /* Safari: a transformed child can escape a rounded overflow clip unless
+     the clipping box is its own stacking context */
+  isolation: isolate;
 }
 
 .has-parallax .parallax-image {
@@ -430,7 +485,7 @@ ol {
     height: 0.903vw; /* 13px */
     background: currentColor;
     mask: url("/button-arrow.svg") center / contain no-repeat;
-    transform: rotate(45deg);
+    transform: rotate(30deg);
   }
 }
 
@@ -451,6 +506,7 @@ ol {
   height: 100%;
   border-radius: 3.472vw;
   overflow: clip;
+  isolation: isolate; /* Safari: keeps the parallax image inside the corners while tilting */
   transform-style: preserve-3d;
   transform-origin: 50% 10%;
   will-change: transform;
@@ -553,12 +609,6 @@ ol {
   & .projects-heading {
     position: relative;
     z-index: 1; /* text sits over the squiggle */
-    font-family: var(--font-otflag);
-    font-size: 3.264vw;
-    font-weight: 500;
-    line-height: 1;
-    letter-spacing: 0;
-    color: var(--dark-green);
   }
 
   /* Sits under "Projects", outside the heading so the reveal mask can't clip
@@ -581,6 +631,23 @@ ol {
     display: flex;
     align-items: center;
   }
+}
+
+/* Small muted date/year (project captions, works listing) */
+.project-date {
+  font-size: 0.764vw;
+  font-weight: 500;
+  color: rgba(4, 33, 0, 0.55);
+}
+
+/* Section heading (also "Related Article" on a post) */
+.projects-heading {
+  font-family: var(--font-otflag);
+  font-size: 3.264vw;
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: 0;
+  color: var(--dark-green);
 }
 
 .icon-button {
@@ -672,9 +739,6 @@ ol {
 
   & .project-date {
     margin-top: 0.278vw;
-    font-size: 0.764vw;
-    font-weight: 500;
-    color: rgba(4, 33, 0, 0.55);
   }
 
   /* Card link: the button arrow, turned to point up-right */
@@ -742,6 +806,22 @@ ol {
   height: 1.528vw; /* 22 */
 }
 
+/* The button arrow as a plain icon, same artwork and size as .button-arrow */
+.icon-arrow {
+  --icon: url("/button-arrow.svg");
+  width: 1.389vw; /* 20 */
+  height: 0.903vw; /* 13 */
+}
+
+/* /public/facebook.svg has its green square baked in; facebook-mark.svg is
+   the same file without the square, so the mark can sit in an .icon-button
+   of any colour. Sized to the button because the artwork is drawn at 52x52. */
+.icon-facebook {
+  --icon: url("/facebook-mark.svg");
+  width: 3.611vw; /* 52 */
+  height: 3.611vw; /* 52 */
+}
+
 /* --------------------------------------------------------------------------
    Footer (see src/components/Footer.js)
    -------------------------------------------------------------------------- */
@@ -781,6 +861,7 @@ ol {
 }
 
 .site-footer {
+  position: relative; /* anchors the wind leaf */
   padding: 2.222vw var(--sidepadding-xs) var(--sidepadding-xs);
 }
 
@@ -1033,6 +1114,7 @@ html.lenis body {
 }
 
 .home-history {
+  position: relative; /* anchors the wind leaf */
   padding-inline: var(--sidepadding-m);
   padding-block: 3.083vw;
 
@@ -1072,4 +1154,1815 @@ html.lenis body {
   overflow: hidden;
   transform-origin: 50% 100%;
   pointer-events: none;
+}
+
+/* --------------------------------------------------------------------------
+   Blog listing (see src/app/blog/page.js)
+   Centred heading, one wide featured card on green, then a 3-up grid.
+   -------------------------------------------------------------------------- */
+.blog-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2.014vw; /* 29px */
+  /* Header is fixed and 5vw tall (1.042vw padding x2 + 2.917vw button);
+     the heading sits 82px below it */
+  padding-block: calc(5vw + 5.694vw) 2.222vw;
+  text-align: center;
+}
+
+.blog-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6.806vw; /* 98px */
+  padding-inline: 5.833vw; /* 84px */
+  padding-block: 0 6.736vw; /* 97px */
+}
+
+/* Tag pill, same type as .project-tag but in flow and on white */
+.blog-tag {
+  width: max-content;
+  padding: 0.278vw 0.556vw;
+  border-radius: 999px;
+  font-family: var(--font-otflag);
+  background: var(--white);
+  color: var(--dark-green);
+  font-size: 0.833vw;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.blog-featured {
+  display: flex;
+  gap: 3.611vw;
+  padding: 2.222vw;
+  background: var(--light-green);
+  border-radius: 3.472vw;
+  color: var(--dark-green);
+
+  & .featured-media {
+    flex: 0 0 38.75vw;
+    aspect-ratio: 3 / 2;
+    border-radius: 1.528vw;
+  }
+
+  & .featured-content {
+    display: flex;
+    flex-direction: column;
+    gap: 0.833vw;
+    padding-block: 1.25vw 0;
+    padding-right: 6.806vw; /* text column ends 98px short of the card edge */
+
+    & .blog-tag {
+      margin-bottom: 0.556vw;
+    }
+  }
+
+  & .featured-link {
+    margin-top: auto;
+  }
+
+  /* On green the pill is white so the button still reads as a button */
+  & .button-pill,
+  & .button-arrow {
+    background: var(--white);
+  }
+}
+
+.blog-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  column-gap: 1.111vw; /* 16px */
+  row-gap: 4.444vw; /* 64px */
+}
+
+.blog-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.764vw;
+
+  & .blog-media {
+    aspect-ratio: 4 / 3;
+    border-radius: 3.472vw;
+    margin-bottom: 0.347vw; /* with the 0.764vw gap: 16px to the date */
+  }
+
+  & .h4 {
+    max-width: 25vw;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Page transitions (see initPageTransitions in custom.js and
+   src/components/PageTransition.js)
+   Swup-style: <html> carries the visit state (is-changing, is-leaving,
+   is-rendering, is-pending, is-popstate) and the snapshot cards carry their
+   own beats. The header is fixed and never takes part. The real pages are
+   never transformed: custom.js stands them in with viewport-sized snapshot
+   cards (.pt-ghost) that only animate scale/translate and corner radius,
+   so the motion runs on the compositor.
+
+   Three beats on the beige:
+   1. .is-prev.is-back   old card shrinks to the middle of the screen
+   2. .is-prev.is-out    old card slides off left while
+      .is-next.is-in     the new card slides in from the right
+   3. .is-next.is-grow   new card grows back to fill the screen, then the
+                         real page is swapped in underneath it
+   Back/forward has no old card; the new card comes in from the left, with
+   the page already put back where it was left (custom.js restores scroll
+   itself, the browser's own restoration would jump the old page first).
+
+   JS reads the three durations to time the beats and the swap.
+   -------------------------------------------------------------------------- */
+:root {
+  --pt-leave-ms: 550; /* shrink; JS switches route after this */
+  --pt-slide-ms: 650;
+  --pt-grow-ms: 550;
+  --pt-card-scale: 0.6;
+  --pt-card-radius: 3.472vw;
+  --pt-ease-in-out: cubic-bezier(0.76, 0, 0.24, 1);
+  --pt-ease-out: cubic-bezier(0.22, 1, 0.36, 1); /* same settle as the header */
+}
+
+/* Layers: backdrop < old card < new card < header (100). The backdrop is
+   the page beige taken a touch deeper so the cards read against it. */
+.pt-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 89;
+  background: color-mix(in srgb, var(--color-bg) 92%, var(--dark-green));
+}
+
+.pt-ghost {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  pointer-events: none;
+
+  &.is-next {
+    z-index: 91;
+  }
+}
+
+/* The card. The inner block is the cloned page offset by the scroll
+   position so the snapshot lines up with the screen. No box-shadow: even a
+   small blur makes the card's repaint at the start of a scale change cost
+   a whole frame, so the edge is a hairline outline instead. */
+.pt-ghost-page {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  background: var(--color-bg);
+  outline: 1px solid rgba(4, 33, 0, 0.1);
+  outline-offset: -1px;
+  transform-origin: 50% 50%;
+  will-change: transform;
+}
+
+.pt-ghost-inner {
+  position: absolute;
+  left: 0;
+  width: 100%;
+}
+
+/* Beat 1: old card shrinks */
+.pt-ghost.is-prev .pt-ghost-page {
+  transition:
+    scale calc(var(--pt-leave-ms) * 1ms) var(--pt-ease-in-out),
+    border-radius calc(var(--pt-leave-ms) * 1ms) var(--pt-ease-in-out);
+}
+
+.pt-ghost.is-prev.is-back .pt-ghost-page {
+  scale: var(--pt-card-scale);
+  border-radius: var(--pt-card-radius);
+}
+
+/* Beat 2: old card out to the left, new card in from the right */
+.pt-ghost.is-prev.is-out .pt-ghost-page {
+  translate: -100vw 0;
+  transition: translate calc(var(--pt-slide-ms) * 1ms) var(--pt-ease-in-out);
+}
+
+.pt-ghost.is-next .pt-ghost-page {
+  scale: var(--pt-card-scale);
+  border-radius: var(--pt-card-radius);
+  translate: var(--pt-from, 100vw) 0;
+}
+
+/* Painted in place, invisibly, before it is moved off screen to slide in */
+.pt-ghost.is-next.is-prep .pt-ghost-page {
+  translate: 0 0;
+  opacity: 0;
+}
+
+html.is-popstate {
+  --pt-from: -100vw;
+}
+
+.pt-ghost.is-next.is-in .pt-ghost-page {
+  translate: 0 0;
+  transition: translate calc(var(--pt-slide-ms) * 1ms) var(--pt-ease-in-out);
+}
+
+/* Beat 3: new card grows to full size */
+.pt-ghost.is-next.is-grow .pt-ghost-page {
+  scale: 1;
+  border-radius: 0;
+  transition:
+    scale calc(var(--pt-grow-ms) * 1ms) var(--pt-ease-out),
+    border-radius calc(var(--pt-grow-ms) * 1ms) var(--pt-ease-out);
+}
+
+/* The real pages: the old one sits under its card until the route
+   changes; the new one stays hidden until the swap. (The snapshot's copy
+   is .pt-ghost-clone, not .site-page, so these rules never reach it.) */
+html.is-leaving .site-page {
+  pointer-events: none;
+}
+
+html.is-rendering .site-page {
+  opacity: 0;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --pt-leave-ms: 0;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Wind leaf (see src/components/WindLeaf.js and initWindLeaves in custom.js)
+   /public/moving-leaf.svg: a blurred palm frond shadow, 550x595 (the
+   export came cropped to 386 wide, which cut the blur with a hard edge;
+   the viewBox was widened to the whole artwork), stem near the top-right
+   (about 97% 8.5% of the box) and fronds fanning down-left. Both the base
+   angle (wrapper) and the sway (image) pivot on the stem, so a placement
+   is where the stem sits, whatever the angle. z-index -1 puts it under
+   everything in flow: the section's content, the hero on the home page,
+   and the green footer block, which hides the footer leaf's lower half.
+   Sizes and stem positions at 1440 are eyeballed from the design.
+   -------------------------------------------------------------------------- */
+.wind-leaf {
+  --leaf-width: 38.2vw; /* 550px, the artwork's own size */
+  --leaf-rotate: 0deg;
+  position: absolute;
+  z-index: -1;
+  width: var(--leaf-width);
+  aspect-ratio: 550 / 595;
+  transform-origin: 97% 8.5%; /* the stem */
+  rotate: var(--leaf-rotate);
+  pointer-events: none;
+
+  & img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    transform-origin: 97% 8.5%;
+    will-change: transform;
+  }
+}
+
+/* Home intro: larger, stem just off the top-right corner of the section so
+   the fronds run from under the hero down to the About button */
+.home-history .wind-leaf {
+  --leaf-width: 47vw; /* 677px */
+  --leaf-rotate: 9deg;
+  top: -2.7vw;
+  right: -4.5vw;
+}
+
+/* Footer: turned so the fronds reach up-left over the last project card,
+   stem at the page edge inside the green block, which hides the rest */
+.site-footer .wind-leaf {
+  --leaf-rotate: 100deg;
+  top: 10.2vw;
+  right: -2.5vw;
+}
+
+/* Blog post: larger, stem off the top-right, behind the featured image */
+.post-header .wind-leaf {
+  --leaf-width: 47vw;
+  --leaf-rotate: 8deg;
+  top: 2.2vw;
+  right: -4.5vw;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wind-leaf img {
+    transform: none !important;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Blog post (see src/app/blog/[slug]/page.js)
+   Date, title and featured image are fields; everything under the image is
+   editor HTML rendered inside .blog-content.
+   -------------------------------------------------------------------------- */
+.post-header {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.458vw; /* 21px, title to image */
+  /* Fixed header (5vw) + 131px to the date */
+  padding-block: calc(5vw + 9.097vw) 0;
+  padding-inline: 13.264vw; /* 191px */
+  text-align: center;
+
+  & .post-back {
+    position: absolute;
+    top: calc(5vw + 2.5vw); /* 36px below the header */
+    left: 13.264vw;
+  }
+
+  & .post-title {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.319vw; /* 19px */
+
+    & .h2 {
+      max-width: 45.833vw;
+    }
+  }
+
+  & .post-media {
+    width: 100%;
+    aspect-ratio: 19 / 10;
+    border-radius: 3.472vw;
+  }
+}
+
+.post-body {
+  padding-inline: 13.264vw;
+  padding-block: 2.5vw 0; /* 36px below the image */
+}
+
+/* Editor output. Tags are bare (h2, p, img...) because WordPress writes them,
+   so spacing is done with margins here rather than gap. */
+.blog-content {
+  color: var(--dark-green);
+
+  & > :first-child {
+    margin-top: 0;
+  }
+
+  & > :last-child {
+    margin-bottom: 0;
+  }
+
+  & h2,
+  & h3,
+  & h4,
+  & h5 {
+    font-family: var(--font-otflag);
+    font-weight: 600;
+    line-height: 1.25;
+    letter-spacing: 0.11vw;
+    color: var(--dark-green);
+    margin-block: 2.778vw 2.5vw; /* 40px above, 36px below */
+  }
+
+  & h2 {
+    font-size: 2.222vw; /* 32px, same as .h3 */
+  }
+
+  & h3 {
+    font-size: 1.667vw; /* 24px, same as .h4 */
+  }
+
+  & h4,
+  & h5 {
+    font-size: 1.389vw; /* 20px */
+  }
+
+  & p,
+  & li {
+    font-family: var(--font-dm-sans);
+    font-size: 1.042vw;
+    font-weight: 400;
+    line-height: 1.33;
+    color: #859383;
+  }
+
+  & p,
+  & ul,
+  & ol,
+  & blockquote {
+    margin-block: 1.111vw;
+  }
+
+  & ul,
+  & ol {
+    padding-left: 1.389vw;
+    display: flex;
+    flex-direction: column;
+    gap: 0.417vw;
+  }
+
+  & ul {
+    list-style: disc;
+  }
+
+  & ol {
+    list-style: decimal;
+  }
+
+  & a {
+    color: var(--dark-green);
+    text-decoration: underline;
+    text-underline-offset: 0.15em;
+  }
+
+  & strong {
+    font-weight: 700;
+    color: var(--dark-green);
+  }
+
+  & blockquote {
+    padding-left: 1.389vw;
+    border-left: 0.278vw solid var(--light-green);
+  }
+
+  /* Images always sit at the content width, same shape as the featured one */
+  & figure,
+  & img {
+    width: 100%;
+    margin-block: 2.778vw; /* 40px */
+  }
+
+  & figure img {
+    margin: 0;
+  }
+
+  & img {
+    aspect-ratio: 19 / 10;
+    object-fit: cover;
+    border-radius: 3.472vw;
+  }
+
+  & figcaption {
+    margin-top: 0.764vw;
+    font-size: 0.764vw;
+    color: #859383;
+  }
+}
+
+/* Related articles: 189px from the end of the content to the heading, with
+   the divider between (108px above it, 81px below). Drawn in by initLines. */
+.post-related {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 4.444vw;
+  margin-top: 7.5vw;
+  margin-inline: 5.833vw;
+  padding-block: 5.625vw 8.125vw; /* 81px, 117px */
+  text-align: center;
+
+  --line-scale: 0;
+
+  &::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: rgba(4, 33, 0, 0.15);
+    transform: scaleX(var(--line-scale));
+    transform-origin: 0 50%;
+  }
+
+  & .blog-grid {
+    text-align: left;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Contact page (see src/app/contact/page.js)
+   Hero: full-bleed leaves with the footer CTA card (same type and spacing
+   as .footer-cta) inset 47px, then a scroll hint. Below it the form on the
+   page beige, hanging plant top-left and leaves bottom-right.
+   -------------------------------------------------------------------------- */
+.contact-hero {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.111vw;
+  padding-block: 19.097vw 3.75vw; /* 275px, 54px */
+  padding-inline: 3.264vw; /* 47px */
+  overflow: clip;
+  color: var(--dark-green);
+
+  & .contact-hero-bg {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+  }
+
+  & > :not(.contact-hero-bg) {
+    position: relative;
+    z-index: 1;
+  }
+}
+
+/* Card: padding matches .footer-cta; with the 47px inset the email runs the
+   same 1270px as it does in the footer */
+.contact-card {
+  width: 100%;
+  background: var(--light-green);
+  border-radius: 3.472vw;
+  padding-block: 4.722vw 4.097vw;
+  padding-inline: 2.639vw;
+  text-align: center;
+}
+
+/* Details row under a divider drawn left to right by initLines in custom.js */
+.contact-info {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  align-items: center;
+  margin-top: 2.5vw;
+  padding-top: 2.5vw;
+  text-align: left;
+
+  --line-scale: 0;
+
+  &::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: rgba(4, 33, 0, 0.15);
+    transform: scaleX(var(--line-scale));
+    transform-origin: 0 50%;
+  }
+}
+
+.contact-social {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  & .icon-button {
+    background: var(--white);
+  }
+}
+
+.contact-social-buttons {
+  display: flex;
+  align-items: center;
+  gap: 1.111vw;
+}
+
+.contact-logo {
+  display: block;
+  color: var(--dark-green);
+}
+
+.contact-scroll {
+  display: flex;
+  align-items: center;
+  gap: 0.417vw;
+  font-size: 0.833vw;
+  font-weight: 500;
+
+  & .icon-arrow {
+    transform: rotate(30deg); /* down-right */
+  }
+}
+
+.contact-form-section {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2.917vw; /* 42px, heading to form */
+  padding-block: 6.319vw 3.472vw; /* 91px, 50px */
+  padding-inline: 5.833vw; /* 84px */
+  text-align: center;
+}
+
+/* Artwork at its native px. The plant hangs from the section's top edge;
+   the leaves' file has 23px of clear space under them, pulled down so the
+   leaves themselves sit on the section's bottom edge. */
+.contact-plant {
+  position: absolute;
+  top: 0;
+  left: 2.083vw;
+  width: 11.389vw; /* 164 */
+  pointer-events: none;
+}
+
+.contact-leaves {
+  position: absolute;
+  right: 0;
+  bottom: -1.597vw;
+  width: 18.333vw; /* 264 */
+  pointer-events: none;
+}
+
+.contact-form {
+  position: relative; /* above the plant */
+  display: flex;
+  flex-direction: column;
+  gap: 1.111vw;
+  width: 100%;
+
+  & .form-row {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.111vw;
+  }
+}
+
+/* Fields: outlined pills on the beige, label centred (same type as
+   .button-label). The textarea grows with its content from one line. */
+.contact-field {
+  width: 100%;
+  padding-block: 6.181vw; /* 89px */
+  padding-inline: 2.639vw;
+  background: transparent;
+  border: 1px solid var(--light-green);
+  border-radius: 3.472vw;
+  font-family: var(--font-otflag);
+  font-size: 1.111vw;
+  font-weight: 700;
+  line-height: 1.25;
+  color: var(--dark-green);
+  text-align: center;
+  outline: none;
+  resize: none;
+  field-sizing: content;
+  transition: border-color 0.35s ease;
+
+  &::placeholder {
+    color: var(--dark-green);
+    opacity: 1;
+  }
+
+  &:focus {
+    border-color: var(--dark-green);
+  }
+}
+
+/* Submit: full-width green pill, heading-size label, arrow pointing up-right */
+.contact-submit {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.389vw;
+  width: 100%;
+  padding-block: 3.264vw;
+  background: var(--light-green);
+  border-radius: 3.472vw;
+  font-family: var(--font-otflag);
+  font-size: 3.264vw;
+  font-weight: 500;
+  line-height: 1;
+  color: var(--dark-green);
+
+  & .icon-arrow {
+    width: 2.778vw; /* 40 */
+    height: auto;
+    aspect-ratio: 20 / 13;
+    transform: rotate(-45deg);
+    transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  &:hover .icon-arrow {
+    transform: rotate(-60deg);
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Works listing (see src/app/works/page.js)
+   Left-aligned heading on the same top offset as the blog heading, then a
+   column of cards: wide image (same width as the main project card on the
+   home page) with the details beside it. A project delivered as more than
+   one service has a photo per service and a pill to switch between them.
+   -------------------------------------------------------------------------- */
+.works-header {
+  padding-block: calc(5vw + 5.694vw) 2.472vw; /* 155px, 35.6px */
+  padding-inline: 5.833vw; /* 84px */
+}
+
+.works-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4.764vw; /* 68.6px */
+  padding-inline: 5.833vw;
+  padding-block: 0 4.806vw; /* 69.2px */
+}
+
+.work-card {
+  display: flex;
+  gap: 3.75vw; /* 54px */
+
+  & .work-media {
+    flex: 0 0 65.556vw;
+    aspect-ratio: 19 / 10;
+    border-radius: 2.222vw; /* 32px */
+  }
+
+  /* One photo per service variant, stacked; the active one is shown and
+     they crossfade when switched (see initWorkToggles in custom.js) */
+  & .work-image {
+    opacity: 0;
+    transition: opacity 0.6s ease;
+
+    &.is-active {
+      opacity: 1;
+    }
+  }
+
+  /* Variant switch: white pill holding one tab per service, the active tab
+     on green. Only rendered when a project has more than one variant. */
+  & .work-toggle {
+    position: absolute;
+    left: 50%;
+    bottom: 5.625vw; /* 81px */
+    z-index: 2;
+    display: flex;
+    gap: 0.625vw; /* 9px */
+    padding-block: 0.694vw 0.764vw; /* 10px, 11px */
+    padding-inline: 0.833vw; /* 12px */
+    background: var(--white);
+    border-radius: 1.806vw; /* 26px */
+    transform: translateX(-50%);
+  }
+
+  & .work-toggle-tab {
+    padding: 1.111vw; /* 16px */
+    border-radius: 1.25vw; /* 18px */
+    text-transform: uppercase;
+    transition: background-color 0.35s ease;
+
+    &.is-active {
+      background: var(--light-green);
+    }
+  }
+
+  & .work-content {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    padding-top: 3.75vw; /* 54px */
+    color: var(--dark-green);
+  }
+
+  & .project-date {
+    margin-top: 0.278vw;
+  }
+
+  & .work-tags {
+    margin-top: 1.111vw;
+  }
+
+  /* Sits on the image's bottom edge */
+  & .work-description {
+    margin-top: auto;
+  }
+}
+
+/* Project tags stacked on green (works listing and project page) */
+.work-tags {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.556vw;
+
+  & .blog-tag {
+    background: var(--light-green);
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Project page (see src/app/works/[slug]/page.js)
+   Category tag, title and a wide hero, then the same two-column grid as the
+   listing but mirrored: overview text left, gallery right. The overview is
+   sticky to the bottom of the screen, so once it has scrolled into view it
+   holds there while the gallery scrolls past, then leaves with the section.
+   -------------------------------------------------------------------------- */
+.work-header {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  /* Fixed header (5vw) + 79px to the tag */
+  padding-block: calc(5vw + 5.486vw) 0;
+  padding-inline: 5.833vw; /* 84px */
+
+  & .work-header-tags {
+    display: flex;
+    gap: 0.556vw;
+
+    & .blog-tag {
+      background: var(--light-green);
+    }
+  }
+
+  & .h1 {
+    margin-block: 1.528vw 1.458vw; /* 22px below the tag, 21px above the hero */
+  }
+
+  & .work-hero {
+    width: 100%;
+    aspect-ratio: 16 / 7;
+    border-radius: 1.528vw; /* 22px */
+  }
+}
+
+.work-body {
+  display: flex;
+  align-items: flex-start;
+  gap: 3.75vw; /* 54px */
+  padding-inline: 5.833vw;
+  /* 32px below the hero; 94px from the last image to the footer's green
+     block, less the footer's own top padding */
+  padding-block: 2.222vw calc(6.528vw - 2.222vw);
+}
+
+.work-overview {
+  position: sticky;
+  bottom: 5.833vw;
+  align-self: flex-end;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  color: var(--dark-green);
+
+  & .work-overview-heading {
+    display: flex;
+    align-items: center;
+    gap: 0.972vw;
+    margin-bottom: 2.222vw;
+  }
+
+  & .icon-arrow {
+    transform: rotate(30deg); /* down-right, like the services header */
+  }
+
+  & .work-overview-text {
+    display: flex;
+    flex-direction: column;
+    gap: 1.111vw;
+    margin-bottom: 3.125vw; /* 45px */
+  }
+
+  & .project-date {
+    margin-top: 1.667vw;
+  }
+}
+
+/* Rows of one wide image then two halves. Every row is the height of the
+   wide image at 19:10, so the halves fill their cells. */
+.work-gallery {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  grid-auto-rows: calc(65.556vw * 10 / 19);
+  gap: 1.181vw; /* 17px */
+  flex: 0 0 65.556vw;
+
+  & .work-gallery-item {
+    border-radius: 1.528vw;
+  }
+
+  & .work-gallery-item:nth-child(3n + 1) {
+    grid-column: 1 / -1;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Mobile
+   -------------------------------------------------------------------------- */
+@media (max-width: 768px) {
+  /* ========== VARIABLES ========== */
+  :root {
+    --sidepadding-xs: 3vw;
+    --sidepadding-m: 6vw;
+    --pt-card-radius: 8vw;
+  }
+
+  /* ========== TYPOGRAPHY ========== */
+  .h1,
+  .h2,
+  .h3,
+  .h4,
+  .h5 {
+    letter-spacing: 0.3vw !important;
+  }
+
+  .h1 {
+    font-size: 14vw;
+  }
+
+  .h2 {
+    font-size: 10vw;
+  }
+
+  .h3 {
+    font-size: 6vw;
+  }
+
+  .h4 {
+    font-size: 4.5vw;
+  }
+
+  .body {
+    font-size: 3.5vw;
+  }
+
+  /* ========== BUTTON ========== */
+  .custom-button {
+    & .button-pill {
+      padding-inline: 3.5vw 8vw;
+      padding-block: 3.3vw; /* pill lands at ~11vw tall (44px) */
+      border-radius: 3.5vw;
+    }
+
+    & .button-arrow {
+      border-radius: 3.5vw;
+    }
+
+    & .button-label {
+      font-size: 3.5vw;
+    }
+
+    &.is-reverse {
+      & .button-pill {
+        padding-inline: 8vw 3.5vw;
+      }
+    }
+  }
+
+  .button-arrow {
+    width: 11vw;
+    height: 11vw;
+    border-radius: 2.5vw;
+
+    &::before {
+      width: 4vw;
+      height: 2.6vw;
+      margin: -1.3vw 0 0 -2vw;
+    }
+  }
+
+  /* ========== HEADER ========== */
+  /* Header is now 17vw tall (3vw padding x2 + 11vw button); the
+     calc(5vw + ...) offsets below use 17vw */
+  .site-header {
+    padding-block: 3vw;
+    padding-inline: 5vw 2.5vw;
+    border-radius: 0 0 6vw 6vw;
+  }
+
+  .logo {
+    width: 12vw;
+  }
+
+  /* Eight links cannot sit beside the logo and CTA: they move into .site-menu */
+  .site-nav {
+    display: none;
+  }
+
+  .site-actions {
+    gap: 2vw;
+    margin-right: 2vw;
+  }
+
+  /* ========== MENU ========== */
+  /* Hamburger: same box as the button arrow, three bars that fold into a cross */
+  .menu-toggle {
+    position: relative;
+    display: block;
+    width: 11vw;
+    height: 11vw;
+    border-radius: 2.5vw;
+    background: var(--light-green);
+    color: var(--dark-green);
+    flex: 0 0 auto;
+  }
+
+  .menu-toggle-bar {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 4.5vw;
+    height: 2px;
+    margin: -1px 0 0 -2.25vw;
+    background: currentColor;
+    border-radius: 999px;
+    transition:
+      transform 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+      opacity 0.2s ease;
+
+    &:nth-child(1) {
+      transform: translateY(-1.4vw);
+    }
+
+    &:nth-child(3) {
+      transform: translateY(1.4vw);
+    }
+  }
+
+  html.menu-open .menu-toggle-bar {
+    &:nth-child(1) {
+      transform: rotate(45deg);
+    }
+
+    &:nth-child(2) {
+      opacity: 0;
+    }
+
+    &:nth-child(3) {
+      transform: rotate(-45deg);
+    }
+  }
+
+  /* Layers: page < backdrop (98) < panel (99) < header (100), so the
+     header and its hamburger stay on top of the open panel */
+  .menu-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 98;
+    display: block;
+    background: rgba(4, 33, 0, 0.5);
+    opacity: 0;
+    pointer-events: none;
+    touch-action: none;
+    transition: opacity 0.5s ease;
+  }
+
+  .site-menu {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 99;
+    display: flex;
+    flex-direction: column;
+    width: 82vw;
+    padding: calc(17vw + 12vw) 8vw 10vw;
+    background: var(--dark-green);
+    color: var(--white);
+    border-radius: 8vw 0 0 8vw;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    translate: 100% 0;
+    visibility: hidden;
+    transition:
+      translate 0.6s cubic-bezier(0.76, 0, 0.24, 1),
+      visibility 0s linear 0.6s;
+  }
+
+  .site-menu-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 3.5vw;
+  }
+
+  .site-menu-link {
+    font-family: var(--font-otflag);
+    font-size: 8vw;
+    font-weight: 600;
+    line-height: 1.1;
+    letter-spacing: 0.3vw;
+    color: var(--white);
+    opacity: 0;
+    translate: 6vw 0;
+    transition:
+      opacity 0.4s ease,
+      translate 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .site-menu-footer {
+    margin-top: auto;
+    padding-top: 10vw;
+  }
+
+  html.menu-open {
+    overflow: hidden;
+
+    & .menu-backdrop {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    & .site-menu {
+      translate: 0 0;
+      visibility: visible;
+      transition:
+        translate 0.6s cubic-bezier(0.76, 0, 0.24, 1),
+        visibility 0s;
+    }
+
+    /* Links follow the panel in, one after another */
+    & .site-menu-link {
+      opacity: 1;
+      translate: 0 0;
+
+      &:nth-child(1) {
+        transition-delay: 0.2s;
+      }
+      &:nth-child(2) {
+        transition-delay: 0.25s;
+      }
+      &:nth-child(3) {
+        transition-delay: 0.3s;
+      }
+      &:nth-child(4) {
+        transition-delay: 0.35s;
+      }
+      &:nth-child(5) {
+        transition-delay: 0.4s;
+      }
+      &:nth-child(6) {
+        transition-delay: 0.45s;
+      }
+      &:nth-child(7) {
+        transition-delay: 0.5s;
+      }
+      &:nth-child(8) {
+        transition-delay: 0.55s;
+      }
+    }
+
+    /* Touches on the header must not scroll the page behind the panel */
+    & .site-header {
+      touch-action: none;
+    }
+  }
+
+  /* ========== EMBLA ========== */
+  .embla__dots {
+    bottom: 6vw;
+    gap: 1.5vw;
+  }
+
+  .embla__dot {
+    width: 1vw;
+    height: 1vw;
+  }
+
+  .embla__dot.is-active {
+    width: 10vw;
+  }
+
+  /* ========== HOME BANNER ========== */
+  .home-banner {
+    border-radius: 0 0 8vw 8vw;
+
+    & .slider-container {
+      & > .h1 {
+        left: 6vw;
+        bottom: 42vw; /* TODO: verify */
+      }
+
+      & .body {
+        left: 6vw;
+        right: 6vw;
+        bottom: 16vw;
+        width: auto;
+      }
+    }
+  }
+
+  /* ========== HOME SERVICES ========== */
+  .home-services {
+    & .services-header {
+      gap: 2.5vw;
+      padding-block: 6vw 0;
+    }
+
+    & .services-arrow {
+      width: 4vw;
+      height: 2.6vw;
+    }
+  }
+
+  .service-card {
+    border-radius: 8vw;
+
+    & .service-meta {
+      left: 6vw;
+      right: 6vw;
+      bottom: 42vw; /* TODO: verify */
+
+      & > * {
+        max-width: 60vw;
+      }
+
+      &::before {
+        top: -5vw;
+      }
+    }
+
+    & .service-label {
+      font-size: 2.5vw;
+      margin-bottom: 2.5vw;
+    }
+
+    /* Left-aligned under the meta instead of centred, so it stacks cleanly */
+    & .service-title {
+      left: 6vw;
+      right: 6vw;
+      bottom: 14vw;
+      transform: none;
+      gap: 3vw;
+    }
+
+    & .service-scroll {
+      left: 6vw;
+      bottom: 5vw;
+      gap: 1.5vw;
+    }
+  }
+
+  /* ========== HOME PROJECTS ========== */
+  .home-projects {
+    padding-block: 10vw 14vw;
+
+    & .projects-header {
+      padding-inline: 3vw;
+      margin-bottom: 6vw;
+    }
+
+    & .projects-scribble {
+      left: 12vw;
+      top: 4.3vw;
+      width: 25.5vw;
+      height: 4.8vw;
+    }
+  }
+
+  .project-date {
+    font-size: 2.5vw;
+  }
+
+  .projects-heading {
+    font-size: 8vw;
+  }
+
+  .icon-button {
+    width: 11vw;
+    height: 11vw;
+    border-radius: 3.5vw;
+
+    & svg {
+      width: 6vw;
+    }
+  }
+
+  .projects-slider {
+    height: 70vw; /* TODO: verify */
+  }
+
+  .projects-track {
+    gap: 4vw;
+  }
+
+  .project-slide {
+    width: 45vw;
+
+    &.is-main {
+      width: 88vw;
+    }
+
+    & .project-media {
+      border-radius: 8vw;
+    }
+
+    &.is-main .project-media {
+      border-radius: 8vw;
+    }
+
+    & .project-tag {
+      top: 4vw;
+      right: 4vw;
+      padding: 1vw 2vw;
+      font-size: 2.5vw;
+    }
+
+    & .project-caption {
+      gap: 4vw;
+      margin-top: 3vw;
+    }
+
+    & .project-date {
+      margin-top: 1vw;
+    }
+  }
+
+  /* ========== ICONS ========== */
+  .icon-whatsapp {
+    width: 4.5vw;
+    height: 4.5vw;
+  }
+
+  .icon-location {
+    width: 4.5vw;
+    height: 5.7vw;
+  }
+
+  .icon-works {
+    width: 3.5vw;
+    height: 5.7vw;
+  }
+
+  .icon-instagram {
+    width: 4.7vw;
+    height: 4.3vw;
+  }
+
+  .icon-arrow {
+    width: 4vw;
+    height: 2.6vw;
+  }
+
+  .icon-facebook {
+    width: 11vw;
+    height: 11vw;
+  }
+
+  /* ========== FOOTER ========== */
+  .site-footer {
+    padding: 6vw var(--sidepadding-xs) var(--sidepadding-xs);
+  }
+
+  .footer-cta {
+    border-radius: 8vw 8vw 0 0;
+    padding-block: 12vw 10vw;
+    padding-inline: 5vw;
+  }
+
+  /* nowrap: sized so the address fills the 84vw inside the card */
+  .footer-email {
+    margin-top: 1.5vw;
+    font-size: 9.5vw;
+  }
+
+  .footer-actions {
+    grid-template-columns: 1fr;
+    gap: 2.5vw;
+    margin-top: 9vw;
+  }
+
+  .footer-action {
+    gap: 4vw;
+    padding: 5vw;
+    border-radius: 8vw;
+  }
+
+  .footer-main {
+    grid-template-columns: 1fr;
+    row-gap: 10vw;
+    border-radius: 0 0 8vw 8vw;
+    padding: 10vw 6vw 5vw;
+  }
+
+  .footer-brand {
+    max-width: 100%;
+  }
+
+  .footer-logo {
+    & .logo {
+      width: 15vw;
+    }
+  }
+
+  .footer-blurb {
+    margin-top: 3.5vw;
+  }
+
+  .social-facebook {
+    width: 11vw;
+    height: 11vw;
+  }
+
+  .footer-social {
+    gap: 2vw;
+    margin-top: 4vw;
+
+    & .button-label {
+      margin-right: 1vw;
+    }
+  }
+
+  .footer-columns {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8vw 4vw;
+    padding-right: 0;
+
+    & ul {
+      margin-top: 3.5vw;
+      gap: 1.5vw;
+    }
+  }
+
+  .footer-bottom {
+    margin-top: 8vw;
+    padding-top: 3.5vw;
+  }
+
+  /* ========== HOME HISTORY ========== */
+  .home-history {
+    padding-block: 8vw;
+
+    & .wrapper {
+      gap: 12vw;
+
+      & .content {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8vw;
+
+        & h4 {
+          max-width: 100%;
+        }
+      }
+    }
+  }
+
+  /* Bottom still on the first line's floor: line height (10vw) minus image height */
+  .home-history .history-image {
+    top: calc(10vw - 25vw);
+    width: 22vw;
+    height: 25vw;
+    margin-right: 3.5vw;
+    border-radius: 4vw;
+  }
+
+  /* ========== BLOG LISTING ========== */
+  .blog-header {
+    gap: 5vw;
+    padding-block: calc(17vw + 12vw) 6vw;
+    padding-inline: 6vw;
+  }
+
+  .blog-list {
+    gap: 16vw;
+    padding-inline: 6vw;
+    padding-block: 0 16vw;
+  }
+
+  .blog-tag {
+    padding: 1vw 2vw;
+    font-size: 2.5vw;
+  }
+
+  .blog-featured {
+    flex-direction: column;
+    gap: 6vw;
+    padding: 5vw;
+    border-radius: 8vw;
+
+    & .featured-media {
+      flex: 0 0 auto;
+      width: 100%;
+      border-radius: 4vw;
+    }
+
+    & .featured-content {
+      gap: 2.5vw;
+      padding-block: 0;
+      padding-right: 0;
+
+      & .blog-tag {
+        margin-bottom: 1.5vw;
+      }
+    }
+  }
+
+  .blog-grid {
+    grid-template-columns: 1fr;
+    row-gap: 12vw;
+  }
+
+  .blog-card {
+    gap: 2.2vw;
+
+    & .blog-media {
+      border-radius: 8vw;
+      margin-bottom: 1vw;
+    }
+
+    & .h4 {
+      max-width: 100%;
+    }
+  }
+
+  /* ========== WIND LEAF ========== */
+  /* Kept and scaled ~2x: it sits behind everything at z-index -1, so overlap is harmless */
+  .wind-leaf {
+    --leaf-width: 80vw;
+  }
+
+  .home-history .wind-leaf {
+    --leaf-width: 90vw;
+    top: -6vw;
+    right: -12vw;
+  }
+
+  .site-footer .wind-leaf {
+    top: 25vw;
+    right: -6vw;
+  }
+
+  .post-header .wind-leaf {
+    --leaf-width: 90vw;
+    top: 5vw;
+    right: -12vw;
+  }
+
+  /* ========== BLOG POST ========== */
+  .post-header {
+    gap: 4vw;
+    padding-block: calc(17vw + 24vw) 0;
+    padding-inline: 6vw;
+
+    & .post-back {
+      top: calc(17vw + 6vw);
+      left: 6vw;
+    }
+
+    & .post-title {
+      gap: 3.5vw;
+
+      & .h2 {
+        max-width: 100%;
+      }
+    }
+
+    & .post-media {
+      border-radius: 8vw;
+    }
+  }
+
+  .post-body {
+    padding-inline: 6vw;
+    padding-block: 6vw 0;
+  }
+
+  .blog-content {
+    & h2,
+    & h3,
+    & h4,
+    & h5 {
+      letter-spacing: 0.3vw;
+      margin-block: 7vw 6vw;
+    }
+
+    & h2 {
+      font-size: 6vw;
+    }
+
+    & h3 {
+      font-size: 4.5vw;
+    }
+
+    & h4,
+    & h5 {
+      font-size: 4vw;
+    }
+
+    & p,
+    & li {
+      font-size: 3.5vw;
+    }
+
+    & p,
+    & ul,
+    & ol,
+    & blockquote {
+      margin-block: 3.5vw;
+    }
+
+    & ul,
+    & ol {
+      padding-left: 4vw;
+      gap: 1.5vw;
+    }
+
+    & blockquote {
+      padding-left: 4vw;
+      border-left: 0.8vw solid var(--light-green);
+    }
+
+    & figure,
+    & img {
+      margin-block: 7vw;
+    }
+
+    & img {
+      border-radius: 8vw;
+    }
+
+    & figcaption {
+      margin-top: 2.2vw;
+      font-size: 2.5vw;
+    }
+  }
+
+  .post-related {
+    gap: 12vw;
+    margin-top: 18vw;
+    margin-inline: 6vw;
+    padding-block: 14vw 20vw;
+  }
+
+  /* ========== CONTACT ========== */
+  .contact-hero {
+    gap: 3.5vw;
+    padding-block: calc(17vw + 24vw) 10vw;
+    padding-inline: 3vw;
+  }
+
+  .contact-card {
+    border-radius: 8vw;
+    padding-block: 12vw 10vw;
+    padding-inline: 5vw;
+  }
+
+  .contact-info {
+    grid-template-columns: 1fr;
+    gap: 5vw;
+    margin-top: 7vw;
+    padding-top: 7vw;
+  }
+
+  .contact-social-buttons {
+    gap: 3.5vw;
+  }
+
+  .contact-scroll {
+    gap: 1.5vw;
+    font-size: 2.5vw;
+  }
+
+  .contact-form-section {
+    gap: 8vw;
+    padding-block: 16vw 10vw;
+    padding-inline: 6vw;
+  }
+
+  /* Shrunk so it clears the centred heading */
+  .contact-plant {
+    left: 2vw;
+    width: 18vw; /* TODO: verify */
+  }
+
+  /* Shrunk so it does not cover the submit arrow */
+  .contact-leaves {
+    bottom: -4vw;
+    width: 30vw; /* TODO: verify */
+  }
+
+  .contact-form {
+    gap: 3.5vw;
+
+    & .form-row {
+      grid-template-columns: 1fr;
+      gap: 3.5vw;
+    }
+  }
+
+  .contact-field {
+    padding-block: 10vw;
+    padding-inline: 5vw;
+    border-radius: 8vw;
+    font-size: 3.5vw;
+  }
+
+  .contact-submit {
+    gap: 4vw;
+    padding-block: 8vw;
+    border-radius: 8vw;
+    font-size: 8vw;
+
+    & .icon-arrow {
+      width: 7vw;
+    }
+  }
+
+  /* ========== WORKS LISTING ========== */
+  .works-header {
+    padding-block: calc(17vw + 12vw) 6vw;
+    padding-inline: 6vw;
+  }
+
+  .works-list {
+    gap: 12vw;
+    padding-inline: 6vw;
+    padding-block: 0 12vw;
+  }
+
+  .work-card {
+    flex-direction: column;
+    gap: 5vw;
+
+    & .work-media {
+      flex: 0 0 auto;
+      width: 100%;
+      border-radius: 6vw;
+    }
+
+    & .work-toggle {
+      bottom: 5vw;
+      gap: 1.5vw;
+      padding-block: 2vw;
+      padding-inline: 2.5vw;
+      border-radius: 5vw;
+    }
+
+    & .work-toggle-tab {
+      padding: 3vw;
+      border-radius: 3.5vw;
+    }
+
+    & .work-content {
+      padding-top: 0;
+    }
+
+    & .project-date {
+      margin-top: 1vw;
+    }
+
+    & .work-tags {
+      margin-top: 3.5vw;
+    }
+
+    /* auto margin has nothing to push against once stacked */
+    & .work-description {
+      margin-top: 4vw;
+    }
+  }
+
+  .work-tags {
+    gap: 1.5vw;
+  }
+
+  /* ========== PROJECT PAGE ========== */
+  .work-header {
+    padding-block: calc(17vw + 12vw) 0;
+    padding-inline: 6vw;
+
+    & .work-header-tags {
+      gap: 1.5vw;
+    }
+
+    & .h1 {
+      margin-block: 4vw 4vw;
+    }
+
+    & .work-hero {
+      aspect-ratio: 4 / 3; /* TODO: verify */
+      border-radius: 4vw;
+    }
+  }
+
+  .work-body {
+    flex-direction: column;
+    gap: 8vw;
+    padding-inline: 6vw;
+    padding-block: 6vw 10vw;
+  }
+
+  /* Static once stacked: sticky-to-bottom would ride over the gallery */
+  .work-overview {
+    position: static;
+    align-self: stretch;
+
+    & .work-overview-heading {
+      gap: 2.5vw;
+      margin-bottom: 6vw;
+    }
+
+    & .work-overview-text {
+      gap: 3.5vw;
+      margin-bottom: 8vw;
+    }
+
+    & .project-date {
+      margin-top: 4.5vw;
+    }
+  }
+
+  .work-gallery {
+    grid-template-columns: 1fr;
+    grid-auto-rows: calc(88vw * 10 / 19);
+    gap: 3vw;
+    flex: 0 0 auto;
+    width: 100%;
+
+    & .work-gallery-item {
+      border-radius: 4vw;
+    }
+  }
 }

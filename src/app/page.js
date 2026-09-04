@@ -1,4 +1,5 @@
 import Button from "@/components/Button";
+import WindLeaf from "@/components/WindLeaf";
 
 // Home banner slides (see /public).
 const heroSlides = [
@@ -94,6 +95,7 @@ export default function Home() {
       </section>
 
       <section className="home-history">
+        <WindLeaf />
         <div className="wrapper">
           <h3 className="body" data-text-reveal="flip">
             Rent a pot <br /> Est. <br /> 1982

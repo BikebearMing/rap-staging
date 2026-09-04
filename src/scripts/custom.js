@@ -13,9 +13,20 @@ import EmblaCarousel from "embla-carousel";
 
 gsap.registerPlugin(ScrollTrigger, SplitText, Flip);
 
+// iOS Safari resizes the window every time its toolbars slide in or out
+// while scrolling. Each resize would refresh every trigger mid-scroll and
+// jump the pinned cards; layout uses svh, which does not move, so ignore it.
+ScrollTrigger.config({ ignoreMobileResize: true });
+
 let lenis = null;
 let tick = null;
 let sliders = [];
+
+// Elements on the live page only. While a page transition runs, a clone of
+// the previous main sits in .pt-ghost (see initPageTransitions) and nothing
+// here may bind to it, or the new page would pin, split and slide the ghost.
+const live = (selector, root = document) =>
+  Array.from(root.querySelectorAll(selector)).filter((el) => !el.closest(".pt-ghost"));
 
 /* --------------------------------------------------------------------------
    Lenis + ScrollTrigger sync
@@ -62,8 +73,17 @@ export function initHeader() {
   if (!header || !lenis) return () => {};
 
   const HIDE_AFTER = 120;
-  const onScroll = ({ scroll, direction }) => {
-    if (scroll < HIDE_AFTER || direction === -1) {
+  const onScroll = ({ scroll, direction, velocity }) => {
+    // The hamburger lives in the header: keep it on screen while the menu is open
+    if (document.documentElement.classList.contains("menu-open")) return;
+    if (scroll < HIDE_AFTER) {
+      header.classList.remove("is-hidden");
+      return;
+    }
+    // A jump (back/forward restore, anchor) has no velocity and direction
+    // is whatever the last real scroll left behind: never react to it
+    if (velocity === 0) return;
+    if (direction === -1) {
       header.classList.remove("is-hidden");
     } else if (direction === 1) {
       header.classList.add("is-hidden");
@@ -166,7 +186,7 @@ function initProgressDots(root, embla) {
 }
 
 export function initSliders() {
-  document.querySelectorAll(".embla").forEach((root) => {
+  live(".embla").forEach((root) => {
     const viewport = root.querySelector(".embla__viewport");
     if (!viewport) return;
 
@@ -215,7 +235,7 @@ export function getSliders() {
    -------------------------------------------------------------------------- */
 export function initParallax() {
   return gsap.context(() => {
-    document.querySelectorAll(".has-parallax").forEach((container) => {
+    live(".has-parallax").forEach((container) => {
       const images = container.querySelectorAll(".parallax-image");
       if (!images.length) return;
 
@@ -241,6 +261,7 @@ export function initParallax() {
         {
           yPercent: shift,
           ease: "none",
+          force3D: true, // stays on the compositor between frames (Safari repaints otherwise)
           scrollTrigger: {
             trigger,
             start: "top bottom",
@@ -264,7 +285,7 @@ export function initParallax() {
    -------------------------------------------------------------------------- */
 export function initFlatten() {
   return gsap.context(() => {
-    document.querySelectorAll("[data-flatten]").forEach((el) => {
+    live("[data-flatten]").forEach((el) => {
       gsap.to(el, {
         borderBottomLeftRadius: 0,
         borderBottomRightRadius: 0,
@@ -293,7 +314,7 @@ export function initFlatten() {
    -------------------------------------------------------------------------- */
 export function initStackCards() {
   return gsap.context(() => {
-    const slides = gsap.utils.toArray(".services-stack .service-slide");
+    const slides = live(".services-stack .service-slide");
 
     slides.forEach((slide, i) => {
       const pin = slide.querySelector(".service-pin");
@@ -301,15 +322,20 @@ export function initStackCards() {
       if (!pin || !card) return;
       if (i === slides.length - 1) return;
 
+      // The pin distance must equal one slide, so an unpinned card lands
+      // exactly under the slide that covered it. The slides are 100svh; on
+      // phones window.innerHeight is the taller, toolbars-hidden viewport,
+      // and pinning for that pushed the cards down over the next section.
       gsap.to(card, {
         scale: 0.9,
         rotationX: 12,
         ease: "power1.in",
+        force3D: true,
         scrollTrigger: {
           trigger: slide,
           pin,
           start: "top top",
-          end: () => "+=" + window.innerHeight,
+          end: () => "+=" + slide.offsetHeight,
           scrub: true,
           invalidateOnRefresh: true,
         },
@@ -321,7 +347,7 @@ export function initStackCards() {
         scrollTrigger: {
           trigger: card,
           start: "top -80%",
-          end: () => "+=" + 0.2 * window.innerHeight,
+          end: () => "+=" + 0.2 * slide.offsetHeight,
           scrub: true,
           invalidateOnRefresh: true,
         },
@@ -342,7 +368,7 @@ export function initStackCards() {
 export function initLines() {
   return gsap.context(() => {
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    document.querySelectorAll("[data-line]").forEach((el) => {
+    live("[data-line]").forEach((el) => {
       if (reduced) {
         gsap.set(el, { "--line-scale": 1 });
         return;
@@ -381,7 +407,7 @@ export function initLines() {
 export function initProjectsSlider() {
   const cleanups = [];
 
-  document.querySelectorAll(".projects-slider").forEach((root) => {
+  live(".projects-slider").forEach((root) => {
     const section = root.closest(".home-projects") || root;
     const track = root.querySelector(".projects-track");
     if (!track || track.children.length < 2) return;
@@ -602,7 +628,7 @@ export function initProjectsSlider() {
 export function initWipes() {
   return gsap.context(() => {
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    document.querySelectorAll("[data-wipe]").forEach((el) => {
+    live("[data-wipe]").forEach((el) => {
       // data-wipe="var": drive a --wipe custom property (for ::after art such
       // as .squiggle) instead of clipping the element itself.
       const useVar = el.dataset.wipe === "var";
@@ -624,6 +650,24 @@ export function initWipes() {
         delay: parseFloat(el.dataset.wipeDelay) || 0,
         scrollTrigger: { trigger, start: el.dataset.wipeStart || "top 90%", once: true },
       });
+    });
+  });
+}
+
+/* --------------------------------------------------------------------------
+   Editor content
+   HTML from the WordPress editor (.blog-content on a blog post) has no
+   data-* hooks, so stamp the text reveal on it before initTextReveal runs:
+   headings lift, everything else reveals per line. Attributes already set
+   by hand are left alone.
+   -------------------------------------------------------------------------- */
+export function initEditorContent() {
+  live(".blog-content").forEach((root) => {
+    root.querySelectorAll("h2, h3, h4, h5").forEach((el) => {
+      if (!el.hasAttribute("data-text-reveal")) el.setAttribute("data-text-reveal", "lift");
+    });
+    root.querySelectorAll("p, li, blockquote, figcaption").forEach((el) => {
+      if (!el.hasAttribute("data-text-reveal")) el.setAttribute("data-text-reveal", "");
     });
   });
 }
@@ -832,6 +876,22 @@ function buildInlinePop(el, self, start, delay) {
     .to(slot, { scale: 1, yPercent: 0, opacity: 1, duration: 0.9, ease: "back.out(1.7)" }, 0.35);
 }
 
+// How far down (in % of a piece's height) a piece must start so no part of
+// it shows through its mask before the reveal. The mask keeps extra room
+// under the line for descenders (padding-bottom on .tr-line-mask), and on a
+// tight line-height the glyphs also overhang the line box, so a fixed 130%
+// leaves the letter tops peeking on big headings. Never less than the mode's
+// own value.
+function hiddenYPercent(el, self, base) {
+  const style = getComputedStyle(el);
+  const fontSize = parseFloat(style.fontSize);
+  const lineHeight = parseFloat(style.lineHeight) || fontSize * 1.2;
+  const mask = self.masks?.[0];
+  const spare = mask ? parseFloat(getComputedStyle(mask).paddingBottom) : 0;
+  const overhang = Math.max(0, (fontSize * 1.25 - lineHeight) / 2);
+  return Math.max(base, Math.ceil(((lineHeight + spare + overhang) / lineHeight) * 100) + 5);
+}
+
 export function initTextReveal() {
   const ctx = gsap.context(() => {});
   const splits = [];
@@ -842,7 +902,7 @@ export function initTextReveal() {
   document.fonts.ready.then(() => {
     if (cancelled) return;
     ctx.add(() => {
-      document.querySelectorAll("[data-text-reveal]").forEach((el) => {
+      live("[data-text-reveal]").forEach((el) => {
         const modeName =
           el.dataset.textReveal in TEXT_REVEAL_MODES ? el.dataset.textReveal : "lines";
         const mode = TEXT_REVEAL_MODES[modeName];
@@ -880,6 +940,9 @@ export function initTextReveal() {
               gsap.from(targets, {
                 transformOrigin: "0% 100%",
                 ...mode.vars,
+                ...(mode.vars.yPercent && {
+                  yPercent: hiddenYPercent(el, self, mode.vars.yPercent),
+                }),
                 delay,
                 scrollTrigger: {
                   trigger: el,
@@ -910,11 +973,601 @@ export function initTextReveal() {
 }
 
 /* --------------------------------------------------------------------------
+   Work variant toggle (see src/app/works/page.js)
+   A [data-work-toggle] card holds one .work-image and one .work-toggle-tab
+   per service variant, matched by data-variant. Clicking a tab moves
+   .is-active to that variant's tab and image; the crossfade is CSS.
+   -------------------------------------------------------------------------- */
+export function initWorkToggles() {
+  const cleanups = live("[data-work-toggle]").map((card) => {
+    const onClick = (e) => {
+      const tab = e.target.closest(".work-toggle-tab");
+      if (!tab || tab.classList.contains("is-active")) return;
+      const { variant } = tab.dataset;
+      card.querySelectorAll(".work-toggle-tab, .work-image").forEach((el) => {
+        el.classList.toggle("is-active", el.dataset.variant === variant);
+      });
+    };
+    card.addEventListener("click", onClick);
+    return () => card.removeEventListener("click", onClick);
+  });
+  return () => cleanups.forEach((fn) => fn());
+}
+
+/* --------------------------------------------------------------------------
+   Page transitions (see src/components/PageTransition.js and the matching
+   section in custom.css)
+   Swup-style: the motion is described in CSS, keyed off state classes on
+   <html> and on the snapshot cards, so the header (fixed, outside the page)
+   never takes part.
+
+     is-changing   whole visit, from the click until the new page has settled
+     is-leaving    old page is on its way out
+     is-rendering  new page has rendered; it stays hidden until the swap
+     is-pending    new page's scripts have not booted yet (see release)
+     is-popstate   back/forward: the router swaps the page on its own, so
+                   only the enter half runs (card comes in from the left)
+                   and the page is put back where it was left (see below).
+
+   Neither real page is ever transformed. Both are stood in for by
+   snapshots: viewport-sized fixed cards holding a clone of .site-page
+   (main + footer, see layout.js) lined up with the scroll position. Cards
+   only ever animate transform properties (scale, translate) plus the
+   corner radius, so the browser can run them on the compositor.
+
+   1. leave():       .pt-ghost.is-prev is cloned from the old page and
+                     shrinks (.is-back). navigate() after --pt-leave-ms.
+   2. onRouteChange: new page rendered, hidden and untransformed so the
+                     page scripts that boot next measure the real layout.
+   3. release():     after initSite() and document.fonts.ready (which
+                     initTextReveal waits for), ScrollTrigger is refreshed
+                     once, GSAP's global timeline is paused so the new page
+                     freezes, and .pt-ghost.is-next is cloned from it. The
+                     old card slides out (.is-out), the new one in (.is-in),
+                     then grows to full size (.is-grow).
+   4. swap:          cards and backdrop are removed, the real page is shown
+                     and GSAP resumes. Because the page was frozen, it is
+                     pixel-identical to the card it replaces.
+
+   Scroll input (wheel, touch, keys) is swallowed for the whole visit rather
+   than calling lenis.stop(): that would hide the scrollbar and reflow the
+   page by its width, which shows up as a jump when the cards appear.
+
+   Back/forward scroll positions are handled here, not by the browser. Its
+   own restoration runs on popstate, before the router has swapped the
+   page, so the old page would jump to the new entry's position first (and
+   the header would hide on that jump). Instead every history entry keeps
+   its position in history.state (Next preserves custom keys on
+   back/forward), saved while scrolling and on leave(); release() moves the
+   still-hidden new page there before it is snapshotted. Fresh loads
+   (reload, back/forward from another site) stay with the browser: manual
+   mode is only switched on after the load event.
+
+   Elements GSAP has pinned (position: fixed inline) are re-anchored inside
+   the clone so they stay where they were on screen.
+
+   Internal link clicks are intercepted (capture phase, so next/link sees
+   defaultPrevented and steps aside). Opt a link out with data-no-transition.
+   External, new-tab, download, modifier-key and same-page (#hash) clicks are
+   left alone.
+   -------------------------------------------------------------------------- */
+let pageTransitions = null;
+
+// Top-level blocks of the page: main's sections plus anything beside main
+// (the footer). Used to keep only what is on screen in a snapshot.
+function pageBlocks(root) {
+  return Array.from(root.children).flatMap((el) =>
+    el.tagName === "MAIN" ? Array.from(el.children) : [el]
+  );
+}
+
+// Clone the live page into a fixed, viewport-sized card lined up with the
+// current scroll position. Only blocks that intersect the viewport are
+// copied; the rest become empty spacers of the same height so offsets hold.
+// Keeps the clone small enough to lay out and paint within a frame.
+function createGhost(className) {
+  const page = live(".site-page")[0];
+  if (!page) return null;
+
+  // Measure anything GSAP has pinned before cloning so it can be re-anchored
+  const all = Array.from(page.querySelectorAll("*"));
+  const fixed = all.filter((el) => el.style.position === "fixed");
+  const anchors = fixed.map((el) => {
+    const r = el.getBoundingClientRect();
+    const p = el.parentElement.getBoundingClientRect();
+    return { top: r.top - p.top, left: r.left - p.left };
+  });
+
+  const clone = page.cloneNode(true);
+  // Not a .site-page any more: the transition rules must not touch the copy
+  clone.classList.remove("site-page");
+  clone.classList.add("pt-ghost-clone");
+  clone.setAttribute("inert", "");
+  clone.setAttribute("aria-hidden", "true");
+  const cloneAll = Array.from(clone.querySelectorAll("*"));
+  fixed.forEach((el, i) => {
+    const c = cloneAll[all.indexOf(el)];
+    if (!c) return;
+    c.style.position = "absolute";
+    c.style.top = anchors[i].top + "px";
+    c.style.left = anchors[i].left + "px";
+    if (getComputedStyle(el.parentElement).position === "static") {
+      c.parentElement.style.position = "relative";
+    }
+  });
+
+  const make = (cls) => {
+    const el = document.createElement("div");
+    el.className = cls;
+    return el;
+  };
+
+  // Drop blocks that are off screen (margins are reset to 0 site-wide, so a
+  // block's box height is all the space it takes)
+  const vh = window.innerHeight;
+  const cloneBlocks = pageBlocks(clone);
+  pageBlocks(page).forEach((block, i) => {
+    const r = block.getBoundingClientRect();
+    if (r.bottom > 0 && r.top < vh) return;
+    const spacer = make("pt-ghost-spacer");
+    spacer.style.height = r.height + "px";
+    cloneBlocks[i].replaceWith(spacer);
+  });
+
+  const ghost = make(`pt-ghost ${className}`);
+  const card = make("pt-ghost-page");
+  const inner = make("pt-ghost-inner");
+  inner.style.top = -window.scrollY + "px";
+  inner.appendChild(clone);
+  card.appendChild(inner);
+  ghost.appendChild(card);
+  document.body.appendChild(ghost);
+  return ghost;
+}
+
+export function initPageTransitions({ navigate }) {
+  if (pageTransitions) return pageTransitions;
+
+  const html = document.documentElement;
+  const STATES = ["is-changing", "is-leaving", "is-rendering", "is-pending", "is-popstate"];
+  const readMs = (name, fallback) => {
+    const v = parseFloat(getComputedStyle(html).getPropertyValue(name));
+    return Number.isNaN(v) ? fallback : v;
+  };
+  const reduced = () => window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  // Force a style flush so a class added right after starts a transition
+  const flush = (el) => void el.offsetWidth;
+  // Two frames: enough for a freshly inserted card to be painted and
+  // uploaded before it starts moving, so its first frames don't stutter
+  const rastered = (fn) => requestAnimationFrame(() => requestAnimationFrame(fn));
+
+  let leaving = false;
+  let backdrop = null;
+  let prevGhost = null;
+  let nextGhost = null;
+  let pausedGsap = false;
+
+  const timers = new Set();
+  const after = (ms, fn) => {
+    const id = setTimeout(() => {
+      timers.delete(id);
+      fn();
+    }, ms);
+    timers.add(id);
+  };
+  const clearTimers = () => {
+    timers.forEach(clearTimeout);
+    timers.clear();
+  };
+
+  // Scroll lock: swallow the input instead of stopping Lenis (see above)
+  const SCROLL_KEYS = new Set(["ArrowUp", "ArrowDown", "PageUp", "PageDown", "Home", "End", " "]);
+  const swallow = (e) => {
+    if (e.type === "keydown" && !SCROLL_KEYS.has(e.key)) return;
+    e.preventDefault();
+    e.stopImmediatePropagation();
+  };
+  const SCROLL_EVENTS = ["wheel", "touchmove", "keydown"];
+  const lockScroll = () =>
+    SCROLL_EVENTS.forEach((t) =>
+      window.addEventListener(t, swallow, { capture: true, passive: false })
+    );
+  const unlockScroll = () =>
+    SCROLL_EVENTS.forEach((t) => window.removeEventListener(t, swallow, { capture: true }));
+
+  // Beige behind the cards; also swallows clicks while the visit runs
+  const ensureBackdrop = () => {
+    if (backdrop) return;
+    backdrop = document.createElement("div");
+    backdrop.className = "pt-backdrop";
+    document.body.appendChild(backdrop);
+  };
+
+  // Scroll positions per history entry (see the section comment).
+  // Fresh loads (reload, back/forward from another site) are left to the
+  // browser, which keeps retrying while images push the page taller and
+  // never overshoots. The mode lives on the history entry and survives a
+  // reload, so it goes manual only once the document has loaded and back
+  // to auto when it is left (pagehide), then manual again if the document
+  // comes back from the back/forward cache (pageshow). ScrollTrigger
+  // re-applies the mode it captured at boot on every refresh, so the switch
+  // goes through it rather than history alone.
+  const SCROLL_KEY = "ptScroll";
+  const setRestoration = (mode) => ScrollTrigger.clearScrollMemory(mode);
+  let pendingScroll = null; // where the incoming back/forward page was left
+  let currentPath = location.pathname;
+  let saveTimer = null;
+  let lastSave = 0;
+  const saveScroll = () => {
+    clearTimeout(saveTimer);
+    saveTimer = null;
+    lastSave = performance.now();
+    // Mid-visit the entry is already the next page's: never stamp it with
+    // the old page's position. Entries the router does not own (hash links)
+    // are left alone, or it would reload the page when they are revisited.
+    if (html.classList.contains("is-changing")) return;
+    const state = history.state;
+    if (!state?.__NA || state[SCROLL_KEY] === window.scrollY) return;
+    try {
+      history.replaceState({ ...state, [SCROLL_KEY]: window.scrollY }, "");
+    } catch {
+      // Safari rate-limits replaceState; one lost position is harmless
+    }
+  };
+  // Saved when scrolling settles, and every half second while it goes on:
+  // Lenis keeps easing for a while after the wheel stops, and a back press
+  // in that tail must still find a recent position. replaceState is rate
+  // limited, so no more often than that.
+  const onScroll = () => {
+    clearTimeout(saveTimer);
+    if (performance.now() - lastSave > 500) saveScroll();
+    else saveTimer = setTimeout(saveScroll, 200);
+  };
+  window.addEventListener("scroll", onScroll, { passive: true });
+  // Lenis dispatches this on the window when its easing settles
+  window.addEventListener("scrollend", saveScroll);
+
+  // Also records where the browser's own restoration put a fresh load, so
+  // the entry never keeps a position from an older, taller layout
+  const armManual = () => {
+    setRestoration("manual");
+    saveScroll();
+  };
+  // No save here: a replaceState while unloading makes Chrome forget the
+  // scroll offset it restores from, and the throttled saves are recent
+  const onPageHide = () => setRestoration("auto");
+  if (document.readyState === "complete") armManual();
+  else window.addEventListener("load", armManual);
+  window.addEventListener("pageshow", armManual);
+  window.addEventListener("pagehide", onPageHide);
+
+  const dropCards = () => {
+    prevGhost?.remove();
+    nextGhost?.remove();
+    prevGhost = nextGhost = null;
+    if (pausedGsap) {
+      gsap.globalTimeline.play();
+      pausedGsap = false;
+    }
+  };
+
+  const clear = () => {
+    clearTimers();
+    html.classList.remove(...STATES);
+    dropCards();
+    backdrop?.remove();
+    backdrop = null;
+    unlockScroll();
+    leaving = false;
+  };
+
+  const leave = (href) => {
+    if (leaving) return;
+    // A click during an enter: drop that visit and start this one from the
+    // page as it is now (the new card is inserted in the same task, so the
+    // real page never paints in between).
+    if (html.classList.contains("is-changing")) clear();
+    leaving = true;
+    saveScroll();
+
+    lockScroll();
+    html.classList.add("is-changing", "is-leaving");
+    if (!reduced()) {
+      ensureBackdrop();
+      prevGhost = createGhost("is-prev");
+      // The card starts as an exact copy of the page, so waiting for it to
+      // paint before shrinking is invisible
+      const ghost = prevGhost;
+      rastered(() => ghost === prevGhost && ghost.classList.add("is-back"));
+    }
+
+    after(readMs("--pt-leave-ms", 550), () => {
+      navigate(href);
+      // If the route never changes (blocked or failed), unlock the page
+      after(8000, () => leaving && clear());
+    });
+  };
+
+  // Route has changed, new page not painted yet. It stays hidden and
+  // untransformed so the page scripts that boot next measure the real layout.
+  const onRouteChange = () => {
+    clearTimers();
+    const fromLink = leaving;
+    leaving = false;
+    currentPath = location.pathname;
+
+    if (!fromLink) {
+      // Back/forward (or a push from code): no old card. If a visit was
+      // still running when the route changed under it, its cards are stale
+      dropCards();
+      lockScroll();
+    }
+    html.classList.remove("is-leaving");
+    html.classList.add("is-changing", "is-rendering", "is-pending");
+    html.classList.toggle("is-popstate", !fromLink);
+    if (!reduced()) ensureBackdrop();
+
+    // Should never be needed, but never leave the page hidden
+    after(3000, release);
+  };
+
+  // Snapshot the new page and run the slide + grow, then swap it in.
+  const release = () => {
+    if (!html.classList.contains("is-pending")) return;
+    clearTimers();
+    html.classList.remove("is-pending");
+
+    // Back/forward: put the page where it was left while it is still
+    // hidden. The header ignores the jump (no velocity, see initHeader).
+    if (html.classList.contains("is-popstate")) {
+      const y = pendingScroll ?? 0;
+      pendingScroll = null;
+      if (lenis) {
+        lenis.resize();
+        lenis.scrollTo(y, { immediate: true, force: true });
+      } else {
+        window.scrollTo(0, y);
+      }
+    }
+
+    // Every ScrollTrigger of the new page exists now: measure once. This
+    // also replaces the refresh GSAP queues for the next frame when
+    // triggers are created after load.
+    ScrollTrigger.refresh();
+
+    if (reduced()) {
+      clear();
+      return;
+    }
+
+    // Freeze the new page so its snapshot still matches it at the swap
+    gsap.globalTimeline.pause();
+    pausedGsap = true;
+
+    nextGhost = createGhost("is-next");
+    if (!nextGhost) {
+      clear();
+      return;
+    }
+    // Painted in place but invisible first (.is-prep), then moved off screen
+    // and slid in, so it arrives already rasterised
+    nextGhost.classList.add("is-prep");
+    const ghost = nextGhost;
+    rastered(() => {
+      if (ghost !== nextGhost) return;
+      ghost.classList.remove("is-prep");
+      flush(ghost);
+      ghost.classList.add("is-in");
+      prevGhost?.classList.add("is-out");
+
+      const slide = readMs("--pt-slide-ms", 650);
+      const grow = readMs("--pt-grow-ms", 550);
+      after(slide, () => ghost.classList.add("is-grow"));
+      after(slide + grow + 30, clear);
+    });
+  };
+
+  // New page scripts have booted. initTextReveal only splits and creates its
+  // triggers after document.fonts.ready, so queue behind the same promise.
+  const onRouteReady = () => {
+    document.fonts.ready.then(release);
+  };
+
+  const onClick = (e) => {
+    const a = e.target.closest?.("a[href]");
+    if (!a || e.defaultPrevented || e.button !== 0) return;
+    if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    if (a.target && a.target !== "_self") return;
+    if (a.hasAttribute("download") || "noTransition" in a.dataset) return;
+
+    let url;
+    try {
+      url = new URL(a.href, location.href);
+    } catch {
+      return;
+    }
+    if (url.origin !== location.origin) return;
+    if (url.pathname === location.pathname) return; // same page, hash or query only
+
+    e.preventDefault();
+    leave(url.pathname + url.search + url.hash);
+  };
+  document.addEventListener("click", onClick, true);
+
+  // Back/forward. The router swaps the page on its own (onRouteChange
+  // follows); the visit starts here so the old page is covered at once,
+  // even while a stale route is fetched again, and the entry's position is
+  // read before anything else touches history.state.
+  const onPopState = (e) => {
+    if (location.pathname === currentPath) {
+      // Hash or query only: same page, no visit. The browser no longer
+      // restores these, so jump to the entry's position if it has one
+      const y = e.state?.[SCROLL_KEY];
+      if (y != null) lenis?.scrollTo(y, { immediate: true, force: true });
+      return;
+    }
+    clearTimeout(saveTimer); // the old page's position is not this entry's
+    pendingScroll = e.state?.[SCROLL_KEY] ?? 0;
+    if (leaving || html.classList.contains("is-changing")) return;
+    lockScroll();
+    html.classList.add("is-changing", "is-popstate");
+    if (!reduced()) ensureBackdrop();
+    // If the router never picks the entry up, unlock the page
+    after(8000, () => !html.classList.contains("is-rendering") && clear());
+  };
+  window.addEventListener("popstate", onPopState);
+
+  pageTransitions = {
+    leave,
+    onRouteChange,
+    onRouteReady,
+    destroy() {
+      document.removeEventListener("click", onClick, true);
+      window.removeEventListener("popstate", onPopState);
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("scrollend", saveScroll);
+      window.removeEventListener("pagehide", onPageHide);
+      window.removeEventListener("pageshow", armManual);
+      window.removeEventListener("load", armManual);
+      clearTimeout(saveTimer);
+      setRestoration("auto");
+      clear();
+      pageTransitions = null;
+    },
+  };
+  return pageTransitions;
+}
+
+/* --------------------------------------------------------------------------
+   Wind leaves (see src/components/WindLeaf.js and the matching CSS)
+   Every [data-wind-leaf] image swings on its stem with the scroll: the
+   faster the page moves, the further the fronds bend, and when it stops
+   they swing back past rest and settle, like a gust dying down. A faint
+   idle breeze keeps them from ever standing still. Runs on GSAP's ticker
+   (shared with Lenis) and reads Lenis' velocity, so the motion follows the
+   smoothed scroll rather than raw wheel ticks.
+   -------------------------------------------------------------------------- */
+export function initWindLeaves() {
+  const leaves = live("[data-wind-leaf]");
+  if (!leaves.length || !lenis) return () => {};
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return () => {};
+
+  // All per-frame constants are for 60fps; the tick scales them by the real
+  // frame time so the sway is the same speed on any display.
+  const MAX_DEG = 10; // hardest bend
+  const GAIN = 0.18; // degrees per px/frame of scroll velocity
+  const GUST_EASE = 0.08; // how quickly the wind follows the scroll speed
+  const STIFFNESS = 0.004; // pull back towards the target: ~1.7s per swing
+  const DAMPING = 0.97; // swing kept per frame: a few slow passes, then rest
+  const BREEZE_DEG = 2;
+
+  let velocity = 0;
+  let gust = 0;
+  let angle = 0;
+  let swing = 0;
+  const onScroll = (l) => {
+    velocity = l.velocity;
+  };
+  lenis.on("scroll", onScroll);
+
+  const tick = (time, deltaTime) => {
+    const dt = gsap.utils.clamp(0.5, 3, deltaTime / (1000 / 60));
+    // Lenis only reports while moving; let the reading fade between
+    // reports, and ease the wind after it so a gust builds and dies down
+    velocity *= Math.pow(0.95, dt);
+    gust += (velocity - gust) * (1 - Math.pow(1 - GUST_EASE, dt));
+    const bend = gsap.utils.clamp(-MAX_DEG, MAX_DEG, -gust * GAIN);
+    const breeze = Math.sin(time * 0.45) * BREEZE_DEG + Math.sin(time * 1.1) * BREEZE_DEG * 0.35;
+    const target = bend + breeze;
+    // Damped spring: swings past the target and settles softly
+    swing += (target - angle) * STIFFNESS * dt;
+    swing *= Math.pow(DAMPING, dt);
+    angle += swing * dt;
+    leaves.forEach((el) => {
+      el.style.transform = `rotate(${angle.toFixed(3)}deg)`;
+    });
+  };
+  gsap.ticker.add(tick);
+
+  return () => {
+    gsap.ticker.remove(tick);
+    lenis?.off("scroll", onScroll);
+    leaves.forEach((el) => el.style.removeProperty("transform"));
+  };
+}
+
+/* --------------------------------------------------------------------------
+   Mobile menu (see src/components/Header.js and the Menu section in
+   custom.css). The hamburger (.menu-toggle) opens .site-menu, a panel that
+   slides in from the right over a backdrop. State is html.menu-open so the
+   header, panel and backdrop can all react in CSS. While open the page
+   scroll is stopped (Lenis) so the panel can be scrolled on its own.
+   Closes on the backdrop, Escape, any link inside, or when the page is
+   left (cleanup), which is also the route change after a link click.
+   -------------------------------------------------------------------------- */
+export function initMenu() {
+  const html = document.documentElement;
+  const toggle = document.querySelector(".menu-toggle");
+  const menu = document.querySelector(".site-menu");
+  if (!toggle || !menu) return () => {};
+
+  const isOpen = () => html.classList.contains("menu-open");
+
+  const setOpen = (open) => {
+    if (open === isOpen()) return;
+    html.classList.toggle("menu-open", open);
+    toggle.setAttribute("aria-expanded", String(open));
+    toggle.setAttribute("aria-label", open ? "Close menu" : "Open menu");
+    menu.scrollTop = 0;
+    if (open) {
+      document.querySelector(".site-header")?.classList.remove("is-hidden");
+      lenis?.stop();
+    } else {
+      lenis?.start();
+    }
+  };
+
+  const onToggle = () => setOpen(!isOpen());
+  const onClose = () => setOpen(false);
+  const onKey = (e) => {
+    if (e.key === "Escape") setOpen(false);
+  };
+  // Closed on any link so a same-page or hash link still dismisses it. A
+  // route link runs the page transition; the panel is outside .site-page,
+  // so it slides away over the shrinking card rather than being copied.
+  const onMenuClick = (e) => {
+    if (e.target.closest("a[href]")) setOpen(false);
+  };
+  // Leaving the phone layout with the menu open would strand the page stopped
+  const mq = window.matchMedia("(max-width: 768px)");
+  const onMedia = () => {
+    if (!mq.matches) setOpen(false);
+  };
+
+  const closers = live("[data-menu-close]");
+  toggle.addEventListener("click", onToggle);
+  closers.forEach((el) => el.addEventListener("click", onClose));
+  menu.addEventListener("click", onMenuClick);
+  document.addEventListener("keydown", onKey);
+  mq.addEventListener("change", onMedia);
+
+  return () => {
+    setOpen(false);
+    toggle.removeEventListener("click", onToggle);
+    closers.forEach((el) => el.removeEventListener("click", onClose));
+    menu.removeEventListener("click", onMenuClick);
+    document.removeEventListener("keydown", onKey);
+    mq.removeEventListener("change", onMedia);
+  };
+}
+
+/* --------------------------------------------------------------------------
    Boot everything. Returns a cleanup function.
    -------------------------------------------------------------------------- */
 export function initSite() {
   initSmoothScroll();
   const destroyHeader = initHeader();
+  const destroyMenu = initMenu();
   initSliders();
   const parallaxCtx = initParallax();
   const flattenCtx = initFlatten();
@@ -922,7 +1575,10 @@ export function initSite() {
   const linesCtx = initLines();
   const wipesCtx = initWipes();
   const destroyProjects = initProjectsSlider();
+  const destroyWorkToggles = initWorkToggles();
+  initEditorContent();
   const destroyTextReveal = initTextReveal();
+  const destroyWindLeaves = initWindLeaves();
 
   // Recalculate trigger positions once images have loaded
   const onLoad = () => ScrollTrigger.refresh();
@@ -930,8 +1586,11 @@ export function initSite() {
 
   return () => {
     window.removeEventListener("load", onLoad);
+    destroyMenu();
     destroyHeader();
+    destroyWindLeaves();
     destroyTextReveal();
+    destroyWorkToggles();
     destroyProjects();
     wipesCtx.revert();
     linesCtx.revert();

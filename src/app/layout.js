@@ -1,5 +1,6 @@
 import "@/styles/custom.css";
 import SiteScripts from "@/components/SiteScripts";
+import PageTransition from "@/components/PageTransition";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 
@@ -13,9 +14,13 @@ export default function RootLayout({ children }) {
     <html lang="en">
       <body>
         <SiteScripts />
+        <PageTransition />
         <Header />
-        {children}
-        <Footer />
+        {/* Page transitions shrink and slide this as one card (see custom.css) */}
+        <div className="site-page">
+          {children}
+          <Footer />
+        </div>
       </body>
     </html>
   );

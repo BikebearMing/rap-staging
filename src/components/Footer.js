@@ -1,4 +1,5 @@
 import Link from "next/link";
+import WindLeaf from "@/components/WindLeaf";
 
 // Site footer. Content is placeholder until it comes from WordPress.
 const footerLinks = [
@@ -19,6 +20,7 @@ const footerLinks = [
 export default function Footer() {
   return (
     <footer className="site-footer">
+      <WindLeaf />
       <div className="footer-cta">
         <p className="h4" data-text-reveal="lift">
           Let&rsquo;s Grow a Greener Space Together
@@ -42,7 +44,7 @@ export default function Footer() {
             <span className="button-label">Where Are We Located?</span>
           </a>
 
-          <a href="#" className="footer-action">
+          <a href="/works" className="footer-action">
             <span className="icon-button footer-action-icon">
               <span className="icon icon-works" aria-hidden="true" />
             </span>
