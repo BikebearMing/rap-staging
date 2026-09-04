@@ -1,0 +1,1065 @@
+/* ==========================================================================
+   Rent-A-Pot — global stylesheet
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   Fonts
+   -------------------------------------------------------------------------- */
+@font-face {
+  font-family: "DM Sans";
+  src: url("/fonts/DMSans-Variable.ttf") format("truetype");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "DM Sans";
+  src: url("/fonts/DMSans-Italic-Variable.ttf") format("truetype");
+  font-weight: 100 900;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Otflag Sans";
+  src: url("/fonts/OtflagSans-Medium.otf") format("opentype");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* --------------------------------------------------------------------------
+   Variables
+   -------------------------------------------------------------------------- */
+:root {
+  --color-bg: #f5f3e9;
+  --dark-green: #042100;
+  --light-green: #a6d800;
+  --white: #ffffff;
+  --sidepadding-xs: 1.458vw;
+  --sidepadding-m: 5.625vw;
+
+  --font-dm-sans: "DM Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-otflag: "Otflag Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+
+.dark,
+.dark .h1,
+.dark .h2,
+.dark .h3,
+.dark .h4,
+.dark .h5 {
+  color: var(--white) !important;
+}
+
+.grey {
+  color: #859383 !important;
+}
+
+/* --------------------------------------------------------------------------
+   Reset
+   -------------------------------------------------------------------------- */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  scroll-behavior: auto; /* Lenis handles smoothing */
+}
+
+body {
+  /* min-height: 200vh; */
+  background: var(--color-bg);
+  color: var(--color-fg);
+  font-family: var(--font-dm-sans);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+}
+
+img,
+picture,
+video,
+svg {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: 0;
+  cursor: pointer;
+}
+
+ul,
+ol {
+  list-style: none;
+}
+
+.h1,
+.h2,
+.h3,
+.h4,
+.h5,
+.button-label {
+  font-family: var(--font-otflag);
+  color: var(--dark-green);
+}
+
+.h1 {
+  font-size: 7.639vw;
+  font-weight: 600;
+  line-height: 0.9;
+  letter-spacing: 0;
+}
+
+.h2 {
+  font-size: 4.167vw;
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: 0;
+}
+
+.h4 {
+  font-size: 1.667vw; /* 24px */
+  font-weight: 600;
+  line-height: 1.25; /* 30px */
+  letter-spacing: 0;
+}
+
+.body {
+  font-family: var(--font-dm-sans);
+  font-size: 1.042vw;
+  font-weight: 400;
+  line-height: 1.33;
+  letter-spacing: 0;
+}
+
+/* Button (see src/components/Button.js): green pill label and a rounded
+   arrow square side by side, same height, no gap. */
+.custom-button {
+  display: inline-flex;
+  align-items: stretch;
+  height: fit-content;
+  max-width: max-content;
+
+  & .button-pill {
+    display: flex;
+    align-items: center;
+    padding-inline: 1.25vw 3.125vw;
+    padding-block: 0.764vw;
+    background: var(--light-green);
+    border-radius: 1.25vw;
+  }
+
+  & .button-arrow {
+    border-radius: 1.25vw;
+  }
+
+  & .button-label {
+    font-size: 1.111vw;
+    font-weight: 700;
+    line-height: 1.25;
+    letter-spacing: 0;
+  }
+
+  &:hover .button-arrow::before {
+    transform: rotate(-30deg);
+  }
+}
+
+/* Arrow box: a square as tall as the pill with the arrow (20x13) centred in
+   it. Used inside .custom-button and standalone (e.g. slider controls). */
+.button-arrow {
+  position: relative;
+  display: block;
+  width: 2.917vw;
+  height: 2.917vw;
+  border-radius: 0.833vw; /* 12px */
+  background: var(--light-green);
+  color: var(--dark-green);
+  flex: 0 0 auto;
+
+  &::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 1.389vw; /* 20px */
+    height: 0.903vw; /* 13px */
+    margin: -0.451vw 0 0 -0.694vw;
+    background: currentColor;
+    -webkit-mask: url("/button-arrow.svg") no-repeat center / contain;
+    mask: url("/button-arrow.svg") no-repeat center / contain;
+    transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  &:hover::before {
+    transform: rotate(-30deg);
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Header (see src/components/Header.js and initHeader in custom.js)
+   Fixed over the page, inset by the xs side padding, rounded bottom corners.
+   Hides on scroll down and returns on scroll up via .is-hidden.
+   -------------------------------------------------------------------------- */
+.site-header {
+  position: fixed;
+  top: 0;
+  left: var(--sidepadding-xs);
+  right: var(--sidepadding-xs);
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  padding-block: 1.042vw;
+  padding-inline: 2.014vw 0.764vw;
+  background: var(--white);
+  border-radius: 0 0 2.083vw 2.083vw;
+  transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+  justify-content: space-between;
+  will-change: transform;
+
+  &.is-hidden {
+    transform: translateY(-110%);
+  }
+}
+
+/* Logo: /public/logo.svg used as a mask so it takes the current text colour */
+.logo {
+  display: block;
+  width: 4.444vw;
+  aspect-ratio: 64 / 43;
+  background: currentColor;
+  -webkit-mask: url("/logo.svg") no-repeat center / contain;
+  mask: url("/logo.svg") no-repeat center / contain;
+}
+
+.site-logo {
+  display: block;
+  color: #1b4428;
+}
+
+.site-nav {
+  display: flex;
+  align-items: center;
+  gap: 2.083vw;
+
+  & .button-label {
+    font-size: 1.111vw;
+    font-weight: 700;
+    line-height: 1.25;
+    color: var(--dark-green);
+  }
+}
+
+.site-actions {
+  display: flex;
+  align-items: center;
+  margin-right: 0.694vw;
+}
+
+/* --------------------------------------------------------------------------
+   Embla slider — required structural rules
+   -------------------------------------------------------------------------- */
+.embla {
+  position: relative;
+}
+
+.embla__viewport {
+  overflow: hidden;
+}
+
+.embla__container {
+  display: flex;
+  touch-action: pan-y pinch-zoom;
+  backface-visibility: hidden;
+}
+
+.embla__slide {
+  flex: 0 0 100%;
+  min-width: 0;
+}
+
+/* Progress pagination (built by initProgressDots in custom.js) */
+.embla__dots {
+  position: absolute;
+  left: 50%;
+  bottom: 2.222vw;
+  transform: translateX(-50%);
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  gap: 0.556vw;
+}
+
+.embla__dot {
+  position: relative;
+  width: 0.347vw;
+  height: 0.347vw;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.3);
+  overflow: hidden;
+  transition: width 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.embla__dot.is-active {
+  width: 4.167vw;
+}
+
+.embla__dot-bar {
+  position: absolute;
+  inset: 0;
+  background: rgba(255, 255, 255, 0.75);
+  transform: scaleX(0);
+  transform-origin: 0 50%;
+}
+
+/* --------------------------------------------------------------------------
+   Parallax
+   Add .has-parallax to a container; every .parallax-image inside it drifts
+   vertically on scroll (driven by GSAP ScrollTrigger in custom.js).
+   The image is 120% tall and starts 10% above so it never shows an edge.
+   Optional: data-parallax-speed="1.5" on the container to exaggerate.
+   -------------------------------------------------------------------------- */
+.has-parallax .embla__slide,
+.has-parallax .parallax-frame {
+  position: relative;
+  overflow: hidden;
+}
+
+.has-parallax .parallax-image {
+  position: absolute;
+  top: -10%;
+  left: 0;
+  width: 100%;
+  height: 120%;
+  object-fit: cover;
+  will-change: transform;
+}
+
+/* --------------------------------------------------------------------------
+   Home banner
+   -------------------------------------------------------------------------- */
+
+.home-banner {
+  height: 100svh;
+  width: 100%;
+  border-radius: 0 0 3.472vw 3.472vw;
+  overflow: clip;
+
+  & .slider-container {
+    width: 100%;
+    height: 100%;
+    position: relative;
+
+    & > .h1,
+    .body {
+      position: absolute;
+      z-index: 5;
+    }
+
+    & > .h1 {
+      left: 3.194vw;
+      bottom: 7.014vw;
+    }
+
+    & .body {
+      right: 2.361vw;
+      bottom: 5.625vw;
+      width: 16.875vw;
+    }
+  }
+}
+
+.home-banner .embla__slide {
+  height: 100svh;
+  width: 100%;
+  position: relative;
+
+  &::before {
+    content: "";
+    width: 100%;
+    position: absolute;
+    display: block;
+    bottom: 0;
+    left: 0;
+    height: 44vh;
+    background: linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.75) 86.61%);
+    z-index: 3;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Home services - stacked cards (see initStackCards in custom.js)
+   Each .service-slide is 100svh. When it reaches the top, .service-pin is
+   pinned for another 100svh while the next slide scrolls over it; the pinned
+   card scales down and tilts back slightly, then fades once it is covered.
+   -------------------------------------------------------------------------- */
+.home-services {
+  padding-inline: var(--sidepadding-xs);
+  position: relative;
+
+  & .services-header {
+    display: flex;
+    align-items: center;
+    gap: 0.417vw;
+    padding-block: 1.111vw;
+    font-weight: 700;
+  }
+}
+
+.service-slide {
+  height: 100svh;
+}
+
+.service-pin {
+  width: 100%;
+  height: 100%;
+  padding-block: var(--sidepadding-xs);
+  perspective: 250vw;
+}
+
+.service-card {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border-radius: 3.472vw;
+  overflow: clip;
+  transform-style: preserve-3d;
+  transform-origin: 50% 10%;
+  will-change: transform;
+
+  &::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    height: 44vh;
+    background: linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.75) 86.61%);
+    z-index: 1;
+  }
+
+  & .service-meta,
+  & .service-title,
+  & .service-scroll {
+    position: absolute;
+    z-index: 2;
+  }
+
+  /* Meta spans the full inset width so its top rule can run edge to edge;
+     the text itself is capped at 12.5vw. */
+  & .service-meta {
+    left: 4.375vw;
+    right: 4.375vw;
+    bottom: 7.5vw;
+    pointer-events: none;
+
+    & > * {
+      max-width: 12.5vw;
+    }
+
+    /* Drawn left to right by initLines in custom.js via --line-scale */
+    --line-scale: 0;
+
+    &::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: -1.944vw;
+      height: 1px;
+      background: rgba(255, 255, 255, 0.35);
+      transform: scaleX(var(--line-scale));
+      transform-origin: 0 50%;
+    }
+  }
+
+  & .service-label {
+    font-size: 0.556vw;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    margin-bottom: 0.833vw;
+  }
+
+  & .service-title {
+    left: 50%;
+    bottom: 3.472vw;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    gap: 1.111vw;
+  }
+
+  & .service-scroll {
+    left: 4.375vw;
+    bottom: 2.222vw;
+    display: flex;
+    align-items: center;
+    gap: 0.417vw;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Home projects - slider (see initProjectsSlider in custom.js)
+   The main card is wide, the rest are small. Changing the main card swaps
+   the .is-main class and shifts the track; GSAP Flip animates the cards
+   between their old and new size/position.
+   -------------------------------------------------------------------------- */
+.home-projects {
+  padding-inline: var(--sidepadding-xs);
+  padding-block: 4.167vw 5.556vw;
+  overflow: clip;
+
+  & .projects-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-inline: 2.917vw 4.167vw;
+    margin-bottom: 2.222vw;
+  }
+
+  & .projects-title {
+    position: relative;
+  }
+
+  & .projects-heading {
+    position: relative;
+    z-index: 1; /* text sits over the squiggle */
+    font-family: var(--font-otflag);
+    font-size: 3.264vw;
+    font-weight: 500;
+    line-height: 1;
+    letter-spacing: 0;
+    color: var(--dark-green);
+  }
+
+  /* Sits under "Projects", outside the heading so the reveal mask can't clip
+     it. Artwork is /public/project-squiggle.svg, applied as a mask. Placed
+     from the rendered text at 1440: "Projects" starts 70px in, baseline at
+     35px; the squiggle starts under the P and overlaps the letter bottoms. */
+  & .projects-scribble {
+    position: absolute;
+    left: 4.931vw; /* 71px */
+    top: 1.736vw; /* 25px: baseline - 10px */
+    width: 10.417vw; /* 150px */
+    height: 1.958vw; /* keeps the 202x38 ratio */
+    background: var(--light-green);
+    -webkit-mask: url("/project-squiggle.svg") no-repeat center / contain;
+    mask: url("/project-squiggle.svg") no-repeat center / contain;
+    pointer-events: none;
+  }
+
+  & .projects-actions {
+    display: flex;
+    align-items: center;
+  }
+}
+
+.icon-button {
+  display: grid;
+  place-items: center;
+  width: 3.611vw;
+  height: 3.611vw;
+  border-radius: 1.25vw;
+  background: var(--light-green);
+  color: var(--dark-green);
+  flex: 0 0 auto;
+
+  & svg {
+    width: 2.25vw; /* 18px */
+  }
+}
+
+.projects-slider {
+  position: relative;
+  /* Fixed so the section height doesn't bounce while cards change size:
+     main media (65.556vw at 16:9) + caption. */
+  height: 42vw;
+  user-select: none;
+  touch-action: pan-y;
+
+  & img {
+    -webkit-user-drag: none;
+    user-drag: none;
+  }
+}
+
+.projects-track {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: flex-start;
+  gap: 2.153vw; /* 31px at 1440 */
+}
+
+/* Small cards are sized so the next project runs ~40px past the right edge
+   of the viewport and is clipped there by the section. */
+.project-slide {
+  flex: 0 0 auto;
+  width: 33.611vw;
+  cursor: pointer;
+
+  &.is-main {
+    width: 65.556vw;
+    cursor: default;
+  }
+
+  & .project-media {
+    border-radius: 3.472vw;
+    aspect-ratio: 16 / 10;
+  }
+
+  &.is-main .project-media {
+    aspect-ratio: 16 / 9;
+    border-radius: 3.472vw;
+  }
+
+  & .project-tag {
+    position: absolute;
+    top: 1.875vw;
+    right: 1.875vw;
+    z-index: 2;
+    padding: 0.278vw 0.556vw;
+    border-radius: 999px;
+    font-family: var(--font-otflag);
+    background: var(--light-green);
+    color: var(--dark-green);
+    font-size: 0.833vw;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+
+  & .project-caption {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1.389vw;
+    margin-top: 1.111vw;
+  }
+
+  & .project-title {
+    color: var(--dark-green);
+  }
+
+  & .project-date {
+    margin-top: 0.278vw;
+    font-size: 0.764vw;
+    font-weight: 500;
+    color: rgba(4, 33, 0, 0.55);
+  }
+
+  /* Card link: the button arrow, turned to point up-right */
+  & .project-link::before {
+    transform: rotate(-45deg);
+  }
+
+  & .project-link:hover::before {
+    transform: rotate(-60deg);
+  }
+
+  /* Only the main card shows its date and link; they fade rather than
+     toggle so the slider transition stays seamless */
+  & .project-date,
+  & .project-link {
+    transition:
+      opacity 0.4s ease,
+      visibility 0.4s;
+  }
+
+  &:not(.is-main) .project-date,
+  &:not(.is-main) .project-link {
+    opacity: 0;
+    visibility: hidden;
+  }
+
+  &.is-main .project-date,
+  &.is-main .project-link {
+    transition-delay: 0.6s;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Icons (artwork in /public/*.svg, applied as masks so they take currentColor)
+   Sizes are the SVGs' native px at 1440.
+   -------------------------------------------------------------------------- */
+.icon {
+  display: block;
+  background: currentColor;
+  -webkit-mask: var(--icon) no-repeat center / contain;
+  mask: var(--icon) no-repeat center / contain;
+}
+
+.icon-whatsapp {
+  --icon: url("/whatsapp.svg");
+  width: 1.528vw; /* 22 */
+  height: 1.528vw; /* 22 */
+}
+
+.icon-location {
+  --icon: url("/location.svg");
+  width: 1.597vw; /* 23 */
+  height: 2.014vw; /* 29 */
+}
+
+.icon-works {
+  --icon: url("/works-icon.svg");
+  width: 1.25vw; /* 18 */
+  height: 2.014vw; /* 29 */
+}
+
+.icon-instagram {
+  --icon: url("/instagram.svg");
+  width: 1.667vw; /* 24 */
+  height: 1.528vw; /* 22 */
+}
+
+/* --------------------------------------------------------------------------
+   Footer (see src/components/Footer.js)
+   -------------------------------------------------------------------------- */
+/* Icon jiggle on hover: CTA circles when their pill is hovered, social
+   buttons on their own hover. Plays once per hover. */
+@keyframes jiggle {
+  0% {
+    transform: rotate(0);
+  }
+  20% {
+    transform: rotate(-12deg);
+  }
+  40% {
+    transform: rotate(10deg);
+  }
+  60% {
+    transform: rotate(-6deg);
+  }
+  80% {
+    transform: rotate(4deg);
+  }
+  100% {
+    transform: rotate(0);
+  }
+}
+
+.footer-action:hover .footer-action-icon,
+.social-button:hover {
+  animation: jiggle 0.55s ease-in-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .footer-action:hover .footer-action-icon,
+  .social-button:hover {
+    animation: none;
+  }
+}
+
+.site-footer {
+  padding: 2.222vw var(--sidepadding-xs) var(--sidepadding-xs);
+}
+
+/* Top CTA block */
+.footer-cta {
+  background: var(--light-green);
+  border-radius: 3.472vw 3.472vw 0 0;
+  padding-block: 4.722vw 4.097vw;
+  padding-inline: 4.444vw;
+
+  text-align: center;
+
+  & .h4 {
+    color: var(--dark-green);
+  }
+}
+
+/* Giant email: 147.89px / 134.951px at 1440 */
+.footer-email {
+  display: block;
+  margin-top: 0.4vw;
+  font-family: var(--font-otflag);
+  font-size: 10.27vw;
+  font-weight: 600;
+  line-height: 0.9125;
+  letter-spacing: 0;
+  color: var(--dark-green);
+  white-space: nowrap;
+}
+
+.footer-actions {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.833vw;
+  margin-top: 3.439vw;
+}
+
+.footer-action {
+  display: flex;
+  align-items: center;
+  gap: 1.389vw;
+  padding: 2.431vw;
+  background: var(--white);
+  border-radius: 3.472vw;
+  text-align: left;
+
+  & .button-label {
+    text-transform: uppercase;
+    color: var(--dark-green);
+  }
+}
+
+/* Bottom dark block */
+.footer-main {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  column-gap: 4vw;
+  background: var(--dark-green);
+  color: var(--white);
+  border-radius: 0 0 3.472vw 3.472vw;
+  padding: 3.75vw 2.639vw 1.667vw;
+
+  & .button-label {
+    color: var(--white);
+    text-transform: uppercase;
+  }
+}
+
+.footer-brand {
+  max-width: 16.7vw;
+}
+
+.footer-logo {
+  display: inline-block;
+  color: var(--white);
+
+  & .logo {
+    width: 5.556vw;
+  }
+}
+
+.footer-blurb {
+  margin-top: 1.111vw;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+/* Facebook artwork already includes its green square, so it's an image at
+   the .icon-button size rather than a masked mark inside one */
+.social-facebook {
+  display: block;
+  width: 3.611vw;
+  height: 3.611vw;
+  flex: 0 0 auto;
+
+  & img {
+    width: 100%;
+    height: 100%;
+  }
+}
+
+.footer-social {
+  display: flex;
+  align-items: center;
+  gap: 0.694vw;
+  margin-top: 1.389vw;
+
+  & .button-label {
+    margin-right: 0.278vw;
+  }
+}
+
+.footer-columns {
+  display: grid;
+  grid-template-columns: repeat(3, auto);
+  gap: 3.75vw;
+  padding-right: 2vw;
+
+  & ul {
+    margin-top: 1.111vw;
+    display: flex;
+    flex-direction: column;
+    gap: 0.417vw;
+  }
+
+  & a {
+    color: rgba(255, 255, 255, 0.85);
+  }
+}
+
+.footer-bottom {
+  position: relative;
+  grid-column: 1 / -1;
+  margin-top: 2.5vw;
+  padding-top: 1.111vw;
+  color: rgba(255, 255, 255, 0.85);
+
+  /* Divider drawn left to right by initLines in custom.js */
+  --line-scale: 0;
+
+  &::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: rgba(255, 255, 255, 0.2);
+    transform: scaleX(var(--line-scale));
+    transform-origin: 0 50%;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Wipe reveal (see initWipes in custom.js)
+   Hidden by a clip until GSAP draws it in from the left.
+   -------------------------------------------------------------------------- */
+[data-wipe]:not([data-wipe="var"]) {
+  clip-path: inset(0 100% 0 0);
+}
+
+/* Word squiggle: wrap a word in .squiggle and the artwork stretches to the
+   word's width, sits behind the letters overlapping their bottoms, and is
+   drawn in via --wipe (data-wipe="var"). --wipe is animated on the nearest
+   split heading (inherited), because SplitText clones nested spans. */
+.squiggle {
+  position: relative;
+  z-index: 0;
+
+  &::after {
+    content: "";
+    position: absolute;
+    left: -4%;
+    bottom: 0; /* top edge just above the baseline */
+    width: 108%;
+    height: 0.5em;
+    z-index: -1; /* behind the letters; the span's z-index: 0 keeps it above the page */
+    background: var(--light-green);
+    -webkit-mask: url("/project-squiggle.svg") no-repeat center / 100% 100%;
+    mask: url("/project-squiggle.svg") no-repeat center / 100% 100%;
+    clip-path: inset(0 var(--wipe, 100%) 0 0);
+    pointer-events: none;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Text reveal (see initTextReveal in custom.js)
+   Hidden until SplitText has wrapped the lines so nothing flashes unmasked.
+   -------------------------------------------------------------------------- */
+[data-text-reveal] {
+  visibility: hidden;
+}
+
+/* Once SplitText has wrapped lines in block-level masks, lay them out as a
+   flex column. Flex items' margins never collapse, so the padding/negative
+   margin pairs below cancel exactly and the element keeps its unsplit
+   height. Not applied before the split so SplitText can measure normal flow. */
+[data-text-reveal]:has(> .tr-line-mask) {
+  display: flex;
+  flex-direction: column;
+}
+
+/* SplitText wraps each masked piece in an overflow-clip element. A tight box
+   would cut ascenders and descenders (g, p, y), so give the clip region room
+   above and below and pull the same amount back with negative margins. Net
+   layout change is zero. The reveal starts pieces further down (see yPercent
+   in custom.js) so nothing shows through the extra room before it should. */
+.tr-line-mask,
+.tr-word-mask,
+.tr-char-mask {
+  padding-top: 0.15em;
+  padding-bottom: 0.3em;
+  margin-top: -0.15em;
+  margin-bottom: -0.3em;
+}
+
+/* Wipe mode: a soft-edged gradient mask on each padded line wrapper. --wipe
+   is the position of the transparent edge; the visible edge trails it by 15%
+   for the feather. custom.js animates --wipe from -15% (fully hidden) to
+   115% (fully shown). */
+.tr-mode-wipe .tr-line-mask {
+  --wipe: 115%;
+  -webkit-mask-image: linear-gradient(90deg, #000 calc(var(--wipe) - 15%), transparent var(--wipe));
+  mask-image: linear-gradient(90deg, #000 calc(var(--wipe) - 15%), transparent var(--wipe));
+}
+
+/* --------------------------------------------------------------------------
+   Lenis (smooth scroll) — required rules from lenis/dist/lenis.css
+   -------------------------------------------------------------------------- */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+
+.lenis:not(.lenis-autoToggle).lenis-stopped {
+  overflow: clip;
+}
+
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+
+.lenis.lenis-smooth iframe {
+  pointer-events: none;
+}
+
+.lenis.lenis-autoToggle {
+  transition-property: overflow;
+  transition-duration: 1ms;
+  transition-behavior: allow-discrete;
+}
+
+.home-history {
+  padding-inline: var(--sidepadding-m);
+  padding-block: 3.083vw;
+
+  & .wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 8.333vw;
+
+    & .content {
+      display: flex;
+      align-items: flex-end;
+      gap: 7.708vw;
+      & h4 {
+        max-width: 59.444vw;
+      }
+    }
+  }
+}
+
+/* Picture beside the first line of the history heading. It sits outside the
+   heading (so the split text ignores it), pinned to the content box with its
+   bottom on the first line's floor and growing upward. custom.js slides the
+   first line right by the picture width plus gap and pops the picture into
+   the space once the heading has lifted in. */
+.home-history .content {
+  position: relative;
+}
+
+.home-history .history-image {
+  position: absolute;
+  left: 0;
+  top: calc(4.167vw - 10.208vw);
+  width: 8.889vw;
+  height: 10.208vw;
+  margin-right: 1.25vw;
+  border-radius: 1.528vw;
+  overflow: hidden;
+  transform-origin: 50% 100%;
+  pointer-events: none;
+}

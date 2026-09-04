@@ -1,0 +1,5 @@
+node_modules
+.next
+public
+fonts-source
+package-lock.json
