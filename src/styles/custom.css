@@ -415,12 +415,22 @@ ol {
   padding-inline: var(--sidepadding-xs);
   position: relative;
 
+  /* "Our Services" sits on the wider text padding above the first card,
+     with the site arrow beside it, turned to point down-right */
   & .services-header {
     display: flex;
     align-items: center;
-    gap: 0.417vw;
-    padding-block: 1.111vw;
-    font-weight: 700;
+    gap: 0.972vw;
+    padding-inline: calc(var(--sidepadding-m) - var(--sidepadding-xs));
+    padding-block: 1.944vw 0;
+  }
+
+  & .services-arrow {
+    width: 1.389vw; /* 20px, same artwork and size as the button arrow */
+    height: 0.903vw; /* 13px */
+    background: currentColor;
+    mask: url("/button-arrow.svg") center / contain no-repeat;
+    transform: rotate(45deg);
   }
 }
 

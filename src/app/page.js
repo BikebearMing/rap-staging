@@ -127,9 +127,10 @@ export default function Home() {
       </section>
 
       <section className="home-services">
-        <h5 className="h5 services-header">
-          Our Services <span className="arrow"></span>
-        </h5>
+        <h4 className="h4 services-header">
+          <span data-text-reveal="lift">Our Services</span>
+          <span className="services-arrow" aria-hidden="true" />
+        </h4>
 
         <div className="services-stack">
           {services.map((service) => (
