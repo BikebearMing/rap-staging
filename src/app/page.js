@@ -3,7 +3,7 @@ import WindLeaf from "@/components/WindLeaf";
 
 // Home banner slides (see /public).
 const heroSlides = [
-  "/hp-banner-1.png",
+  "/hp-banner-1.jpg",
   "/slider-2.jpg",
   "/slider-3.jpg",
   "/slider-4.jpg",
@@ -20,7 +20,7 @@ const services = [
   {
     title: "Landscaping",
     project: "Desa 8 Condo Landscape Design in Taman Desa",
-    image: "/service-image-2.png",
+    image: "/service-image-2.jpg",
   },
   {
     title: "Plant Rental",
@@ -35,25 +35,25 @@ const projects = [
     title: "Plant Decoration @WOLO KL",
     date: "June 2026",
     tag: "Landscape",
-    image: "/service-image-2.png",
+    image: "/service-image-2.jpg",
   },
   {
     title: "Hyatt Regency KL Midtown Farm Style Grazing Table Design",
     date: "May 2026",
     tag: "Event",
-    image: "/hp-banner-1.png",
+    image: "/hp-banner-1.jpg",
   },
   {
     title: "Placeholder Project Three",
     date: "April 2026",
     tag: "Landscape",
-    image: "/service-image-2.png",
+    image: "/service-image-2.jpg",
   },
   {
     title: "Placeholder Project Four",
     date: "March 2026",
     tag: "Event",
-    image: "/hp-banner-1.png",
+    image: "/hp-banner-1.jpg",
   },
 ];
 

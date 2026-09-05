@@ -12,7 +12,7 @@ export default function Contact() {
     <main className="contact-page">
       <section className="contact-hero has-parallax">
         <div className="contact-hero-bg parallax-frame">
-          <img src="/contact-bg.png" alt="" className="parallax-image" />
+          <img src="/contact-bg.jpg" alt="" className="parallax-image" />
         </div>
 
         <div className="contact-card">
@@ -68,9 +68,21 @@ export default function Contact() {
         <form className="contact-form" method="post">
           <div className="form-row">
             <input type="text" name="name" placeholder="Name" className="contact-field" required />
-            <input type="email" name="email" placeholder="Email" className="contact-field" required />
+            <input
+              type="email"
+              name="email"
+              placeholder="Email"
+              className="contact-field"
+              required
+            />
           </div>
-          <textarea name="message" placeholder="Message" className="contact-field" rows="1" required />
+          <textarea
+            name="message"
+            placeholder="Message"
+            className="contact-field"
+            rows="1"
+            required
+          />
           <button type="submit" className="contact-submit">
             <span>Let&rsquo;s Connect</span>
             <span className="icon icon-arrow" aria-hidden="true" />

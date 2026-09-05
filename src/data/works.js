@@ -9,7 +9,7 @@ const overview = [
   "The installation enhances the environment through considered plant selection, composition, and placement.",
 ];
 
-const gallery = ["/hp-banner-1.png", "/slider-4.jpg", "/slider-5.jpg", "/service-image-2.png"];
+const gallery = ["/hp-banner-1.jpg", "/slider-4.jpg", "/slider-5.jpg", "/service-image-2.jpg"];
 
 export const works = [
   {
@@ -19,7 +19,7 @@ export const works = [
     date: "Oct 2026",
     variants: [
       { category: "Event Design", image: "/slider-2.jpg" },
-      { category: "Landscaping", image: "/service-image-2.png" },
+      { category: "Landscaping", image: "/service-image-2.jpg" },
     ],
     tags: ["Event Design", "Installation", "Planning"],
     description:

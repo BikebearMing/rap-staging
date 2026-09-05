@@ -9,14 +9,14 @@ export const posts = [
     date: "December 25, 2026",
     excerpt:
       "Blending lush planting, natural textures, and thoughtful spatial design to create a refreshing urban environment.",
-    image: "/hp-banner-1.png",
+    image: "/hp-banner-1.jpg",
     featured: true,
   },
   {
     slug: "tropical-landscape-design-for-a-corporate-office",
     title: "Tropical Landscape Design for a Corporate Office",
     date: "July 10, 2026",
-    image: "/service-image-2.png",
+    image: "/service-image-2.jpg",
   },
   {
     slug: "how-greenery-can-completely-change-a-space",
@@ -46,7 +46,7 @@ export const posts = [
     slug: "5-best-indoor-plants-for-corporate-events",
     title: "5 Best Indoor Plants for Corporate Events",
     date: "March 21, 2026",
-    image: "/hp-banner-1.png",
+    image: "/hp-banner-1.jpg",
   },
 ];
 
@@ -69,7 +69,7 @@ export const placeholderContent = `
 <p>A successful tropical landscape needs to respond to its environment. Plant selections were assessed based on sunlight exposure, humidity, rainfall, maintenance requirements, and their ability to perform within the specific conditions of the site.</p>
 <p>Different planting zones were established according to the amount of natural light available. Species suited to brighter areas were positioned in open sections, while shade-tolerant varieties were introduced beneath covered areas and around the building.</p>
 <p>This approach allowed the landscape to remain visually consistent while supporting healthier long-term plant growth.</p>
-<figure><img src="/service-image-2.png" alt="" /></figure>
+<figure><img src="/service-image-2.jpg" alt="" /></figure>
 <h2>From Concept to Completion</h2>
 <p>The transformation was carried out through a carefully coordinated installation process.</p>
 <p>Following the initial site assessment and design development, planting locations and material requirements were mapped out before work began. Existing surfaces were prepared, planting beds were established, and the supporting landscape infrastructure was installed.</p>

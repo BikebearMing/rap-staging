@@ -28,6 +28,14 @@ let sliders = [];
 const live = (selector, root = document) =>
   Array.from(root.querySelectorAll(selector)).filter((el) => !el.closest(".pt-ghost"));
 
+// Phones and tablets scroll on the compositor thread and only tell the page
+// afterwards, so a scrubbed tween that snaps to every scroll event paints a
+// frame behind the page and the layers look torn from each other. Easing
+// the scrub over a few frames hides that. With a mouse, Lenis already eases
+// the scroll itself and the tween can follow it exactly.
+const coarse = () => window.matchMedia("(hover: none) and (pointer: coarse)").matches;
+const scrubFor = () => (coarse() ? 0.5 : true);
+
 /* --------------------------------------------------------------------------
    Lenis + ScrollTrigger sync
    -------------------------------------------------------------------------- */
@@ -35,7 +43,7 @@ export function initSmoothScroll() {
   if (lenis) return lenis;
 
   lenis = new Lenis({
-    lerp: 0.1,
+    lerp: 0.07, // lower is heavier: the page glides longer after the wheel stops
     smoothWheel: true,
     autoRaf: false, // driven from GSAP's ticker below so both share one rAF
   });
@@ -266,7 +274,7 @@ export function initParallax() {
             trigger,
             start: "top bottom",
             end: "bottom top",
-            scrub: true,
+            scrub: scrubFor(),
             invalidateOnRefresh: true,
             pinnedContainer,
           },
@@ -285,6 +293,10 @@ export function initParallax() {
    -------------------------------------------------------------------------- */
 export function initFlatten() {
   return gsap.context(() => {
+    // A changing border radius repaints the whole clipped block every scroll
+    // frame; on a phone that is a screen-sized image and it stutters. The
+    // corners stay rounded there, like the cards that follow.
+    if (coarse()) return;
     live("[data-flatten]").forEach((el) => {
       gsap.to(el, {
         borderBottomLeftRadius: 0,
@@ -336,7 +348,7 @@ export function initStackCards() {
           pin,
           start: "top top",
           end: () => "+=" + slide.offsetHeight,
-          scrub: true,
+          scrub: scrubFor(),
           invalidateOnRefresh: true,
         },
       });
@@ -348,7 +360,7 @@ export function initStackCards() {
           trigger: card,
           start: "top -80%",
           end: () => "+=" + 0.2 * slide.offsetHeight,
-          scrub: true,
+          scrub: scrubFor(),
           invalidateOnRefresh: true,
         },
       });

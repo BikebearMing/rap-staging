@@ -1286,17 +1286,27 @@ html.lenis body {
 }
 
 /* Layers: backdrop < old card < new card < header (100). The backdrop is
-   the page beige taken a touch deeper so the cards read against it. */
+   the page beige taken a touch deeper so the cards read against it.
+   Both are as tall as the largest viewport (100lvh) rather than inset: 0.
+   On phones the browser bar slides in as the visit starts, and a fixed box
+   sized to the shrinking viewport lags a frame behind, showing a strip of
+   the page above the bar; the taller box already covers that strip. */
 .pt-backdrop {
   position: fixed;
-  inset: 0;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100lvh;
   z-index: 89;
   background: color-mix(in srgb, var(--color-bg) 92%, var(--dark-green));
 }
 
 .pt-ghost {
   position: fixed;
-  inset: 0;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100lvh;
   z-index: 90;
   pointer-events: none;
 
