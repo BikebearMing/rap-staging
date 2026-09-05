@@ -1,47 +1,62 @@
 import Link from "next/link";
+import { Lines } from "@/components/Heading";
+import { getContact, getSiteSettings } from "@/lib/wp";
 
 export const metadata = {
   title: "Contact | Rent-A-Pot",
   description: "Let's grow a greener space together.",
 };
 
-// Contact page. Details are placeholder until they come from WordPress and
-// the form is plain HTML until Gravity Forms replaces it.
-export default function Contact() {
+// Contact page. Copy comes from the Contact Page field group and the
+// details from Site Settings; the form is plain HTML until a form plugin
+// replaces it.
+export default async function Contact() {
+  const [contact, site] = await Promise.all([getContact(), getSiteSettings()]);
+
   return (
     <main className="contact-page">
       <section className="contact-hero has-parallax">
         <div className="contact-hero-bg parallax-frame">
-          <img src="/contact-bg.jpg" alt="" className="parallax-image" />
+          <img src={contact.heroImage} alt="" className="parallax-image" />
         </div>
 
         <div className="contact-card">
           <p className="h4" data-text-reveal="lift">
-            Let&rsquo;s Grow a Greener Space Together
+            {contact.heroHeading}
           </p>
-          <a href="mailto:sayhello@rap.com.my" className="footer-email" data-text-reveal="lift">
-            sayhello@rap.com.my
+          <a href={`mailto:${site.email}`} className="footer-email" data-text-reveal="lift">
+            {site.email}
           </a>
 
           <div className="contact-info" data-line data-line-start="top 100%">
             <p className="body" data-text-reveal="flip">
-              B-G-33, Prima Avenue, Jalan PJU 1/39, Dataran
-              <br />
-              Prima, 47301 Petaling Jaya, Selangor
+              <Lines text={site.address} />
             </p>
-            <a href="tel:+60376224256" className="body" data-text-reveal="flip">
-              03 - 7622 4256
+            <a href={`tel:${site.phoneLink}`} className="body" data-text-reveal="flip">
+              {site.phone}
             </a>
 
             <div className="contact-social">
               <div className="contact-social-buttons">
-                <a href="#" className="icon-button social-button" aria-label="Location">
+                <a
+                  href={site.locationUrl}
+                  className="icon-button social-button"
+                  aria-label="Location"
+                >
                   <span className="icon icon-location" aria-hidden="true" />
                 </a>
-                <a href="#" className="icon-button social-button" aria-label="Facebook">
+                <a
+                  href={site.facebookUrl}
+                  className="icon-button social-button"
+                  aria-label="Facebook"
+                >
                   <span className="icon icon-facebook" aria-hidden="true" />
                 </a>
-                <a href="#" className="icon-button social-button" aria-label="Instagram">
+                <a
+                  href={site.instagramUrl}
+                  className="icon-button social-button"
+                  aria-label="Instagram"
+                >
                   <span className="icon icon-instagram" aria-hidden="true" />
                 </a>
               </div>
@@ -53,7 +68,7 @@ export default function Contact() {
         </div>
 
         <p className="contact-scroll">
-          Scroll to fill form <span className="icon icon-arrow" aria-hidden="true" />
+          {contact.scrollLabel} <span className="icon icon-arrow" aria-hidden="true" />
         </p>
       </section>
 
@@ -61,10 +76,10 @@ export default function Contact() {
         <img src="/hanging-plant.png" alt="" className="contact-plant" />
 
         <h2 className="projects-heading" data-text-reveal="lift">
-          Had an Idea? Let&rsquo;s work it out together.
+          {contact.formHeading}
         </h2>
 
-        {/* Gravity Forms will replace this markup */}
+        {/* A form plugin will replace this markup */}
         <form className="contact-form" method="post">
           <div className="form-row">
             <input type="text" name="name" placeholder="Name" className="contact-field" required />

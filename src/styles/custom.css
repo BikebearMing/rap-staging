@@ -806,6 +806,31 @@ ol {
   height: 1.528vw; /* 22 */
 }
 
+/* Gallery tab icons (landscaping page), drawn at 16x16 */
+.icon-hard-landscaping,
+.icon-soft-landscaping,
+.icon-water-features,
+.icon-outdoor-living {
+  width: 1.111vw; /* 16 */
+  height: 1.111vw;
+}
+
+.icon-hard-landscaping {
+  --icon: url("/hard-landscaping.svg");
+}
+
+.icon-soft-landscaping {
+  --icon: url("/soft-landscaping.svg");
+}
+
+.icon-water-features {
+  --icon: url("/water-features.svg");
+}
+
+.icon-outdoor-living {
+  --icon: url("/outdoor-living.svg");
+}
+
 /* The button arrow as a plain icon, same artwork and size as .button-arrow */
 .icon-arrow {
   --icon: url("/button-arrow.svg");
@@ -1459,6 +1484,43 @@ html.is-rendering .site-page {
   right: -4.5vw;
 }
 
+/* Service intro: as the home intro, stem a little lower so the fronds sit
+   beside the heading and the columns */
+.service-intro .wind-leaf {
+  --leaf-width: 47vw;
+  --leaf-rotate: 9deg;
+  top: 1.5vw;
+  right: -4.5vw;
+}
+
+/* Event categories: stem off the top-right, fronds behind the heading */
+.service-categories .wind-leaf {
+  --leaf-width: 47vw;
+  --leaf-rotate: 9deg;
+  top: -1vw;
+  right: -4.5vw;
+}
+
+/* Maintenance: a leaf off the top-right corner and another turned round
+   off the bottom-left, its fronds reaching up towards the first. The turn
+   pivots on the stem (97% 8.5% of the box), so the left box is placed by
+   where that puts the stem: 4.5vw off the left edge, 2vw above the
+   section's bottom. */
+.service-maintenance .wind-leaf {
+  --leaf-width: 40vw;
+  --leaf-rotate: 9deg;
+  top: 1vw;
+  right: -4.5vw;
+
+  &.is-left {
+    --leaf-rotate: 185deg;
+    top: auto;
+    right: auto;
+    left: calc(-4.5vw - 0.97 * var(--leaf-width));
+    bottom: calc(2vw - 0.915 * var(--leaf-width) * 595 / 550);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .wind-leaf img {
     transform: none !important;
@@ -2046,6 +2108,481 @@ html.is-rendering .site-page {
 
   & .work-gallery-item:nth-child(3n + 1) {
     grid-column: 1 / -1;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Service page (see src/app/plant-rental/page.js)
+   Same bones as the home page: a full-height banner with rounded bottom
+   corners that flatten on scroll, then the intro on the beige with the
+   wind leaf behind it. Measurements at 1440 from the design.
+   -------------------------------------------------------------------------- */
+.service-banner {
+  position: relative;
+  height: 100svh;
+  width: 100%;
+  border-radius: 0 0 3.472vw 3.472vw;
+  overflow: clip;
+
+  & .service-banner-media {
+    position: absolute;
+    inset: 0;
+
+    /* Same fade as the home banner slides so the white type reads */
+    &::after {
+      content: "";
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 44vh;
+      background: linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.75) 86.61%);
+      z-index: 3;
+    }
+  }
+
+  & > .h1,
+  & > .body {
+    position: absolute;
+    z-index: 5;
+  }
+
+  & > .h1 {
+    left: 5.833vw; /* 84px */
+    bottom: 9.861vw; /* 142px */
+  }
+
+  & > .body {
+    right: 4.931vw; /* 71px */
+    bottom: 11.319vw; /* 163px */
+    width: 22.083vw; /* 318px */
+  }
+}
+
+.service-intro {
+  position: relative; /* anchors the wind leaf */
+  display: flex;
+  flex-direction: column;
+  gap: 5.556vw; /* 80px */
+  padding-inline: 5.833vw; /* 84px */
+  padding-block: 4.236vw 8.403vw; /* 61px, 121px */
+
+  & .content {
+    display: flex;
+    flex-direction: column;
+    gap: 1.806vw; /* 26px */
+
+    /* Wraps the heading onto four lines as in the design */
+    & .h2 {
+      max-width: 61vw;
+    }
+  }
+
+  /* Two equal paragraphs pushed to the right edge. The block width is
+     eyeballed from the design (the columns start ~780px in). */
+  & .columns {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 3.542vw; /* 51px */
+    width: 40vw;
+    margin-left: auto;
+  }
+}
+
+/* Areas: list of area names beside a tall photo. Hovering a name makes it
+   the active one (the rest sit at 0.2 opacity) and crossfades the copy under
+   the divider and the photo (see initAreas in custom.js). The photo width
+   is what is left of 1440 after the 83px sides, the copy column and the
+   64px between them. */
+.service-areas {
+  display: grid;
+  grid-template-columns: 1fr 41.25vw; /* 594px */
+  gap: 4.444vw; /* 64px */
+  align-items: start;
+  padding-inline: 5.764vw; /* 83px */
+  padding-block: 0 11.25vw; /* 162px */
+
+  & .areas-content {
+    display: flex;
+    flex-direction: column;
+    gap: 2.708vw; /* 39px */
+  }
+
+  & .areas-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1.111vw; /* 16px */
+  }
+
+  & .areas-item {
+    opacity: 0.2;
+    cursor: pointer;
+    transition: opacity 0.35s ease;
+
+    &.is-active {
+      opacity: 1;
+    }
+  }
+
+  /* Copy for every area stacked in one cell so the block keeps one height;
+     the active one shows. Divider above is drawn by initLines via --line-scale */
+  & .areas-description {
+    position: relative;
+    display: grid;
+    margin-top: 0.764vw; /* 50px from the list, less the 39px gap */
+    padding-top: 2.083vw; /* 30px */
+
+    --line-scale: 0;
+
+    &::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: rgba(4, 33, 0, 0.15);
+      transform: scaleX(var(--line-scale));
+      transform-origin: 0 50%;
+    }
+  }
+
+  & .areas-copy {
+    grid-area: 1 / 1;
+    opacity: 0;
+    transition: opacity 0.6s ease;
+
+    &.is-active {
+      opacity: 1;
+    }
+  }
+
+  & .areas-media {
+    height: 100%;
+    border-radius: 1.528vw; /* 22px */
+  }
+
+  & .areas-image {
+    opacity: 0;
+    transition: opacity 0.6s ease;
+
+    &.is-active {
+      opacity: 1;
+    }
+  }
+}
+
+/* Gallery (landscaping page): heading with the hanging plant off the
+   top-right, a row of tab pills, then one strip of cards per tab. The
+   strips are stacked in one grid cell and the active one shows (see
+   initGalleryTabs in custom.js); each is an Embla slider whose cards run
+   off the right edge of the page. The design measures 85px to the cards
+   and 84px to the heading; both sit on the 84px side padding. */
+.service-gallery {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  padding-inline: 5.833vw 0; /* 84px */
+  padding-block: 6.389vw 6.181vw; /* 92px, 89px */
+
+  /* Artwork at its native px, hanging from the section's top edge */
+  & .gallery-plant {
+    position: absolute;
+    top: 0;
+    right: 2.083vw; /* 30px */
+    width: 11.389vw; /* 164 */
+    pointer-events: none;
+  }
+
+  & .gallery-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.111vw; /* 16px */
+    margin-top: 1.875vw; /* 27px */
+  }
+
+  /* Outlined pill; the active one fills */
+  & .gallery-tab {
+    display: inline-flex;
+    align-items: center;
+    gap: 1.111vw; /* 16px */
+    padding-inline: 1.944vw; /* 28px */
+    padding-block: 0.972vw; /* 14px */
+    border: 1px solid var(--light-green);
+    border-radius: 1.25vw; /* 18px */
+    font-size: 1.111vw; /* same type as the button label */
+    font-weight: 700;
+    line-height: 1.25;
+    color: var(--dark-green);
+    transition: background-color 0.35s ease;
+
+    &.is-active {
+      background: var(--light-green);
+    }
+  }
+
+  /* minmax(0, 1fr): the strips would otherwise size the cell to their
+     cards and Embla would have nothing to scroll */
+  & .gallery-sets {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    margin-top: 2.361vw; /* 34px */
+  }
+
+  & .gallery-set {
+    grid-area: 1 / 1;
+    opacity: 0;
+    visibility: hidden;
+    transition:
+      opacity 0.6s ease,
+      visibility 0.6s;
+
+    &.is-active {
+      opacity: 1;
+      visibility: visible;
+    }
+  }
+
+  & .embla__container {
+    gap: 1.042vw; /* 15px */
+  }
+}
+
+/* Card: photo over a dark green band with the name centred in it. In the
+   landscaping strips (flex) and the event categories grid, where the
+   column sets the width instead. */
+.gallery-card {
+  display: flex;
+  flex-direction: column;
+  flex: 0 0 21.181vw; /* 305px */
+  height: 25.417vw; /* 366px */
+  border-radius: 2.222vw; /* 32px */
+  background: var(--dark-green);
+  overflow: hidden;
+
+  & .gallery-card-media {
+    height: 18.889vw; /* 272px */
+
+    & img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+  }
+
+  & .gallery-card-title {
+    display: grid;
+    place-items: center;
+    flex: 1;
+    padding-block: 1.25vw 1.181vw; /* 18px, 17px */
+    padding-inline: 1.389vw; /* 20px */
+    text-align: center;
+  }
+}
+
+/* Event categories (event design page): label, heading and a 4 x 2 grid of
+   cards on the 84px side padding, with the wind leaf behind the heading.
+   The cards are the landscaping ones, sized by the grid: four across with
+   the same 15px between them lands on the same 305px card. Vertical
+   spacing is read off the design. */
+.service-categories {
+  position: relative; /* anchors the wind leaf */
+  display: flex;
+  flex-direction: column;
+  padding-inline: 5.833vw; /* 84px */
+  padding-block: 4.792vw 6.181vw; /* 69px, 89px */
+
+  & .categories-label {
+    display: flex;
+    align-items: center;
+    gap: 0.694vw; /* 10px */
+
+    & .icon-arrow {
+      transform: rotate(30deg); /* down-right, like the services header */
+    }
+  }
+
+  & .h2 {
+    margin-top: 4.028vw; /* 58px */
+  }
+
+  & .categories-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 2.083vw 1.042vw; /* 30px, 15px */
+    margin-top: 3.333vw; /* 48px */
+  }
+}
+
+/* Maintenance services (maintenance page): centred heading and label over
+   a centred grid of the landscaping cards, three across then two, with a
+   wind leaf on each side. The grid is capped at three cards so the last
+   two wrap onto their own row. Spacing is read off the design. */
+.service-maintenance {
+  position: relative; /* anchors the wind leaves */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-inline: 5.833vw; /* 84px */
+  padding-block: 6.944vw 6.181vw; /* 100px, 89px */
+  text-align: center;
+
+  & .maintenance-label {
+    display: flex;
+    align-items: center;
+    gap: 0.694vw; /* 10px */
+    margin-top: 3.472vw; /* 50px */
+
+    & .icon-arrow {
+      transform: rotate(30deg); /* down-right, like the services header */
+    }
+  }
+
+  & .maintenance-grid {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 2.083vw 1.042vw; /* 30px, 15px */
+    max-width: calc(3 * 21.181vw + 2 * 1.042vw); /* three cards and two gaps */
+    margin-top: 2.778vw; /* 40px */
+  }
+}
+
+/* FAQ: centred heading over a list of questions with a divider between
+   them (drawn by initLines). Clicking a question opens its answer and
+   closes the others (see initFaq in custom.js); the answer row grows from
+   0fr to 1fr so the height animates without JS. The 213px from the page
+   edge to the numbers is the list inset plus the item's own 30px, which is
+   also where the divider runs past the text on both sides. */
+.service-faq {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 4.444vw; /* 64px */
+  padding-inline: 12.708vw; /* 183px */
+  padding-block: calc(6.159vw + 3.333vw) 13.681vw; /* 88.69px + 48px, 197px */
+
+  /* Rule between the projects and the FAQ: 88.69px below the slider, 48px
+     above the heading, on the same inset as the question dividers. Drawn
+     left to right by initLines via --line-scale. */
+  --line-scale: 0;
+
+  &::before {
+    content: "";
+    position: absolute;
+    top: 6.159vw;
+    left: 12.708vw;
+    right: 12.708vw;
+    height: 1px;
+    background: rgba(4, 33, 0, 0.15);
+    transform: scaleX(var(--line-scale));
+    transform-origin: 0 50%;
+  }
+
+  & .projects-heading {
+    text-align: center;
+  }
+
+  & .faq-list {
+    display: flex;
+    flex-direction: column;
+  }
+
+  & .faq-item {
+    position: relative;
+    padding-inline: 2.083vw; /* 30px */
+    padding-block: 2.083vw 2.778vw; /* 30px, 40px */
+
+    --line-scale: 0;
+
+    /* The 64px above and 197px below are measured to the questions */
+    &:first-child {
+      padding-top: 0;
+    }
+
+    &:last-child {
+      padding-bottom: 0;
+    }
+
+    &::before {
+      content: "";
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: rgba(4, 33, 0, 0.15);
+      transform: scaleX(var(--line-scale));
+      transform-origin: 0 50%;
+    }
+
+    &:last-child::before {
+      display: none;
+    }
+  }
+
+  & .faq-question {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.625vw; /* 9px */
+    width: 100%;
+    text-align: left;
+    color: var(--dark-green);
+  }
+
+  /* Plus that turns into a minus: the upright bar swings flat */
+  & .faq-icon {
+    position: relative;
+    flex: 0 0 auto;
+    width: 1.528vw; /* 22px */
+    height: 1.528vw;
+    margin-left: auto;
+    margin-top: 0.278vw; /* centred on the first line of the question */
+
+    &::before,
+    &::after {
+      content: "";
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      background: currentColor;
+      transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    &::before {
+      width: 100%;
+      height: 0.104vw; /* 1.5px */
+      transform: translate(-50%, -50%);
+    }
+
+    &::after {
+      width: 0.104vw;
+      height: 100%;
+      transform: translate(-50%, -50%);
+    }
+  }
+
+  & .faq-item.is-open .faq-icon::after {
+    transform: translate(-50%, -50%) rotate(90deg);
+  }
+
+  & .faq-answer {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+
+    & .faq-answer-inner {
+      overflow: hidden;
+    }
+
+    & .body {
+      max-width: 45.208vw; /* 651px, eyeballed */
+      padding-top: 1.736vw; /* 25px */
+    }
+  }
+
+  & .faq-item.is-open .faq-answer {
+    grid-template-rows: 1fr;
   }
 }
 
@@ -2691,6 +3228,29 @@ html.is-rendering .site-page {
     right: -12vw;
   }
 
+  .service-intro .wind-leaf {
+    --leaf-width: 90vw;
+    top: 4vw;
+    right: -12vw;
+  }
+
+  .service-categories .wind-leaf {
+    --leaf-width: 90vw;
+    top: 0;
+    right: -12vw;
+  }
+
+  .service-maintenance .wind-leaf {
+    --leaf-width: 80vw;
+    top: 0;
+    right: -12vw;
+
+    &.is-left {
+      left: calc(-12vw - 0.97 * var(--leaf-width));
+      bottom: calc(4vw - 0.915 * var(--leaf-width) * 595 / 550);
+    }
+  }
+
   /* ========== BLOG POST ========== */
   .post-header {
     gap: 4vw;
@@ -2973,6 +3533,234 @@ html.is-rendering .site-page {
 
     & .work-gallery-item {
       border-radius: 4vw;
+    }
+  }
+
+  /* ========== SERVICE PAGE ========== */
+  .service-banner {
+    border-radius: 0 0 8vw 8vw;
+
+    & > .h1 {
+      left: 6vw;
+      bottom: 52vw; /* TODO: verify */
+    }
+
+    & > .body {
+      left: 6vw;
+      right: 6vw;
+      bottom: 16vw;
+      width: auto;
+    }
+  }
+
+  .service-intro {
+    gap: 12vw;
+    padding-inline: 6vw;
+    padding-block: 8vw 16vw;
+
+    & .content {
+      gap: 6vw;
+
+      & .h2 {
+        max-width: 100%;
+      }
+    }
+
+    & .columns {
+      grid-template-columns: 1fr;
+      gap: 6vw;
+      width: 100%;
+    }
+  }
+
+  /* Photo above the list */
+  .service-areas {
+    grid-template-columns: 1fr;
+    gap: 8vw;
+    padding-inline: 6vw;
+    padding-block: 0 16vw;
+
+    & .areas-content {
+      gap: 6vw;
+    }
+
+    & .areas-list {
+      gap: 3vw;
+    }
+
+    & .areas-description {
+      margin-top: 4vw;
+      padding-top: 5vw;
+    }
+
+    & .areas-media {
+      order: -1;
+      height: 90vw;
+      border-radius: 4vw;
+    }
+  }
+
+  .service-gallery {
+    padding-inline: 6vw 0;
+    padding-block: 14vw 14vw;
+
+    & .gallery-plant {
+      right: 2vw;
+      width: 14vw; /* TODO: verify */
+    }
+
+    /* Wraps clear of the plant */
+    & .h2 {
+      padding-right: 16vw;
+    }
+
+    & .gallery-tabs {
+      gap: 2.5vw;
+      margin-top: 6vw;
+      padding-right: 6vw;
+    }
+
+    & .gallery-tab {
+      gap: 2.5vw;
+      padding-inline: 4.5vw;
+      padding-block: 3vw;
+      border-radius: 3.5vw;
+      font-size: 3.5vw;
+    }
+
+    & .gallery-sets {
+      margin-top: 7vw;
+    }
+
+    & .embla__container {
+      gap: 3vw;
+    }
+  }
+
+  .gallery-card {
+    flex: 0 0 68vw;
+    height: 82vw;
+    border-radius: 6vw;
+
+    & .gallery-card-media {
+      height: 60vw;
+    }
+
+    & .gallery-card-title {
+      padding-block: 4vw;
+      padding-inline: 4vw;
+    }
+  }
+
+  /* Two across, so the cards are shorter than in the landscaping strips */
+  .service-categories {
+    padding-inline: 6vw;
+    padding-block: 12vw 14vw;
+
+    & .categories-label {
+      gap: 2vw;
+    }
+
+    & .h2 {
+      margin-top: 8vw;
+    }
+
+    & .categories-grid {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 4vw 3vw;
+      margin-top: 8vw;
+    }
+
+    & .gallery-card {
+      height: 60vw;
+      border-radius: 5vw;
+
+      & .gallery-card-media {
+        height: 42vw;
+      }
+
+      & .gallery-card-title {
+        padding-inline: 2vw;
+      }
+    }
+  }
+
+  .icon-hard-landscaping,
+  .icon-soft-landscaping,
+  .icon-water-features,
+  .icon-outdoor-living {
+    width: 4vw;
+    height: 4vw;
+  }
+
+  /* Two across, same card size as the event grid */
+  .service-maintenance {
+    padding-inline: 6vw;
+    padding-block: 14vw 14vw;
+
+    & .maintenance-label {
+      gap: 2vw;
+      margin-top: 6vw;
+    }
+
+    & .maintenance-grid {
+      gap: 4vw 3vw;
+      max-width: 100%;
+      margin-top: 8vw;
+    }
+
+    & .gallery-card {
+      flex: 0 0 42.5vw;
+      height: 60vw;
+      border-radius: 5vw;
+
+      & .gallery-card-media {
+        height: 42vw;
+      }
+
+      & .gallery-card-title {
+        padding-inline: 2vw;
+      }
+    }
+  }
+
+  .service-faq {
+    gap: 10vw;
+    padding-inline: 6vw;
+    padding-block: calc(10vw + 8vw) 20vw;
+
+    &::before {
+      top: 10vw;
+      left: 6vw;
+      right: 6vw;
+    }
+
+    & .faq-item {
+      padding-inline: 0;
+      padding-block: 6vw 7vw;
+    }
+
+    & .faq-question {
+      gap: 2vw;
+    }
+
+    & .faq-icon {
+      width: 5vw;
+      height: 5vw;
+      margin-top: 0.5vw;
+
+      &::before {
+        height: 0.4vw;
+      }
+
+      &::after {
+        width: 0.4vw;
+      }
+    }
+
+    & .faq-answer .body {
+      max-width: 100%;
+      padding-top: 4vw;
     }
   }
 }

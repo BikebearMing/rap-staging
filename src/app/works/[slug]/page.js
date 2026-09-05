@@ -1,19 +1,23 @@
 import { notFound } from "next/navigation";
-import { works } from "@/data/works";
+import { getWork, getWorks } from "@/lib/wp";
 
 export async function generateStaticParams() {
+  const works = await getWorks();
   return works.map((work) => ({ slug: work.slug }));
 }
 
 export async function generateMetadata({ params }) {
   const { slug } = await params;
-  const work = works.find((w) => w.slug === slug);
+  const work = await getWork(slug);
   return { title: work ? `${work.title} | Rent-A-Pot` : "Our Works | Rent-A-Pot" };
 }
 
+// A single work, from the Work Details field group. `overview` is one
+// paragraph per row and `gallery` is laid out in rows of one wide image then
+// two half images (see .work-gallery).
 export default async function Work({ params }) {
   const { slug } = await params;
-  const work = works.find((w) => w.slug === slug);
+  const work = await getWork(slug);
   if (!work) notFound();
 
   return (
@@ -30,7 +34,7 @@ export default async function Work({ params }) {
           {work.title}
         </h1>
         <div className="work-hero parallax-frame">
-          <img src={work.variants[0].image} alt="" className="parallax-image" />
+          <img src={work.variants[0]?.image} alt="" className="parallax-image" />
         </div>
       </section>
 

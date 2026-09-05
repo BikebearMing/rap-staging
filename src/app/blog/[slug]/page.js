@@ -2,21 +2,22 @@ import { notFound } from "next/navigation";
 import Button from "@/components/Button";
 import BlogCard from "@/components/BlogCard";
 import WindLeaf from "@/components/WindLeaf";
-import { posts, placeholderContent } from "@/data/posts";
+import { getPost, getPosts } from "@/lib/wp";
 
 export async function generateStaticParams() {
+  const posts = await getPosts();
   return posts.map((post) => ({ slug: post.slug }));
 }
 
 export async function generateMetadata({ params }) {
   const { slug } = await params;
-  const post = posts.find((p) => p.slug === slug);
+  const post = await getPost(slug);
   return { title: post ? `${post.title} | Rent-A-Pot` : "Blog | Rent-A-Pot" };
 }
 
 export default async function BlogPost({ params }) {
   const { slug } = await params;
-  const post = posts.find((p) => p.slug === slug);
+  const [post, posts] = await Promise.all([getPost(slug), getPosts()]);
   if (!post) notFound();
 
   const related = posts.filter((p) => p.slug !== slug).slice(0, 3);
@@ -46,10 +47,7 @@ export default async function BlogPost({ params }) {
       {/* Editor HTML from WordPress goes straight in here; .blog-content
           standardises how its headings, paragraphs, images and lists look. */}
       <section className="post-body">
-        <div
-          className="blog-content"
-          dangerouslySetInnerHTML={{ __html: post.content || placeholderContent }}
-        />
+        <div className="blog-content" dangerouslySetInnerHTML={{ __html: post.content }} />
       </section>
 
       <section className="post-related" data-line>

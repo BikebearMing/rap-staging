@@ -469,9 +469,20 @@ export function initProjectsSlider() {
       },
     });
 
+    // A card sent to the back fades in over 0.5s after its hop. A hop that
+    // starts before that has finished (multi-hop clicks, quick arrow taps)
+    // would Flip the card at its half-faded opacity and leave it there, as
+    // Flip records opacity with the layout. So every card is settled first.
+    const settleFades = () => {
+      const all = slides();
+      gsap.killTweensOf(all, "opacity,visibility");
+      gsap.set(all, { autoAlpha: 1 });
+    };
+
     const next = () => {
       if (animating) return;
       animating = true;
+      settleFades();
 
       const all = slides();
       const main = all[0];
@@ -525,6 +536,7 @@ export function initProjectsSlider() {
     const prev = () => {
       if (animating) return;
       animating = true;
+      settleFades();
 
       const all = slides();
       const main = all[0];
@@ -1004,6 +1016,159 @@ export function initWorkToggles() {
     return () => card.removeEventListener("click", onClick);
   });
   return () => cleanups.forEach((fn) => fn());
+}
+
+/* --------------------------------------------------------------------------
+   Areas (service pages)
+   Markup: [data-areas] holding .areas-item names, .areas-copy paragraphs and
+   .areas-image photos that share a data-area index. Hovering (or tapping) a
+   name makes it, its copy and its photo the active ones; CSS does the fades.
+   -------------------------------------------------------------------------- */
+export function initAreas() {
+  const cleanups = live("[data-areas]").map((root) => {
+    const activate = (e) => {
+      const item = e.target.closest(".areas-item");
+      if (!item || item.classList.contains("is-active")) return;
+      const { area } = item.dataset;
+      root.querySelectorAll("[data-area]").forEach((el) => {
+        el.classList.toggle("is-active", el.dataset.area === area);
+      });
+    };
+    root.addEventListener("pointerover", activate);
+    root.addEventListener("click", activate);
+    return () => {
+      root.removeEventListener("pointerover", activate);
+      root.removeEventListener("click", activate);
+    };
+  });
+  return () => cleanups.forEach((fn) => fn());
+}
+
+/* --------------------------------------------------------------------------
+   Gallery tabs (landscaping page)
+   Markup: [data-gallery] holding .gallery-tab buttons and .gallery-set strips
+   that share a data-set index. Clicking a tab makes it and its strip the
+   active ones; the crossfade is CSS. The strips are Embla sliders set up by
+   initSliders; they stay laid out while hidden, so no re-measure is needed.
+   -------------------------------------------------------------------------- */
+export function initGalleryTabs() {
+  const cleanups = live("[data-gallery]").map((root) => {
+    const onClick = (e) => {
+      const tab = e.target.closest(".gallery-tab");
+      if (!tab || tab.classList.contains("is-active")) return;
+      const { set } = tab.dataset;
+      root.querySelectorAll(".gallery-tab, .gallery-set").forEach((el) => {
+        el.classList.toggle("is-active", el.dataset.set === set);
+      });
+    };
+    root.addEventListener("click", onClick);
+    return () => root.removeEventListener("click", onClick);
+  });
+  return () => cleanups.forEach((fn) => fn());
+}
+
+/* --------------------------------------------------------------------------
+   FAQ (service pages)
+   Markup: [data-faq] > .faq-item > .faq-question + .faq-answer > ... > .body
+   Clicking a question opens its item and closes the rest; CSS animates the
+   answer row. The answer copy gets the same flip reveal as the site's body
+   text (see TEXT_REVEAL_MODES.flip): letters wait swung down behind their
+   masks while the row grows and swing up line by line once it has finished
+   opening, so the text arrives after the space does. On close they swing
+   back down while the row collapses. ScrollTrigger is refreshed once the
+   height has settled, since everything below has moved.
+   -------------------------------------------------------------------------- */
+const FAQ_FLIP = { rotate: -80, transformOrigin: "50% 120%" };
+
+export function initFaq() {
+  const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const splits = [];
+  let cancelled = false;
+
+  const cleanups = live("[data-faq]").map((list) => {
+    const items = gsap.utils.toArray(".faq-item", list);
+    const isOpen = (item) => item.classList.contains("is-open");
+
+    if (!reduced) {
+      document.fonts.ready.then(() => {
+        if (cancelled) return;
+        items.forEach((item) => {
+          const copy = item.querySelector(".faq-answer .body");
+          if (!copy) return;
+          const split = SplitText.create(copy, {
+            type: "lines,words,chars",
+            mask: "chars",
+            autoSplit: true,
+            linesClass: "tr-line",
+            wordsClass: "tr-word",
+            charsClass: "tr-char",
+            onSplit(self) {
+              // Re-splits on resize: park the letters where the item's state wants them
+              gsap.set(self.chars, isOpen(item) ? { rotate: 0 } : FAQ_FLIP);
+              return null;
+            },
+          });
+          item._faqSplit = split;
+          splits.push(split);
+        });
+      });
+    }
+
+    const show = (item) => {
+      const split = item._faqSplit;
+      if (!split) return;
+      gsap.killTweensOf(split.chars);
+      split.lines.forEach((line, i) => {
+        const chars = line.querySelectorAll(".tr-char");
+        gsap.fromTo(chars, FAQ_FLIP, {
+          rotate: 0,
+          duration: 0.8,
+          stagger: 0.018,
+          ease: "back.out(1.1)",
+          delay: i * 0.25,
+        });
+      });
+    };
+    const hide = (item) => {
+      const split = item._faqSplit;
+      if (!split) return;
+      gsap.killTweensOf(split.chars);
+      gsap.to(split.chars, { ...FAQ_FLIP, duration: 0.3, ease: "power2.in" });
+    };
+
+    const onClick = (e) => {
+      const question = e.target.closest(".faq-question");
+      if (!question) return;
+      const item = question.closest(".faq-item");
+      const open = !isOpen(item);
+      items.forEach((el) => {
+        const on = open && el === item;
+        if (isOpen(el) && !on) hide(el);
+        el.classList.toggle("is-open", on);
+        el.querySelector(".faq-question").setAttribute("aria-expanded", String(on));
+      });
+    };
+    // The row has finished growing (or shrinking)
+    const onEnd = (e) => {
+      if (e.propertyName !== "grid-template-rows" || !e.target.matches(".faq-answer")) return;
+      const item = e.target.closest(".faq-item");
+      if (isOpen(item)) show(item);
+      ScrollTrigger.refresh();
+    };
+    list.addEventListener("click", onClick);
+    list.addEventListener("transitionend", onEnd);
+    return () => {
+      list.removeEventListener("click", onClick);
+      list.removeEventListener("transitionend", onEnd);
+      items.forEach((item) => delete item._faqSplit);
+    };
+  });
+
+  return () => {
+    cancelled = true;
+    cleanups.forEach((fn) => fn());
+    splits.forEach((split) => split.revert());
+  };
 }
 
 /* --------------------------------------------------------------------------
@@ -1588,6 +1753,9 @@ export function initSite() {
   const wipesCtx = initWipes();
   const destroyProjects = initProjectsSlider();
   const destroyWorkToggles = initWorkToggles();
+  const destroyAreas = initAreas();
+  const destroyGalleryTabs = initGalleryTabs();
+  const destroyFaq = initFaq();
   initEditorContent();
   const destroyTextReveal = initTextReveal();
   const destroyWindLeaves = initWindLeaves();
@@ -1602,6 +1770,9 @@ export function initSite() {
     destroyHeader();
     destroyWindLeaves();
     destroyTextReveal();
+    destroyFaq();
+    destroyGalleryTabs();
+    destroyAreas();
     destroyWorkToggles();
     destroyProjects();
     wipesCtx.revert();

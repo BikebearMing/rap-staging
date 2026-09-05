@@ -2,12 +2,12 @@ import Link from "next/link";
 import Button from "@/components/Button";
 
 // Site header. Nav items are placeholder until they come from WordPress;
-// only Our Works, Blog and Contact have real routes for now.
+// Specialty is placeholder until it has a page.
 const navItems = [
-  { label: "Event Designs", href: "#" },
-  { label: "Landscaping", href: "#" },
-  { label: "Plant Rental", href: "#" },
-  { label: "Maintenance", href: "#" },
+  { label: "Event Designs", href: "/event-design" },
+  { label: "Landscaping", href: "/landscaping" },
+  { label: "Plant Rental", href: "/plant-rental" },
+  { label: "Maintenance", href: "/maintenance" },
   { label: "Specialty", href: "#" },
   { label: "Our Works", href: "/works" },
   { label: "Blog", href: "/blog" },

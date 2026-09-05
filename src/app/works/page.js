@@ -1,17 +1,23 @@
 import Link from "next/link";
-import { works } from "@/data/works";
+import { getPageHeader, getWorks } from "@/lib/wp";
 
 export const metadata = {
   title: "Our Works | Rent-A-Pot",
   description: "A collection of spaces, details, and moments brought to life.",
 };
 
-export default function Works() {
+// Our Works listing. Heading comes from the Page Header field group; the
+// works are the Works post type, newest first. A project has one variant per
+// service it was delivered as, each with its own photo; a pill over the
+// image switches between them when there is more than one.
+export default async function Works() {
+  const [header, works] = await Promise.all([getPageHeader("works"), getWorks()]);
+
   return (
     <main className="works-page">
       <section className="works-header">
         <h1 className="h1" data-text-reveal="lift">
-          Our Works
+          {header.heading}
         </h1>
       </section>
 
