@@ -26,6 +26,11 @@ export async function wpQuery(query, variables = {}) {
     next: { revalidate: 60, tags: ["wordpress"] },
   });
   if (!res.ok) throw new Error(`WordPress responded ${res.status} for ${ENDPOINT}`);
+  // A broken WordPress redirects to an HTML page with a 200, so check before parsing.
+  const type = res.headers.get("content-type") || "";
+  if (!type.includes("json")) {
+    throw new Error(`WordPress returned ${type || "no content-type"} instead of JSON from ${ENDPOINT} (landed on ${res.url})`);
+  }
   const { data, errors } = await res.json();
   if (errors?.length) throw new Error(errors.map((e) => e.message).join("\n"));
   return data;
@@ -38,6 +43,13 @@ const IMAGES = "nodes { sourceUrl altText }";
 
 export const SERVICE_BANNER = `serviceBannerFields { bannerHeading bannerHighlight bannerText bannerImage { ${IMAGE} } }`;
 export const SERVICE_FAQ = "serviceFaqFields { faqs { question answer } }";
+
+// Sections shared by the service pages and contact. Each page's own field
+// group carries the same field names, so these drop into any of them; the
+// matching normalisers are processFrom, costsFrom and whereFrom below.
+export const PROCESS_FIELDS = "processHeading processHighlight processSteps { title text }";
+export const COSTS_FIELDS = `costsHeading costsHighlight costsText costsCards { title price image { ${IMAGE} } }`;
+export const WHERE_FIELDS = "whereLabel whereGroups { heading note areas rows }";
 
 const WORK = `
   title slug date
@@ -56,6 +68,36 @@ const POST = `title slug date excerpt isSticky featuredImage { ${IMAGE} }`;
 const src = (edge) => edge?.node?.sourceUrl || "";
 const srcs = (conn) => (conn?.nodes || []).map((n) => n.sourceUrl).filter(Boolean);
 const first = (conn) => conn?.nodes?.[0] || null;
+
+// A textarea with one entry per line, or paragraphs split by an empty line
+const lines = (text) => String(text || "").split(/\r?\n/).map((l) => l.trim()).filter(Boolean);
+const paragraphs = (text) => String(text || "").split(/\r?\n\s*\r?\n/).map((p) => p.trim()).filter(Boolean);
+
+// Props for ServiceProcess, ServiceCosts and ServiceWhere from a page's fields
+export const processFrom = (fields = {}) => ({
+  heading: fields.processHeading || "",
+  highlight: fields.processHighlight || "",
+  steps: (fields.processSteps || []).map((step) => ({ title: step.title || "", text: step.text || "" })),
+});
+export const costsFrom = (fields = {}) => ({
+  heading: fields.costsHeading || "",
+  highlight: fields.costsHighlight || "",
+  text: paragraphs(fields.costsText),
+  cards: (fields.costsCards || []).map((card) => ({
+    title: card.title || "",
+    price: card.price || "",
+    image: src(card.image),
+  })),
+});
+export const whereFrom = (fields = {}) => ({
+  label: fields.whereLabel || "",
+  groups: (fields.whereGroups || []).map((group) => ({
+    heading: group.heading || "",
+    note: group.note || "",
+    areas: lines(group.areas),
+    columns: group.rows || 0, // rows deep; 0 is one long column
+  })),
+});
 
 // "/event-design/" from WordPress becomes the Next.js route "/event-design"
 export const localPath = (uri) => (uri ? uri.replace(/\/+$/, "") || "/" : "#");
@@ -203,13 +245,16 @@ export async function getPageHeader(slug) {
 export async function getContact() {
   const { contactFields: c = {} } = await getPage(
     "contact",
-    `contactFields { heroHeading heroImage { ${IMAGE} } scrollLabel formHeading }`
+    `contactFields { heroHeading heroImage { ${IMAGE} } scrollLabel formHeading formHighlight formServices ${WHERE_FIELDS} }`
   );
   return {
     heroHeading: c.heroHeading || "",
     heroImage: src(c.heroImage),
     scrollLabel: c.scrollLabel || "",
     formHeading: c.formHeading || "",
+    formHighlight: c.formHighlight || "",
+    formServices: lines(c.formServices),
+    where: whereFrom(c),
   };
 }
 

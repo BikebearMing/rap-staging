@@ -1,9 +1,18 @@
 import Faq from "@/components/Faq";
-import Heading from "@/components/Heading";
 import ProjectsSlider from "@/components/ProjectsSlider";
+import ServiceAreas from "@/components/ServiceAreas";
 import ServiceBanner from "@/components/ServiceBanner";
-import WindLeaf from "@/components/WindLeaf";
-import { getServicePage, getWorks, worksForService } from "@/lib/wp";
+import ServiceCosts from "@/components/ServiceCosts";
+import ServiceProcess from "@/components/ServiceProcess";
+import {
+  COSTS_FIELDS,
+  PROCESS_FIELDS,
+  costsFrom,
+  getServicePage,
+  getWorks,
+  processFrom,
+  worksForService,
+} from "@/lib/wp";
 
 const SERVICE = "event-design";
 
@@ -14,16 +23,17 @@ export const metadata = {
 };
 
 // Event design service page. Content comes from the Service Page Banner,
-// Service Page FAQ and Event Design Page field groups. Same bones as the
-// other service pages, with the categories laid out as a grid instead of a
-// strip.
+// Service Page FAQ and Event Design Page field groups. Same sections as the
+// landscaping page, with the categories as a hover list like plant rental's
+// areas.
 export default async function EventDesign() {
   const [page, works] = await Promise.all([
     getServicePage(
       SERVICE,
       `eventDesignFields {
-        categoriesLabel categoriesHeading categoriesHighlight
-        categories { title image { node { sourceUrl } } }
+        categoriesLabel
+        categories { title description image { node { sourceUrl } } }
+        ${PROCESS_FIELDS} ${COSTS_FIELDS}
       }`
     ),
     getWorks(),
@@ -31,6 +41,7 @@ export default async function EventDesign() {
   const fields = page.eventDesignFields || {};
   const categories = (fields.categories || []).map((category) => ({
     title: category.title,
+    description: category.description || "",
     image: category.image?.node?.sourceUrl || "",
   }));
   const projects = worksForService(works, SERVICE);
@@ -39,32 +50,11 @@ export default async function EventDesign() {
     <main className="service-page">
       <ServiceBanner banner={page.banner} />
 
-      <section className="service-categories">
-        <WindLeaf />
-        <p className="body categories-label">
-          <span data-text-reveal="flip">{fields.categoriesLabel}</span>
-          <span className="icon icon-arrow" aria-hidden="true" />
-        </p>
+      <ServiceAreas className="event-categories" label={fields.categoriesLabel} areas={categories} />
 
-        <Heading
-          className="h2"
-          text={fields.categoriesHeading}
-          highlight={fields.categoriesHighlight}
-          trigger=".service-categories"
-          delay="1.3"
-        />
+      <ServiceProcess process={processFrom(fields)} />
 
-        <div className="categories-grid">
-          {categories.map((category) => (
-            <article className="gallery-card" key={category.title}>
-              <div className="gallery-card-media">
-                <img src={category.image} alt="" />
-              </div>
-              <p className="h4 dark gallery-card-title">{category.title}</p>
-            </article>
-          ))}
-        </div>
-      </section>
+      <ServiceCosts costs={costsFrom(fields)} />
 
       <ProjectsSlider projects={projects} />
 

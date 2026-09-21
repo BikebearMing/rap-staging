@@ -1050,10 +1050,20 @@ export function initAreas() {
    that share a data-set index. Clicking a tab makes it and its strip the
    active ones; the crossfade is CSS. The strips are Embla sliders set up by
    initSliders; they stay laid out while hidden, so no re-measure is needed.
+   The .gallery-prev / .gallery-next arrows sit outside the strips, so they
+   move whichever strip is active.
    -------------------------------------------------------------------------- */
 export function initGalleryTabs() {
   const cleanups = live("[data-gallery]").map((root) => {
     const onClick = (e) => {
+      const arrow = e.target.closest(".gallery-arrow");
+      if (arrow) {
+        const viewport = root.querySelector(".gallery-set.is-active .embla__viewport");
+        const embla = getSliders().find((s) => s.rootNode() === viewport);
+        if (arrow.classList.contains("gallery-prev")) embla?.scrollPrev();
+        else embla?.scrollNext();
+        return;
+      }
       const tab = e.target.closest(".gallery-tab");
       if (!tab || tab.classList.contains("is-active")) return;
       const { set } = tab.dataset;

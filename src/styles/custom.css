@@ -1493,34 +1493,6 @@ html.is-rendering .site-page {
   right: -4.5vw;
 }
 
-/* Event categories: stem off the top-right, fronds behind the heading */
-.service-categories .wind-leaf {
-  --leaf-width: 47vw;
-  --leaf-rotate: 9deg;
-  top: -1vw;
-  right: -4.5vw;
-}
-
-/* Maintenance: a leaf off the top-right corner and another turned round
-   off the bottom-left, its fronds reaching up towards the first. The turn
-   pivots on the stem (97% 8.5% of the box), so the left box is placed by
-   where that puts the stem: 4.5vw off the left edge, 2vw above the
-   section's bottom. */
-.service-maintenance .wind-leaf {
-  --leaf-width: 40vw;
-  --leaf-rotate: 9deg;
-  top: 1vw;
-  right: -4.5vw;
-
-  &.is-left {
-    --leaf-rotate: 185deg;
-    top: auto;
-    right: auto;
-    left: calc(-4.5vw - 0.97 * var(--leaf-width));
-    bottom: calc(2vw - 0.915 * var(--leaf-width) * 595 / 550);
-  }
-}
-
 @media (prefers-reduced-motion: reduce) {
   .wind-leaf img {
     transform: none !important;
@@ -1811,24 +1783,39 @@ html.is-rendering .site-page {
   }
 }
 
+/* "Area we serve" panel (see ServiceWhere.js) between the hero and the
+   form, with the hanging plant over its top-right corner; the list is held
+   clear of the plant. The form section sets the gap below. */
+.contact-where {
+  position: relative; /* anchors the plant */
+  padding-top: 3.611vw; /* 52px */
+
+  & .service-where {
+    padding-bottom: 0;
+  }
+
+  /* .service-where in the selector to outrank the panel's own rule below */
+  & .service-where .where-group:only-child {
+    padding-right: 9.514vw; /* 137px */
+  }
+}
+
 .contact-form-section {
   position: relative;
   display: flex;
   flex-direction: column;
-  align-items: center;
   gap: 2.917vw; /* 42px, heading to form */
-  padding-block: 6.319vw 3.472vw; /* 91px, 50px */
+  padding-block: 7.569vw 3.472vw; /* 109px, 50px */
   padding-inline: 5.833vw; /* 84px */
-  text-align: center;
 }
 
-/* Artwork at its native px. The plant hangs from the section's top edge;
-   the leaves' file has 23px of clear space under them, pulled down so the
-   leaves themselves sit on the section's bottom edge. */
+/* Artwork at its native px. The plant hangs from the top of the area
+   panel's wrapper; the leaves' file has 23px of clear space under them,
+   pulled down so the leaves themselves sit on the section's bottom edge. */
 .contact-plant {
   position: absolute;
   top: 0;
-  left: 2.083vw;
+  right: 3.194vw; /* 46px */
   width: 11.389vw; /* 164 */
   pointer-events: none;
 }
@@ -1842,47 +1829,74 @@ html.is-rendering .site-page {
 }
 
 .contact-form {
-  position: relative; /* above the plant */
+  position: relative; /* above the leaves */
   display: flex;
   flex-direction: column;
-  gap: 1.111vw;
+  gap: 1.111vw; /* 16px */
   width: 100%;
 
+  /* Six fields, three across */
   & .form-row {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 1.111vw;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.111vw; /* 16px */
   }
 }
 
-/* Fields: outlined pills on the beige, label centred (same type as
-   .button-label). The textarea grows with its content from one line. */
+/* Fields: outlined boxes on the beige, 88px tall, body type with a muted
+   placeholder on the left. */
 .contact-field {
   width: 100%;
-  padding-block: 6.181vw; /* 89px */
-  padding-inline: 2.639vw;
+  padding-block: 2.222vw; /* 32px */
+  padding-inline: 2.431vw; /* 35px */
   background: transparent;
-  border: 1px solid var(--light-green);
-  border-radius: 3.472vw;
-  font-family: var(--font-otflag);
-  font-size: 1.111vw;
-  font-weight: 700;
-  line-height: 1.25;
+  border: 0.139vw solid var(--light-green); /* 2px */
+  border-radius: 1.667vw; /* 24px */
+  font-family: var(--font-dm-sans);
+  font-size: 1.042vw; /* 15px */
+  font-weight: 400;
+  line-height: 1.33; /* 20px */
   color: var(--dark-green);
-  text-align: center;
   outline: none;
-  resize: none;
-  field-sizing: content;
   transition: border-color 0.35s ease;
 
   &::placeholder {
     color: var(--dark-green);
-    opacity: 1;
+    opacity: 0.6;
   }
 
   &:focus {
     border-color: var(--dark-green);
   }
+}
+
+/* Select: native arrow swapped for a chevron; reads as a placeholder until
+   a service is picked (it is required and starts on the empty option) */
+.contact-select {
+  appearance: none;
+  padding-right: 5vw; /* clear of the chevron */
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 22 12' fill='none' stroke='%23042100' stroke-width='1.5'%3E%3Cpath d='M1 1l10 10L21 1'/%3E%3C/svg%3E")
+    no-repeat right 2.431vw center / 1.528vw auto; /* 22px chevron, 35px in */
+  cursor: pointer;
+
+  &:invalid {
+    color: rgba(4, 33, 0, 0.6);
+  }
+
+  & option {
+    color: var(--dark-green);
+  }
+}
+
+/* Message: taller and rounder, 10px further from its neighbours, with the
+   text centred. It grows with its content from one line. */
+.contact-message {
+  margin-block: 0.694vw; /* 10px */
+  padding-block: 6.389vw; /* 92px */
+  border-radius: 2.778vw; /* 40px */
+  text-align: center;
+  resize: none;
+  field-sizing: content;
 }
 
 /* Submit: full-width green pill, heading-size label, arrow pointing up-right */
@@ -2208,6 +2222,17 @@ html.is-rendering .site-page {
     gap: 2.708vw; /* 39px */
   }
 
+  /* Small label with the site arrow, in place of the heading (event design) */
+  & .areas-label {
+    display: flex;
+    align-items: center;
+    gap: 0.694vw; /* 10px */
+
+    & .icon-arrow {
+      transform: rotate(30deg); /* down-right, like the services header */
+    }
+  }
+
   & .areas-list {
     display: flex;
     flex-direction: column;
@@ -2272,47 +2297,77 @@ html.is-rendering .site-page {
   }
 }
 
+/* Event design and maintenance pages: the areas list comes straight after
+   the banner. On event design the process strip follows, which brings 20px
+   of its own, and the photo is narrower than plant rental's, near square
+   against the four names. On maintenance the costs section follows, which
+   gives up its own top padding after an areas list (see below). */
+.event-categories {
+  grid-template-columns: 1fr 35.764vw; /* 515px */
+  padding-block: 4.792vw 6.181vw; /* 69px, 89px */
+}
+
+.maintenance-services {
+  padding-block: 4.792vw 9.722vw; /* 69px, 140px */
+}
+
 /* Gallery (landscaping page): heading with the hanging plant off the
-   top-right, a row of tab pills, then one strip of cards per tab. The
-   strips are stacked in one grid cell and the active one shows (see
-   initGalleryTabs in custom.js); each is an Embla slider whose cards run
-   off the right edge of the page. The design measures 85px to the cards
-   and 84px to the heading; both sit on the 84px side padding. */
+   top-right, then two columns: the tab pills stacked over the prev/next
+   arrows on the left, and one strip of cards per tab on the right, each
+   under its own title and description. The strips are stacked in one grid
+   cell and the active one shows (see initGalleryTabs in custom.js); each
+   is an Embla slider whose cards run off the right edge of the page, moved
+   by the arrows or by dragging. */
 .service-gallery {
   position: relative;
   display: flex;
   flex-direction: column;
   padding-inline: 5.833vw 0; /* 84px */
-  padding-block: 6.389vw 6.181vw; /* 92px, 89px */
+  padding-block: 4.861vw 6.181vw; /* 70px, 89px */
+  overflow: clip; /* crops the plant's wires */
 
-  /* Artwork at its native px, hanging from the section's top edge */
+  /* Artwork at its native px, hung high enough that the section's top edge
+     crops its wires and the leaves clear the set description */
   & .gallery-plant {
     position: absolute;
-    top: 0;
+    top: -4.167vw; /* -60px */
     right: 2.083vw; /* 30px */
     width: 11.389vw; /* 164 */
     pointer-events: none;
   }
 
+  & .gallery-body {
+    display: flex;
+    align-items: flex-start;
+    gap: 5vw; /* 72px */
+    margin-top: 3.611vw; /* 52px */
+  }
+
+  & .gallery-side {
+    flex: 0 0 auto;
+  }
+
+  /* Stretched, so every pill is as wide as the longest label */
   & .gallery-tabs {
     display: flex;
-    flex-wrap: wrap;
+    flex-direction: column;
     gap: 1.111vw; /* 16px */
-    margin-top: 1.875vw; /* 27px */
   }
 
   /* Outlined pill; the active one fills */
   & .gallery-tab {
     display: inline-flex;
     align-items: center;
-    gap: 1.111vw; /* 16px */
-    padding-inline: 1.944vw; /* 28px */
+    justify-content: center;
+    gap: 0.833vw; /* 12px */
+    padding-inline: 1.389vw; /* 20px */
     padding-block: 0.972vw; /* 14px */
     border: 1px solid var(--light-green);
     border-radius: 1.25vw; /* 18px */
-    font-size: 1.111vw; /* same type as the button label */
+    font-size: 0.972vw; /* 14px */
     font-weight: 700;
-    line-height: 1.25;
+    line-height: 1.43; /* 20px */
+    white-space: nowrap;
     color: var(--dark-green);
     transition: background-color 0.35s ease;
 
@@ -2321,12 +2376,39 @@ html.is-rendering .site-page {
     }
   }
 
-  /* minmax(0, 1fr): the strips would otherwise size the cell to their
-     cards and Embla would have nothing to scroll */
+  /* The arrow artwork points right */
+  & .gallery-arrows {
+    display: flex;
+    gap: 1.111vw; /* 16px */
+    margin-top: 3.75vw; /* 54px */
+  }
+
+  & .gallery-prev .icon-arrow {
+    transform: rotate(180deg);
+  }
+
+  /* min-width and minmax(0, 1fr): the strips would otherwise size the
+     column to their cards and Embla would have nothing to scroll */
   & .gallery-sets {
     display: grid;
     grid-template-columns: minmax(0, 1fr);
-    margin-top: 2.361vw; /* 34px */
+    flex: 1;
+    min-width: 0;
+  }
+
+  /* Title and description side by side, held off the right edge that the
+     cards run past */
+  & .gallery-set-head {
+    display: flex;
+    align-items: center;
+    gap: 5.694vw; /* 82px */
+    min-height: 2.778vw; /* 40px, so a set with no description lines up */
+    margin-bottom: 1.597vw; /* 23px */
+    padding-right: 5.833vw; /* 84px */
+
+    & .h3 {
+      flex: 0 0 auto;
+    }
   }
 
   & .gallery-set {
@@ -2349,8 +2431,7 @@ html.is-rendering .site-page {
 }
 
 /* Card: photo over a dark green band with the name centred in it. In the
-   landscaping strips (flex) and the event categories grid, where the
-   column sets the width instead. */
+   landscaping strips and, grown to fit a price, the costs cards. */
 .gallery-card {
   display: flex;
   flex-direction: column;
@@ -2380,71 +2461,256 @@ html.is-rendering .site-page {
   }
 }
 
-/* Event categories (event design page): label, heading and a 4 x 2 grid of
-   cards on the 84px side padding, with the wind leaf behind the heading.
-   The cards are the landscaping ones, sized by the grid: four across with
-   the same 15px between them lands on the same 305px card. Vertical
-   spacing is read off the design. */
-.service-categories {
-  position: relative; /* anchors the wind leaf */
-  display: flex;
-  flex-direction: column;
-  padding-inline: 5.833vw; /* 84px */
-  padding-block: 4.792vw 6.181vw; /* 69px, 89px */
+/* Process (service pages, see ServiceProcess.js): heading with the prev/next arrows opposite,
+   over an Embla strip of numbered step cards that runs off the right edge
+   like the gallery's. Each card's number badge straddles its top edge, so
+   the viewport is padded by half a badge to keep it from being clipped.
+   Spacing is read off the design. */
+.service-process {
+  padding-inline: 5.833vw 0; /* 84px */
+  padding-block: 1.389vw 0; /* 20px; the costs section sets the gap below */
 
-  & .categories-label {
+  & .process-head {
     display: flex;
     align-items: center;
-    gap: 0.694vw; /* 10px */
+    justify-content: space-between;
+    gap: 2.778vw; /* 40px */
+    padding-right: 5.833vw; /* 84px */
+  }
 
-    & .icon-arrow {
-      transform: rotate(30deg); /* down-right, like the services header */
+  /* The arrow artwork points right */
+  & .process-arrows {
+    display: flex;
+    flex: 0 0 auto;
+    gap: 1.111vw; /* 16px */
+  }
+
+  & .embla__prev .icon-arrow {
+    transform: rotate(180deg);
+  }
+
+  & .embla__viewport {
+    margin-top: 1.944vw; /* 28px */
+    padding-top: 2.708vw; /* 39px, half the badge */
+  }
+
+  & .embla__container {
+    gap: 1.111vw; /* 16px */
+  }
+
+  & .process-card {
+    position: relative; /* anchors the badge */
+    flex: 0 0 21.181vw; /* 305px */
+    padding-inline: 2.917vw; /* 42px */
+    padding-block: 6.25vw 5.625vw; /* 90px, 81px */
+    border-radius: 3.333vw; /* 48px */
+    background: var(--dark-green);
+    text-align: center;
+    list-style: none;
+
+    /* Two lines tall even for a one-line title, so the copy starts level
+       across the cards */
+    & .h3 {
+      min-height: 2.5em;
+    }
+
+    & .body {
+      margin-top: 2.153vw; /* 31px */
     }
   }
 
-  & .h2 {
-    margin-top: 4.028vw; /* 58px */
-  }
-
-  & .categories-grid {
+  & .process-number {
+    position: absolute;
+    top: 0;
+    left: 50%;
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 2.083vw 1.042vw; /* 30px, 15px */
-    margin-top: 3.333vw; /* 48px */
+    place-items: center;
+    width: 5.417vw; /* 78px */
+    height: 5.417vw;
+    border-radius: 50%;
+    background: var(--light-green);
+    font-family: var(--font-otflag);
+    font-size: 1.944vw; /* 28px */
+    font-weight: 700;
+    line-height: 1;
+    color: var(--dark-green);
+    transform: translate(-50%, -50%);
   }
 }
 
-/* Maintenance services (maintenance page): centred heading and label over
-   a centred grid of the landscaping cards, three across then two, with a
-   wind leaf on each side. The grid is capped at three cards so the last
-   two wrap onto their own row. Spacing is read off the design. */
-.service-maintenance {
-  position: relative; /* anchors the wind leaves */
+/* Costs (service pages, see ServiceCosts.js): heading and copy on the left, a drag-only Embla
+   strip of price cards on the right that runs off the page edge. The cards
+   are the gallery ones grown to fit a price under the title. The 140px
+   above is the whole gap to the process cards, which end flush. */
+.service-costs {
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding-inline: 5.833vw; /* 84px */
-  padding-block: 6.944vw 6.181vw; /* 100px, 89px */
-  text-align: center;
+  align-items: flex-start;
+  gap: 4.097vw; /* 59px */
+  padding-inline: 5.833vw 0; /* 84px */
+  padding-block: 9.722vw 10.764vw; /* 140px, 155px */
 
-  & .maintenance-label {
+  & .costs-text {
+    flex: 0 0 33.194vw; /* 478px */
+  }
+
+  & .costs-copy {
+    display: flex;
+    flex-direction: column;
+    gap: 1.389vw; /* one line, 20px */
+    margin-top: 2.292vw; /* 33px */
+  }
+
+  /* min-width: the strip would otherwise size to its cards and Embla would
+     have nothing to scroll */
+  & .costs-cards {
+    flex: 1;
+    min-width: 0;
+  }
+
+  & .embla__container {
+    gap: 1.111vw; /* 16px */
+  }
+
+  & .cost-card {
+    flex-basis: 21.319vw; /* 307px */
+    height: auto;
+
+    & .gallery-card-media {
+      flex: 0 0 auto;
+      height: 18.958vw; /* 273px */
+    }
+  }
+
+  & .cost-card-text {
+    display: flex;
+    flex-direction: column;
+    gap: 0.833vw; /* 12px */
+    padding-block: 1.875vw 1.597vw; /* 27px, 23px */
+    padding-inline: 1.111vw; /* 16px */
+    text-align: center;
+
+    /* A step down from the h4, so the two-line titles fit the card */
+    & .h4 {
+      font-size: 1.389vw; /* 20px */
+      line-height: 1.5; /* 30px */
+    }
+
+    & .body {
+      font-size: 0.972vw; /* 14px */
+      opacity: 0.8;
+    }
+  }
+}
+
+/* The pages run these sections in different orders, so the gaps that depend
+   on the neighbour live here: an areas list already ends with the gap to
+   the costs; costs followed by the process strip (plant rental) close up to
+   120px with its 20px; and the process strip, which ends flush with its
+   cards, stands 120px off a where panel. */
+.service-areas + .service-costs {
+  padding-top: 0;
+}
+
+.service-costs:has(+ .service-process) {
+  padding-bottom: 6.944vw; /* 100px */
+}
+
+.service-process + .service-where {
+  margin-top: 8.333vw; /* 120px */
+}
+
+/* Where we work (service pages and contact, see ServiceWhere.js): dark green panel inset 10px from the
+   page edges, so its 74px padding lands the copy on the 84px line. A label
+   over two heading + area list pairs in a row. Spacing is read off the
+   design. */
+.service-where {
+  padding-inline: 0.694vw; /* 10px */
+  padding-bottom: 6.181vw; /* 89px */
+
+  & .where-panel {
+    padding-inline: 5.139vw; /* 74px */
+    padding-block: 2.708vw 4.653vw; /* 39px, 67px */
+    border-radius: 1.667vw; /* 24px */
+    background: var(--dark-green);
+  }
+
+  & .where-label {
     display: flex;
     align-items: center;
     gap: 0.694vw; /* 10px */
-    margin-top: 3.472vw; /* 50px */
 
     & .icon-arrow {
       transform: rotate(30deg); /* down-right, like the services header */
     }
   }
 
-  & .maintenance-grid {
+  & .where-groups {
     display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 2.083vw 1.042vw; /* 30px, 15px */
-    max-width: calc(3 * 21.181vw + 2 * 1.042vw); /* three cards and two gaps */
-    margin-top: 2.778vw; /* 40px */
+    align-items: flex-start;
+    gap: 4.236vw; /* 61px */
+    margin-top: 2.222vw; /* 32px */
+  }
+
+  & .where-group {
+    display: flex;
+    align-items: flex-start;
+    gap: 4.861vw; /* 70px */
+  }
+
+  /* A group on its own spreads out: heading left, list held 65px off the
+     panel's padding like the last list of a pair */
+  & .where-group:only-child {
+    flex: 1;
+    justify-content: space-between;
+    padding-right: 4.514vw; /* 65px */
+  }
+
+  & .h2 {
+    white-space: nowrap;
+  }
+
+  /* Small print under a heading (contact page) */
+  & .where-note {
+    max-width: 33.333vw; /* 480px */
+    margin-top: 1.389vw; /* 20px */
+    opacity: 0.6;
+  }
+
+  /* Dot bullets; rows 36px apart */
+  & .where-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.764vw; /* 11px */
+    list-style: none;
+    font-family: var(--font-otflag);
+    font-size: 1.389vw; /* 20px */
+    font-weight: 600;
+    line-height: 1.25; /* 25px */
+    letter-spacing: 0.11vw; /* same as the headings */
+    white-space: nowrap;
+
+    /* Two rows deep, running across */
+    &.is-columns {
+      display: grid;
+      grid-template-rows: repeat(var(--where-rows, 2), auto);
+      grid-auto-flow: column;
+      column-gap: 1.944vw; /* 28px */
+      margin-top: 0.833vw; /* 12px, level with the heading's first line */
+    }
+
+    & li {
+      display: flex;
+      align-items: center;
+      gap: 0.972vw; /* 14px */
+
+      &::before {
+        content: "";
+        width: 0.278vw; /* 4px */
+        height: 0.278vw;
+        border-radius: 50%;
+        background: currentColor;
+      }
+    }
   }
 }
 
@@ -3234,23 +3500,6 @@ html.is-rendering .site-page {
     right: -12vw;
   }
 
-  .service-categories .wind-leaf {
-    --leaf-width: 90vw;
-    top: 0;
-    right: -12vw;
-  }
-
-  .service-maintenance .wind-leaf {
-    --leaf-width: 80vw;
-    top: 0;
-    right: -12vw;
-
-    &.is-left {
-      left: calc(-12vw - 0.97 * var(--leaf-width));
-      bottom: calc(4vw - 0.915 * var(--leaf-width) * 595 / 550);
-    }
-  }
-
   /* ========== BLOG POST ========== */
   .post-header {
     gap: 4vw;
@@ -3376,15 +3625,29 @@ html.is-rendering .site-page {
     font-size: 2.5vw;
   }
 
+  .contact-where {
+    padding-top: 8vw;
+
+    & .service-where .where-group:only-child {
+      padding-right: 0;
+    }
+
+    /* Label and heading wrap clear of the plant */
+    & .where-label,
+    & .where-heading {
+      padding-right: 16vw;
+    }
+  }
+
   .contact-form-section {
     gap: 8vw;
     padding-block: 16vw 10vw;
     padding-inline: 6vw;
   }
 
-  /* Shrunk so it clears the centred heading */
+  /* Shrunk to sit in the panel's corner */
   .contact-plant {
-    left: 2vw;
+    right: 4vw;
     width: 18vw; /* TODO: verify */
   }
 
@@ -3404,10 +3667,23 @@ html.is-rendering .site-page {
   }
 
   .contact-field {
-    padding-block: 10vw;
+    padding-block: 5vw;
     padding-inline: 5vw;
-    border-radius: 8vw;
+    border-width: 2px;
+    border-radius: 5vw;
     font-size: 3.5vw;
+  }
+
+  .contact-select {
+    padding-right: 14vw;
+    background-position: right 5vw center;
+    background-size: 4.5vw auto;
+  }
+
+  .contact-message {
+    margin-block: 0;
+    padding-block: 16vw;
+    border-radius: 8vw;
   }
 
   .contact-submit {
@@ -3598,6 +3874,18 @@ html.is-rendering .site-page {
       height: 90vw;
       border-radius: 4vw;
     }
+
+    & .areas-label {
+      gap: 2vw;
+    }
+  }
+
+  .event-categories {
+    padding-block: 12vw 14vw;
+  }
+
+  .maintenance-services {
+    padding-block: 12vw 16vw;
   }
 
   .service-gallery {
@@ -3605,6 +3893,7 @@ html.is-rendering .site-page {
     padding-block: 14vw 14vw;
 
     & .gallery-plant {
+      top: 0;
       right: 2vw;
       width: 14vw; /* TODO: verify */
     }
@@ -3614,9 +3903,23 @@ html.is-rendering .site-page {
       padding-right: 16vw;
     }
 
-    & .gallery-tabs {
-      gap: 2.5vw;
+    /* Stacked: tabs, the active strip, then the arrows under the cards.
+       The side column dissolves so the arrows can be ordered last. */
+    & .gallery-body {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 0;
       margin-top: 6vw;
+    }
+
+    & .gallery-side {
+      display: contents;
+    }
+
+    & .gallery-tabs {
+      flex-direction: row;
+      flex-wrap: wrap;
+      gap: 2.5vw;
       padding-right: 6vw;
     }
 
@@ -3629,7 +3932,24 @@ html.is-rendering .site-page {
     }
 
     & .gallery-sets {
-      margin-top: 7vw;
+      order: 2;
+      flex: none;
+      margin-top: 8vw;
+    }
+
+    & .gallery-set-head {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 3vw;
+      min-height: 0;
+      margin-bottom: 5vw;
+      padding-right: 6vw;
+    }
+
+    & .gallery-arrows {
+      order: 3;
+      gap: 3vw;
+      margin-top: 6vw;
     }
 
     & .embla__container {
@@ -3652,36 +3972,173 @@ html.is-rendering .site-page {
     }
   }
 
-  /* Two across, so the cards are shorter than in the landscaping strips */
-  .service-categories {
-    padding-inline: 6vw;
-    padding-block: 12vw 14vw;
+  /* Arrows stay beside the heading, level with its last line */
+  /* Stacked: copy, then the strip of cards */
+  .service-costs {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8vw;
+    padding-inline: 6vw 0;
+    padding-block: 16vw 16vw;
 
-    & .categories-label {
+    & .costs-text {
+      flex: none;
+      padding-right: 6vw;
+    }
+
+    & .costs-copy {
+      gap: 4vw;
+      margin-top: 6vw;
+    }
+
+    & .costs-cards {
+      flex: none;
+    }
+
+    & .embla__container {
+      gap: 3vw;
+    }
+
+    & .cost-card {
+      flex-basis: 68vw;
+      height: auto;
+
+      & .gallery-card-media {
+        height: 60vw;
+      }
+    }
+
+    & .cost-card-text {
+      gap: 2vw;
+      padding-block: 5vw;
+      padding-inline: 3vw;
+
+      & .h4 {
+        font-size: 4.2vw;
+        line-height: 1.35;
+      }
+
+      & .body {
+        font-size: 3.2vw;
+      }
+    }
+  }
+
+  .service-areas + .service-costs {
+    padding-top: 0;
+  }
+
+  .service-costs:has(+ .service-process) {
+    padding-bottom: 12vw;
+  }
+
+  .service-process + .service-where {
+    margin-top: 16vw;
+  }
+
+  /* Groups stack, each heading over its list */
+  .service-where {
+    padding-inline: var(--sidepadding-xs);
+    padding-bottom: 14vw;
+
+    & .where-panel {
+      padding-inline: 5vw;
+      padding-block: 8vw 10vw;
+      border-radius: 6vw;
+    }
+
+    & .where-label {
       gap: 2vw;
     }
 
+    & .where-groups {
+      flex-direction: column;
+      gap: 10vw;
+      margin-top: 6vw;
+    }
+
+    & .where-group {
+      flex-direction: column;
+      gap: 5vw;
+    }
+
+    & .where-group:only-child {
+      padding-right: 0;
+    }
+
+    & .where-note {
+      max-width: none;
+      margin-top: 4vw;
+    }
+
+    /* Headings wrap to the panel rather than holding their line */
     & .h2 {
-      margin-top: 8vw;
+      white-space: normal;
     }
 
-    & .categories-grid {
-      grid-template-columns: repeat(2, 1fr);
-      gap: 4vw 3vw;
-      margin-top: 8vw;
+    & .where-list {
+      gap: 2.5vw;
+      font-size: 4.5vw;
+      letter-spacing: 0.3vw;
+
+      /* Two across, running down */
+      &.is-columns {
+        grid-template-rows: none;
+        grid-template-columns: repeat(2, max-content);
+        grid-auto-flow: row;
+        column-gap: 8vw;
+        margin-top: 0;
+      }
+
+      & li {
+        gap: 3vw;
+
+        &::before {
+          width: 1vw;
+          height: 1vw;
+        }
+      }
+    }
+  }
+
+  .service-process {
+    padding-inline: 6vw 0;
+    padding-block: 2vw 0;
+
+    & .process-head {
+      align-items: flex-end;
+      gap: 4vw;
+      padding-right: 6vw;
     }
 
-    & .gallery-card {
-      height: 60vw;
-      border-radius: 5vw;
+    & .process-arrows {
+      gap: 3vw;
+    }
 
-      & .gallery-card-media {
-        height: 42vw;
-      }
+    & .embla__viewport {
+      margin-top: 6vw;
+      padding-top: 9vw; /* half the badge */
+    }
 
-      & .gallery-card-title {
-        padding-inline: 2vw;
+    & .embla__container {
+      gap: 3vw;
+    }
+
+    & .process-card {
+      flex: 0 0 72vw;
+      padding-inline: 6vw;
+      padding-block: 17vw 12vw;
+      border-radius: 8vw;
+
+      & .body {
+        margin-top: 5vw;
       }
+    }
+
+    & .process-number {
+      width: 18vw;
+      height: 18vw;
+      font-size: 6.5vw;
     }
   }
 
@@ -3691,37 +4148,6 @@ html.is-rendering .site-page {
   .icon-outdoor-living {
     width: 4vw;
     height: 4vw;
-  }
-
-  /* Two across, same card size as the event grid */
-  .service-maintenance {
-    padding-inline: 6vw;
-    padding-block: 14vw 14vw;
-
-    & .maintenance-label {
-      gap: 2vw;
-      margin-top: 6vw;
-    }
-
-    & .maintenance-grid {
-      gap: 4vw 3vw;
-      max-width: 100%;
-      margin-top: 8vw;
-    }
-
-    & .gallery-card {
-      flex: 0 0 42.5vw;
-      height: 60vw;
-      border-radius: 5vw;
-
-      & .gallery-card-media {
-        height: 42vw;
-      }
-
-      & .gallery-card-title {
-        padding-inline: 2vw;
-      }
-    }
   }
 
   .service-faq {

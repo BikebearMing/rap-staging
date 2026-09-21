@@ -1,9 +1,23 @@
 import Faq from "@/components/Faq";
 import Heading, { Lines } from "@/components/Heading";
 import ProjectsSlider from "@/components/ProjectsSlider";
+import ServiceAreas from "@/components/ServiceAreas";
 import ServiceBanner from "@/components/ServiceBanner";
+import ServiceCosts from "@/components/ServiceCosts";
+import ServiceProcess from "@/components/ServiceProcess";
+import ServiceWhere from "@/components/ServiceWhere";
 import WindLeaf from "@/components/WindLeaf";
-import { getServicePage, getWorks, worksForService } from "@/lib/wp";
+import {
+  COSTS_FIELDS,
+  PROCESS_FIELDS,
+  WHERE_FIELDS,
+  costsFrom,
+  getServicePage,
+  getWorks,
+  processFrom,
+  whereFrom,
+  worksForService,
+} from "@/lib/wp";
 
 const SERVICE = "plant-rental";
 const IMAGE = "node { sourceUrl }";
@@ -24,6 +38,7 @@ export default async function PlantRental() {
       `plantRentalFields {
         introLabel introHeading introHighlight introColumn1 introColumn2
         areasHeading areas { title description image { ${IMAGE} } }
+        ${COSTS_FIELDS} ${PROCESS_FIELDS} ${WHERE_FIELDS}
       }`
     ),
     getWorks(),
@@ -66,51 +81,13 @@ export default async function PlantRental() {
         </div>
       </section>
 
-      {/* Hovering an area swaps the copy and the photo (see initAreas in custom.js) */}
-      <section className="service-areas has-parallax" data-areas>
-        <div className="areas-content">
-          <p className="h4" data-text-reveal="lift">
-            {intro.areasHeading}
-          </p>
+      <ServiceAreas heading={intro.areasHeading} areas={areas} />
 
-          <ul className="areas-list">
-            {areas.map((area, i) => (
-              <li
-                className={`h2 areas-item${i === 0 ? " is-active" : ""}`}
-                data-area={i}
-                data-text-reveal="lift"
-                key={area.title}
-              >
-                {area.title}
-              </li>
-            ))}
-          </ul>
+      <ServiceCosts costs={costsFrom(intro)} />
 
-          <div className="areas-description" data-line data-line-start="top 100%">
-            {areas.map((area, i) => (
-              <p
-                className={`body areas-copy${i === 0 ? " is-active" : ""}`}
-                data-area={i}
-                key={area.title}
-              >
-                {area.description}
-              </p>
-            ))}
-          </div>
-        </div>
+      <ServiceProcess process={processFrom(intro)} />
 
-        <div className="areas-media parallax-frame">
-          {areas.map((area, i) => (
-            <img
-              src={area.image}
-              alt=""
-              className={`parallax-image areas-image${i === 0 ? " is-active" : ""}`}
-              data-area={i}
-              key={area.title}
-            />
-          ))}
-        </div>
-      </section>
+      <ServiceWhere where={whereFrom(intro)} />
 
       <ProjectsSlider projects={projects} />
 

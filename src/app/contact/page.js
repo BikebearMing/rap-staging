@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { Lines } from "@/components/Heading";
+import Heading, { Lines } from "@/components/Heading";
+import ServiceWhere from "@/components/ServiceWhere";
 import { getContact, getSiteSettings } from "@/lib/wp";
 
 export const metadata = {
@@ -72,17 +73,26 @@ export default async function Contact() {
         </p>
       </section>
 
-      <section className="contact-form-section">
+      {/* The hanging plant overlaps the panel's top-right corner */}
+      <div className="contact-where">
+        <ServiceWhere where={contact.where} />
         <img src="/hanging-plant.png" alt="" className="contact-plant" />
+      </div>
 
-        <h2 className="projects-heading" data-text-reveal="lift">
-          {contact.formHeading}
-        </h2>
+      <section className="contact-form-section">
+        <Heading
+          className="h2"
+          text={contact.formHeading}
+          highlight={contact.formHighlight}
+          trigger=".contact-form-section"
+        />
 
         {/* A form plugin will replace this markup */}
         <form className="contact-form" method="post">
           <div className="form-row">
             <input type="text" name="name" placeholder="Name" className="contact-field" required />
+            <input type="text" name="company" placeholder="Company" className="contact-field" />
+            <input type="tel" name="phone" placeholder="Phone" className="contact-field" />
             <input
               type="email"
               name="email"
@@ -90,11 +100,26 @@ export default async function Contact() {
               className="contact-field"
               required
             />
+            {/* required + an empty first option: :invalid styles it as a placeholder */}
+            <select name="service" className="contact-field contact-select" defaultValue="" required>
+              <option value="" disabled>
+                Service needed
+              </option>
+              {contact.formServices.map((service) => (
+                <option key={service}>{service}</option>
+              ))}
+            </select>
+            <input
+              type="text"
+              name="location"
+              placeholder="Site Location"
+              className="contact-field"
+            />
           </div>
           <textarea
             name="message"
             placeholder="Message"
-            className="contact-field"
+            className="contact-field contact-message"
             rows="1"
             required
           />

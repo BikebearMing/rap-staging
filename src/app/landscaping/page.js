@@ -2,7 +2,20 @@ import Faq from "@/components/Faq";
 import Heading from "@/components/Heading";
 import ProjectsSlider from "@/components/ProjectsSlider";
 import ServiceBanner from "@/components/ServiceBanner";
-import { getServicePage, getWorks, worksForService } from "@/lib/wp";
+import ServiceCosts from "@/components/ServiceCosts";
+import ServiceProcess from "@/components/ServiceProcess";
+import ServiceWhere from "@/components/ServiceWhere";
+import {
+  COSTS_FIELDS,
+  PROCESS_FIELDS,
+  WHERE_FIELDS,
+  costsFrom,
+  getServicePage,
+  getWorks,
+  processFrom,
+  whereFrom,
+  worksForService,
+} from "@/lib/wp";
 
 const SERVICE = "landscaping";
 
@@ -31,7 +44,8 @@ export default async function Landscaping() {
       SERVICE,
       `landscapingFields {
         galleryHeading galleryHighlight
-        sets { title icon items { title image { node { sourceUrl } } } }
+        sets { title description icon items { title image { node { sourceUrl } } } }
+        ${PROCESS_FIELDS} ${COSTS_FIELDS} ${WHERE_FIELDS}
       }`
     ),
     getWorks(),
@@ -39,6 +53,7 @@ export default async function Landscaping() {
   const gallery = page.landscapingFields || {};
   const sets = (gallery.sets || []).map((set) => ({
     title: set.title,
+    description: set.description || "",
     icon: `icon-${Array.isArray(set.icon) ? set.icon[0] : set.icon}`,
     items: (set.items || []).map((item) => ({
       title: item.title,
@@ -63,44 +78,70 @@ export default async function Landscaping() {
           delay="1.3"
         />
 
-        <div className="gallery-tabs">
-          {sets.map((set, i) => (
-            <button
-              type="button"
-              className={`gallery-tab button-label${i === 0 ? " is-active" : ""}`}
-              data-set={i}
-              key={set.title}
-            >
-              <span className={`icon ${set.icon}`} aria-hidden="true" />
-              {set.title}
-            </button>
-          ))}
-        </div>
+        {/* Tabs and arrows in a column on the left, the active strip on the
+            right. The arrows sit outside the strips, so initGalleryTabs
+            points them at whichever one is showing. */}
+        <div className="gallery-body">
+          <div className="gallery-side">
+            <div className="gallery-tabs">
+              {sets.map((set, i) => (
+                <button
+                  type="button"
+                  className={`gallery-tab button-label${i === 0 ? " is-active" : ""}`}
+                  data-set={i}
+                  key={set.title}
+                >
+                  <span className={`icon ${set.icon}`} aria-hidden="true" />
+                  {set.title}
+                </button>
+              ))}
+            </div>
 
-        <div className="gallery-sets">
-          {sets.map((set, i) => (
-            <div
-              className={`gallery-set embla${i === 0 ? " is-active" : ""}`}
-              data-set={i}
-              data-embla-options={emblaOptions}
-              key={set.title}
-            >
-              <div className="embla__viewport">
-                <div className="embla__container">
-                  {set.items.map((item) => (
-                    <article className="embla__slide gallery-card" key={item.title}>
-                      <div className="gallery-card-media">
-                        <img src={item.image} alt="" />
-                      </div>
-                      <p className="h4 dark gallery-card-title">{item.title}</p>
-                    </article>
-                  ))}
+            <div className="gallery-arrows">
+              <button type="button" className="icon-button gallery-arrow gallery-prev" aria-label="Previous">
+                <span className="icon icon-arrow" aria-hidden="true" />
+              </button>
+              <button type="button" className="icon-button gallery-arrow gallery-next" aria-label="Next">
+                <span className="icon icon-arrow" aria-hidden="true" />
+              </button>
+            </div>
+          </div>
+
+          <div className="gallery-sets">
+            {sets.map((set, i) => (
+              <div
+                className={`gallery-set embla${i === 0 ? " is-active" : ""}`}
+                data-set={i}
+                data-embla-options={emblaOptions}
+                key={set.title}
+              >
+                <div className="gallery-set-head">
+                  <h3 className="h3">{set.title}</h3>
+                  {set.description && <p className="body">{set.description}</p>}
+                </div>
+                <div className="embla__viewport">
+                  <div className="embla__container">
+                    {set.items.map((item) => (
+                      <article className="embla__slide gallery-card" key={item.title}>
+                        <div className="gallery-card-media">
+                          <img src={item.image} alt="" />
+                        </div>
+                        <p className="h4 dark gallery-card-title">{item.title}</p>
+                      </article>
+                    ))}
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       </section>
+
+      <ServiceProcess process={processFrom(gallery)} />
+
+      <ServiceCosts costs={costsFrom(gallery)} />
+
+      <ServiceWhere where={whereFrom(gallery)} />
 
       <ProjectsSlider projects={projects} />
 
