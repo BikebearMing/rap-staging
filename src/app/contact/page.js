@@ -33,9 +33,13 @@ export default async function Contact() {
             <p className="body" data-text-reveal="flip">
               <Lines text={site.address} />
             </p>
-            <a href={`tel:${site.phoneLink}`} className="body" data-text-reveal="flip">
-              {site.phone}
-            </a>
+            <p className="body phone-list" data-text-reveal="flip">
+              {site.phones.map((phone) => (
+                <a href={`tel:${phone.tel}`} key={phone.tel}>
+                  {phone.label}
+                </a>
+              ))}
+            </p>
 
             <div className="contact-social">
               <div className="contact-social-buttons">
@@ -101,7 +105,12 @@ export default async function Contact() {
               required
             />
             {/* required + an empty first option: :invalid styles it as a placeholder */}
-            <select name="service" className="contact-field contact-select" defaultValue="" required>
+            <select
+              name="service"
+              className="contact-field contact-select"
+              defaultValue=""
+              required
+            >
               <option value="" disabled>
                 Service needed
               </option>

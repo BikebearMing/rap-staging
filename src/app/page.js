@@ -47,27 +47,38 @@ export default async function Home() {
             <Lines text={history.label} />
           </h3>
 
-          <div className="content">
-            <span
-              className="history-image has-parallax parallax-frame"
-              data-inline-pop
-              data-parallax-trigger=".home-history"
-              aria-hidden="true"
-            >
-              <img src={history.image} alt="" className="parallax-image" />
-            </span>
-            <Heading
-              as="h4"
-              className="h2"
-              text={history.heading}
-              highlight={history.highlight}
-              trigger=".home-history"
-              delay="1.3"
-            />
+          <div className="history-body">
+            <div className="content">
+              <span
+                className="history-image has-parallax parallax-frame"
+                data-inline-pop
+                data-parallax-trigger=".home-history"
+                aria-hidden="true"
+              >
+                <img src={history.image} alt="" className="parallax-image" />
+              </span>
+              <Heading
+                as="h4"
+                className="h2"
+                text={history.heading}
+                highlight={history.highlight}
+                trigger=".home-history"
+                delay="1.3"
+              />
+            </div>
 
-            {history.buttonLabel && (
-              <Button href={history.buttonHref}>{history.buttonLabel}</Button>
-            )}
+            {/* One column per paragraph, button on the far right */}
+            <div className="history-text">
+              {history.text.map((paragraph) => (
+                <p className="body" data-text-reveal="flip" key={paragraph}>
+                  {paragraph}
+                </p>
+              ))}
+
+              {history.buttonLabel && (
+                <Button href={history.buttonHref}>{history.buttonLabel}</Button>
+              )}
+            </div>
           </div>
         </div>
       </section>

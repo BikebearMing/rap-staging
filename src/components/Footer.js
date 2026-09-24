@@ -1,10 +1,11 @@
 import Link from "next/link";
+import { Lines } from "@/components/Heading";
 import WindLeaf from "@/components/WindLeaf";
 import { getSiteSettings } from "@/lib/wp";
 
 // Site footer. Contact details, social links and copy come from the Site
 // Settings options page in WordPress; the link columns are placeholder
-// until their pages exist.
+// until their pages exist. The last column is the address and phone numbers.
 const footerLinks = [
   {
     heading: "Our Services",
@@ -84,6 +85,9 @@ export default async function Footer() {
             >
               <span className="icon icon-instagram" aria-hidden="true" />
             </a>
+            <a href={site.tiktokUrl} className="icon-button social-button" aria-label="TikTok">
+              <span className="icon icon-tiktok" aria-hidden="true" />
+            </a>
           </div>
         </div>
 
@@ -104,6 +108,24 @@ export default async function Footer() {
               </ul>
             </div>
           ))}
+
+          <div className="footer-col footer-contact">
+            <p className="button-label" data-text-reveal="lift">
+              Find Us
+            </p>
+            <address>
+              <p className="body" data-text-reveal="flip">
+                <Lines text={site.address} />
+              </p>
+              <p className="body phone-list" data-text-reveal="flip">
+                {site.phones.map((phone) => (
+                  <a href={`tel:${phone.tel}`} key={phone.tel}>
+                    {phone.label}
+                  </a>
+                ))}
+              </p>
+            </address>
+          </div>
         </nav>
 
         <div className="footer-bottom" data-line data-line-start="top 100%">

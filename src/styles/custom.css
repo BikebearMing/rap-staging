@@ -565,6 +565,9 @@ ol {
     margin-bottom: 0.833vw;
   }
 
+  /* Centred by transform, so the box needs its own width: an absolutely
+     positioned box at left: 50% otherwise shrinks to the half of the card it
+     starts in, and titles longer than that wrap. Capped at the meta inset. */
   & .service-title {
     left: 50%;
     bottom: 3.472vw;
@@ -572,6 +575,8 @@ ol {
     display: flex;
     flex-direction: column;
     gap: 1.111vw;
+    width: max-content;
+    max-width: calc(100% - 8.75vw);
   }
 
   & .service-scroll {
@@ -806,6 +811,13 @@ ol {
   height: 1.528vw; /* 22 */
 }
 
+/* Hand-drawn TikTok note, drawn at 15x22 */
+.icon-tiktok {
+  --icon: url("/tiktok.svg");
+  width: 1.042vw; /* 15 */
+  height: 1.528vw; /* 22 */
+}
+
 /* Gallery tab icons (landscaping page), drawn at 16x16 */
 .icon-hard-landscaping,
 .icon-soft-landscaping,
@@ -956,7 +968,7 @@ ol {
 }
 
 .footer-brand {
-  max-width: 16.7vw;
+  max-width: 19vw; /* fits "Follow us on" plus three social buttons */
 }
 
 .footer-logo {
@@ -995,12 +1007,14 @@ ol {
 
   & .button-label {
     margin-right: 0.278vw;
+    flex: 0 0 auto;
+    white-space: nowrap;
   }
 }
 
 .footer-columns {
   display: grid;
-  grid-template-columns: repeat(3, auto);
+  grid-template-columns: repeat(4, auto);
   gap: 3.75vw;
   padding-right: 2vw;
 
@@ -1014,6 +1028,25 @@ ol {
   & a {
     color: rgba(255, 255, 255, 0.85);
   }
+}
+
+/* Address and phone numbers (Site Settings > Contact) */
+.footer-contact {
+  max-width: 24vw;
+
+  & address {
+    margin-top: 1.111vw;
+    font-style: normal;
+    display: flex;
+    flex-direction: column;
+    gap: 1.111vw;
+    color: rgba(255, 255, 255, 0.85);
+  }
+}
+
+/* One tel: link per line, footer and contact page */
+.phone-list a {
+  display: block;
 }
 
 .footer-bottom {
@@ -1155,6 +1188,28 @@ html.lenis body {
       & h4 {
         max-width: 59.444vw;
       }
+    }
+  }
+
+  /* Heading, then the paragraphs 60px below it */
+  & .history-body {
+    display: flex;
+    flex-direction: column;
+    gap: 4.167vw;
+  }
+
+  /* Paragraph columns (368px wide, 92px apart) with the button on the right */
+  & .history-text {
+    display: flex;
+    align-items: center;
+    gap: 6.389vw;
+
+    & p {
+      flex: 0 1 25.556vw;
+    }
+
+    & .custom-button {
+      margin-left: auto;
     }
   }
 }
@@ -3189,6 +3244,8 @@ html.is-rendering .site-page {
       bottom: 14vw;
       transform: none;
       gap: 3vw;
+      width: auto;
+      max-width: none;
     }
 
     & .service-scroll {
@@ -3294,6 +3351,11 @@ html.is-rendering .site-page {
     height: 4.3vw;
   }
 
+  .icon-tiktok {
+    width: 3vw;
+    height: 4.3vw;
+  }
+
   .icon-arrow {
     width: 4vw;
     height: 2.6vw;
@@ -3379,6 +3441,16 @@ html.is-rendering .site-page {
     }
   }
 
+  .footer-contact {
+    max-width: none;
+    grid-column: 1 / -1;
+
+    & address {
+      margin-top: 3.5vw;
+      gap: 3.5vw;
+    }
+  }
+
   .footer-bottom {
     margin-top: 8vw;
     padding-top: 3.5vw;
@@ -3389,7 +3461,7 @@ html.is-rendering .site-page {
     padding-block: 8vw;
 
     & .wrapper {
-      gap: 12vw;
+      gap: 20vw; /* the picture rises 15vw above the heading's first line */
 
       & .content {
         flex-direction: column;
@@ -3399,6 +3471,25 @@ html.is-rendering .site-page {
         & h4 {
           max-width: 100%;
         }
+      }
+    }
+
+    & .history-body {
+      gap: 8vw;
+    }
+
+    & .history-text {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 5vw;
+
+      & p {
+        flex: none;
+      }
+
+      & .custom-button {
+        margin-left: 0;
+        margin-top: 3vw;
       }
     }
   }

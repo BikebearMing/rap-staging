@@ -29,7 +29,9 @@ export async function wpQuery(query, variables = {}) {
   // A broken WordPress redirects to an HTML page with a 200, so check before parsing.
   const type = res.headers.get("content-type") || "";
   if (!type.includes("json")) {
-    throw new Error(`WordPress returned ${type || "no content-type"} instead of JSON from ${ENDPOINT} (landed on ${res.url})`);
+    throw new Error(
+      `WordPress returned ${type || "no content-type"} instead of JSON from ${ENDPOINT} (landed on ${res.url})`
+    );
   }
   const { data, errors } = await res.json();
   if (errors?.length) throw new Error(errors.map((e) => e.message).join("\n"));
@@ -70,14 +72,25 @@ const srcs = (conn) => (conn?.nodes || []).map((n) => n.sourceUrl).filter(Boolea
 const first = (conn) => conn?.nodes?.[0] || null;
 
 // A textarea with one entry per line, or paragraphs split by an empty line
-const lines = (text) => String(text || "").split(/\r?\n/).map((l) => l.trim()).filter(Boolean);
-const paragraphs = (text) => String(text || "").split(/\r?\n\s*\r?\n/).map((p) => p.trim()).filter(Boolean);
+const lines = (text) =>
+  String(text || "")
+    .split(/\r?\n/)
+    .map((l) => l.trim())
+    .filter(Boolean);
+const paragraphs = (text) =>
+  String(text || "")
+    .split(/\r?\n\s*\r?\n/)
+    .map((p) => p.trim())
+    .filter(Boolean);
 
 // Props for ServiceProcess, ServiceCosts and ServiceWhere from a page's fields
 export const processFrom = (fields = {}) => ({
   heading: fields.processHeading || "",
   highlight: fields.processHighlight || "",
-  steps: (fields.processSteps || []).map((step) => ({ title: step.title || "", text: step.text || "" })),
+  steps: (fields.processSteps || []).map((step) => ({
+    title: step.title || "",
+    text: step.text || "",
+  })),
 });
 export const costsFrom = (fields = {}) => ({
   heading: fields.costsHeading || "",
@@ -98,6 +111,26 @@ export const whereFrom = (fields = {}) => ({
     columns: group.rows || 0, // rows deep; 0 is one long column
   })),
 });
+
+// One tap-to-call link per number in "Phone (as shown)", split on " / " or
+// newlines. The tel: is built from the digits (a leading 0 becomes +60);
+// `override` is the old single "Phone (tel: link)" field, honoured when
+// there is only one number.
+const telFor = (label) => {
+  let digits = label.replace(/\D/g, "");
+  if (digits.startsWith("0")) digits = `60${digits.slice(1)}`;
+  return `+${digits}`;
+};
+const phones = (text, override) => {
+  const labels = lines(text)
+    .flatMap((l) => l.split("/"))
+    .map((s) => s.trim())
+    .filter(Boolean);
+  return labels.map((label) => ({
+    label,
+    tel: labels.length === 1 && override ? override : telFor(label),
+  }));
+};
 
 // "/event-design/" from WordPress becomes the Next.js route "/event-design"
 export const localPath = (uri) => (uri ? uri.replace(/\/+$/, "") || "/" : "#");
@@ -189,7 +222,7 @@ export async function getHome() {
     "home",
     `homeFields {
       heroHeading heroHighlight heroText heroSlides { ${IMAGES} }
-      historyLabel historyImage { ${IMAGE} } historyHeading historyHighlight
+      historyLabel historyImage { ${IMAGE} } historyHeading historyHighlight historyText
       historyButtonLabel historyButtonLink { nodes { uri } }
       servicesHeading
       services { title page { nodes { uri } } featuredWork { nodes { ... on Work { title } } } image { ${IMAGE} } }
@@ -208,6 +241,7 @@ export async function getHome() {
       image: src(h.historyImage),
       heading: h.historyHeading || "",
       highlight: h.historyHighlight || "",
+      text: paragraphs(h.historyText),
       buttonLabel: h.historyButtonLabel || "",
       buttonHref: localPath(first(h.historyButtonLink)?.uri),
     },
@@ -261,20 +295,20 @@ export async function getContact() {
 export async function getSiteSettings() {
   const data = await wpQuery(
     `{ siteSettings { siteSettingsFields {
-      email phone phoneLink address locationUrl whatsappUrl facebookUrl instagramUrl
+      email phone phoneLink address locationUrl whatsappUrl facebookUrl instagramUrl tiktokUrl
       ctaHeading footerBlurb companyLine
     } } }`
   );
   const s = data.siteSettings?.siteSettingsFields || {};
   return {
     email: s.email || "",
-    phone: s.phone || "",
-    phoneLink: s.phoneLink || "",
+    phones: phones(s.phone, s.phoneLink),
     address: s.address || "",
     locationUrl: s.locationUrl || "#",
     whatsappUrl: s.whatsappUrl || "#",
     facebookUrl: s.facebookUrl || "#",
     instagramUrl: s.instagramUrl || "#",
+    tiktokUrl: s.tiktokUrl || "#",
     ctaHeading: s.ctaHeading || "",
     footerBlurb: s.footerBlurb || "",
     companyLine: s.companyLine || "",

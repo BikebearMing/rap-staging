@@ -1,0 +1,346 @@
+[
+  {
+    "key": "group_rap_site_settings",
+    "title": "Site Settings",
+    "fields": [
+      {
+        "key": "field_rap_tab_contact_1",
+        "label": "Contact",
+        "name": "",
+        "aria-label": "",
+        "type": "tab",
+        "instructions": "",
+        "required": 0,
+        "conditional_logic": 0,
+        "wrapper": {
+          "width": "",
+          "class": "",
+          "id": ""
+        },
+        "show_in_graphql": 0,
+        "graphql_field_name": "tabContact",
+        "placement": "top",
+        "endpoint": 0,
+        "selected": 0
+      },
+      {
+        "key": "field_rap_email_2",
+        "label": "Email",
+        "name": "email",
+        "aria-label": "",
+        "type": "email",
+        "instructions": "",
+        "required": 0,
+        "conditional_logic": 0,
+        "wrapper": {
+          "width": "",
+          "class": "",
+          "id": ""
+        },
+        "show_in_graphql": 1,
+        "graphql_field_name": "email",
+        "default_value": "",
+        "placeholder": "",
+        "prepend": "",
+        "append": ""
+      },
+      {
+        "key": "field_rap_phone_3",
+        "label": "Phone (as shown)",
+        "name": "phone",
+        "aria-label": "",
+        "type": "text",
+        "instructions": "One or more numbers separated by \" / \", e.g. +60 12-211 0113 / +60 3-7980 0113. Each becomes its own tap-to-call link.",
+        "required": 0,
+        "conditional_logic": 0,
+        "wrapper": {
+          "width": "",
+          "class": "",
+          "id": ""
+        },
+        "show_in_graphql": 1,
+        "graphql_field_name": "phone",
+        "default_value": "",
+        "maxlength": "",
+        "placeholder": "",
+        "prepend": "",
+        "append": ""
+      },
+      {
+        "key": "field_rap_phone_link_4",
+        "label": "Phone (tel: link)",
+        "name": "phone_link",
+        "aria-label": "",
+        "type": "text",
+        "instructions": "Optional override for the tel: link when there is a single number, e.g. +60376224256. Left empty, the link is built from the digits of each number.",
+        "required": 0,
+        "conditional_logic": 0,
+        "wrapper": {
+          "width": "",
+          "class": "",
+          "id": ""
+        },
+        "show_in_graphql": 1,
+        "graphql_field_name": "phoneLink",
+        "default_value": "",
+        "maxlength": "",
+        "placeholder": "",
+        "prepend": "",
+        "append": ""
+      },
+      {
+        "key": "field_rap_address_5",
+        "label": "Address",
+        "name": "address",
+        "aria-label": "",
+        "type": "textarea",
+        "instructions": "",
+        "required": 0,
+        "conditional_logic": 0,
+        "wrapper": {
+          "width": "",
+          "class": "",
+          "id": ""
+        },
+        "show_in_graphql": 1,
+        "graphql_field_name": "address",
+        "default_value": "",
+        "maxlength": "",
+        "rows": 2,
+        "placeholder": "",
+        "new_lines": ""
+      },
+      {
+        "key": "field_rap_location_url_6",
+        "label": "Google Maps link",
+        "name": "location_url",
+        "aria-label": "",
+        "type": "url",
+        "instructions": "",
+        "required": 0,
+        "conditional_logic": 0,
+        "wrapper": {
+          "width": "",
+          "class": "",
+          "id": ""
+        },
+        "show_in_graphql": 1,
+        "graphql_field_name": "locationUrl",
+        "default_value": "",
+        "placeholder": ""
+      },
+      {
+        "key": "field_rap_whatsapp_url_7",
+        "label": "WhatsApp link",
+        "name": "whatsapp_url",
+        "aria-label": "",
+        "type": "url",
+        "instructions": "",
+        "required": 0,
+        "conditional_logic": 0,
+        "wrapper": {
+          "width": "",
+          "class": "",
+          "id": ""
+        },
+        "show_in_graphql": 1,
+        "graphql_field_name": "whatsappUrl",
+        "default_value": "",
+        "placeholder": ""
+      },
+      {
+        "key": "field_rap_tab_social_8",
+        "label": "Social",
+        "name": "",
+        "aria-label": "",
+        "type": "tab",
+        "instructions": "",
+        "required": 0,
+        "conditional_logic": 0,
+        "wrapper": {
+          "width": "",
+          "class": "",
+          "id": ""
+        },
+        "show_in_graphql": 0,
+        "graphql_field_name": "tabSocial",
+        "placement": "top",
+        "endpoint": 0,
+        "selected": 0
+      },
+      {
+        "key": "field_rap_facebook_url_9",
+        "label": "Facebook",
+        "name": "facebook_url",
+        "aria-label": "",
+        "type": "url",
+        "instructions": "",
+        "required": 0,
+        "conditional_logic": 0,
+        "wrapper": {
+          "width": "",
+          "class": "",
+          "id": ""
+        },
+        "show_in_graphql": 1,
+        "graphql_field_name": "facebookUrl",
+        "default_value": "",
+        "placeholder": ""
+      },
+      {
+        "key": "field_rap_instagram_url_a",
+        "label": "Instagram",
+        "name": "instagram_url",
+        "aria-label": "",
+        "type": "url",
+        "instructions": "",
+        "required": 0,
+        "conditional_logic": 0,
+        "wrapper": {
+          "width": "",
+          "class": "",
+          "id": ""
+        },
+        "show_in_graphql": 1,
+        "graphql_field_name": "instagramUrl",
+        "default_value": "",
+        "placeholder": ""
+      },
+      {
+        "key": "field_rap_tiktok_url_f",
+        "label": "TikTok",
+        "name": "tiktok_url",
+        "aria-label": "",
+        "type": "url",
+        "instructions": "Full profile link, e.g. https://www.tiktok.com/@thebrotanists",
+        "required": 0,
+        "conditional_logic": 0,
+        "wrapper": {
+          "width": "",
+          "class": "",
+          "id": ""
+        },
+        "show_in_graphql": 1,
+        "graphql_field_name": "tiktokUrl",
+        "default_value": "",
+        "placeholder": ""
+      },
+      {
+        "key": "field_rap_tab_footer_b",
+        "label": "Footer",
+        "name": "",
+        "aria-label": "",
+        "type": "tab",
+        "instructions": "",
+        "required": 0,
+        "conditional_logic": 0,
+        "wrapper": {
+          "width": "",
+          "class": "",
+          "id": ""
+        },
+        "show_in_graphql": 0,
+        "graphql_field_name": "tabFooter",
+        "placement": "top",
+        "endpoint": 0,
+        "selected": 0
+      },
+      {
+        "key": "field_rap_cta_heading_c",
+        "label": "Footer CTA heading",
+        "name": "cta_heading",
+        "aria-label": "",
+        "type": "text",
+        "instructions": "",
+        "required": 0,
+        "conditional_logic": 0,
+        "wrapper": {
+          "width": "",
+          "class": "",
+          "id": ""
+        },
+        "show_in_graphql": 1,
+        "graphql_field_name": "ctaHeading",
+        "default_value": "",
+        "maxlength": "",
+        "placeholder": "",
+        "prepend": "",
+        "append": ""
+      },
+      {
+        "key": "field_rap_footer_blurb_d",
+        "label": "Footer blurb",
+        "name": "footer_blurb",
+        "aria-label": "",
+        "type": "textarea",
+        "instructions": "",
+        "required": 0,
+        "conditional_logic": 0,
+        "wrapper": {
+          "width": "",
+          "class": "",
+          "id": ""
+        },
+        "show_in_graphql": 1,
+        "graphql_field_name": "footerBlurb",
+        "default_value": "",
+        "maxlength": "",
+        "rows": 3,
+        "placeholder": "",
+        "new_lines": ""
+      },
+      {
+        "key": "field_rap_company_line_e",
+        "label": "Company line",
+        "name": "company_line",
+        "aria-label": "",
+        "type": "text",
+        "instructions": "Shown after the copyright year, e.g. RAP Landscape Sdn Bhd (464563-D)",
+        "required": 0,
+        "conditional_logic": 0,
+        "wrapper": {
+          "width": "",
+          "class": "",
+          "id": ""
+        },
+        "show_in_graphql": 1,
+        "graphql_field_name": "companyLine",
+        "default_value": "",
+        "maxlength": "",
+        "placeholder": "",
+        "prepend": "",
+        "append": ""
+      }
+    ],
+    "location": [
+      [
+        {
+          "param": "options_page",
+          "operator": "==",
+          "value": "site-settings"
+        }
+      ]
+    ],
+    "menu_order": 0,
+    "position": "normal",
+    "style": "default",
+    "label_placement": "top",
+    "instruction_placement": "label",
+    "hide_on_screen": [
+      "the_content",
+      "discussion",
+      "comments",
+      "send-trackbacks"
+    ],
+    "active": true,
+    "description": "",
+    "show_in_rest": 1,
+    "display_title": "",
+    "allow_ai_access": false,
+    "ai_description": "",
+    "show_in_graphql": 1,
+    "graphql_field_name": "siteSettingsFields",
+    "map_graphql_types_from_location_rules": 0,
+    "graphql_types": ""
+  }
+]

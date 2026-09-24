@@ -1,0 +1,575 @@
+[
+  {
+    "key": "group_rap_home",
+    "title": "Home Page",
+    "fields": [
+      {
+        "key": "field_rap_tab_hero_f",
+        "label": "Hero",
+        "name": "",
+        "aria-label": "",
+        "type": "tab",
+        "instructions": "",
+        "required": 0,
+        "conditional_logic": 0,
+        "wrapper": {
+          "width": "",
+          "class": "",
+          "id": ""
+        },
+        "show_in_graphql": 0,
+        "graphql_field_name": "tabHero",
+        "placement": "top",
+        "endpoint": 0,
+        "selected": 0
+      },
+      {
+        "key": "field_rap_hero_heading_g",
+        "label": "Hero heading",
+        "name": "hero_heading",
+        "aria-label": "",
+        "type": "textarea",
+        "instructions": "One line per row; each line break shows as a line break on the site.",
+        "required": 0,
+        "conditional_logic": 0,
+        "wrapper": {
+          "width": "",
+          "class": "",
+          "id": ""
+        },
+        "show_in_graphql": 1,
+        "graphql_field_name": "heroHeading",
+        "default_value": "",
+        "maxlength": "",
+        "rows": 2,
+        "placeholder": "",
+        "new_lines": ""
+      },
+      {
+        "key": "field_rap_hero_highlight_h",
+        "label": "Hero highlighted word",
+        "name": "hero_highlight",
+        "aria-label": "",
+        "type": "text",
+        "instructions": "A word from the heading that gets the hand-drawn underline. Leave blank for none.",
+        "required": 0,
+        "conditional_logic": 0,
+        "wrapper": {
+          "width": "",
+          "class": "",
+          "id": ""
+        },
+        "show_in_graphql": 1,
+        "graphql_field_name": "heroHighlight",
+        "default_value": "",
+        "maxlength": "",
+        "placeholder": "",
+        "prepend": "",
+        "append": ""
+      },
+      {
+        "key": "field_rap_hero_text_i",
+        "label": "Hero text",
+        "name": "hero_text",
+        "aria-label": "",
+        "type": "textarea",
+        "instructions": "",
+        "required": 0,
+        "conditional_logic": 0,
+        "wrapper": {
+          "width": "",
+          "class": "",
+          "id": ""
+        },
+        "show_in_graphql": 1,
+        "graphql_field_name": "heroText",
+        "default_value": "",
+        "maxlength": "",
+        "rows": 3,
+        "placeholder": "",
+        "new_lines": ""
+      },
+      {
+        "key": "field_rap_hero_slides_j",
+        "label": "Hero slides",
+        "name": "hero_slides",
+        "aria-label": "",
+        "type": "gallery",
+        "instructions": "",
+        "required": 0,
+        "conditional_logic": 0,
+        "wrapper": {
+          "width": "",
+          "class": "",
+          "id": ""
+        },
+        "show_in_graphql": 1,
+        "graphql_field_name": "heroSlides",
+        "return_format": "array",
+        "library": "all",
+        "min": "",
+        "max": "",
+        "min_width": "",
+        "min_height": "",
+        "min_size": "",
+        "max_width": "",
+        "max_height": "",
+        "max_size": "",
+        "mime_types": "",
+        "insert": "append",
+        "preview_size": "medium"
+      },
+      {
+        "key": "field_rap_tab_history_k",
+        "label": "History",
+        "name": "",
+        "aria-label": "",
+        "type": "tab",
+        "instructions": "",
+        "required": 0,
+        "conditional_logic": 0,
+        "wrapper": {
+          "width": "",
+          "class": "",
+          "id": ""
+        },
+        "show_in_graphql": 0,
+        "graphql_field_name": "tabHistory",
+        "placement": "top",
+        "endpoint": 0,
+        "selected": 0
+      },
+      {
+        "key": "field_rap_history_label_l",
+        "label": "History label",
+        "name": "history_label",
+        "aria-label": "",
+        "type": "textarea",
+        "instructions": "The small left-hand label, e.g. Rent a pot / Est. / 1982",
+        "required": 0,
+        "conditional_logic": 0,
+        "wrapper": {
+          "width": "",
+          "class": "",
+          "id": ""
+        },
+        "show_in_graphql": 1,
+        "graphql_field_name": "historyLabel",
+        "default_value": "",
+        "maxlength": "",
+        "rows": 3,
+        "placeholder": "",
+        "new_lines": ""
+      },
+      {
+        "key": "field_rap_history_image_m",
+        "label": "History image",
+        "name": "history_image",
+        "aria-label": "",
+        "type": "image",
+        "instructions": "",
+        "required": 0,
+        "conditional_logic": 0,
+        "wrapper": {
+          "width": "",
+          "class": "",
+          "id": ""
+        },
+        "show_in_graphql": 1,
+        "graphql_field_name": "historyImage",
+        "return_format": "array",
+        "library": "all",
+        "min_width": "",
+        "min_height": "",
+        "min_size": "",
+        "max_width": "",
+        "max_height": "",
+        "max_size": "",
+        "mime_types": "",
+        "preview_size": "medium"
+      },
+      {
+        "key": "field_rap_history_heading_n",
+        "label": "History heading",
+        "name": "history_heading",
+        "aria-label": "",
+        "type": "textarea",
+        "instructions": "One line per row; each line break shows as a line break on the site.",
+        "required": 0,
+        "conditional_logic": 0,
+        "wrapper": {
+          "width": "",
+          "class": "",
+          "id": ""
+        },
+        "show_in_graphql": 1,
+        "graphql_field_name": "historyHeading",
+        "default_value": "",
+        "maxlength": "",
+        "rows": 2,
+        "placeholder": "",
+        "new_lines": ""
+      },
+      {
+        "key": "field_rap_history_highlight_o",
+        "label": "History highlighted word",
+        "name": "history_highlight",
+        "aria-label": "",
+        "type": "text",
+        "instructions": "A word from the heading that gets the hand-drawn underline. Leave blank for none.",
+        "required": 0,
+        "conditional_logic": 0,
+        "wrapper": {
+          "width": "",
+          "class": "",
+          "id": ""
+        },
+        "show_in_graphql": 1,
+        "graphql_field_name": "historyHighlight",
+        "default_value": "",
+        "maxlength": "",
+        "placeholder": "",
+        "prepend": "",
+        "append": ""
+      },
+      {
+        "key": "field_rap_history_text",
+        "label": "History text",
+        "name": "history_text",
+        "aria-label": "",
+        "type": "textarea",
+        "instructions": "Shown under the heading. Leave an empty line between paragraphs; each paragraph becomes a column on desktop.",
+        "required": 0,
+        "conditional_logic": 0,
+        "wrapper": {
+          "width": "",
+          "class": "",
+          "id": ""
+        },
+        "show_in_graphql": 1,
+        "graphql_field_name": "historyText",
+        "default_value": "",
+        "maxlength": "",
+        "rows": 8,
+        "placeholder": "",
+        "new_lines": ""
+      },
+      {
+        "key": "field_rap_history_button_label_p",
+        "label": "Button label",
+        "name": "history_button_label",
+        "aria-label": "",
+        "type": "text",
+        "instructions": "",
+        "required": 0,
+        "conditional_logic": 0,
+        "wrapper": {
+          "width": "",
+          "class": "",
+          "id": ""
+        },
+        "show_in_graphql": 1,
+        "graphql_field_name": "historyButtonLabel",
+        "default_value": "",
+        "maxlength": "",
+        "placeholder": "",
+        "prepend": "",
+        "append": ""
+      },
+      {
+        "key": "field_rap_history_button_link_q",
+        "label": "Button link",
+        "name": "history_button_link",
+        "aria-label": "",
+        "type": "post_object",
+        "instructions": "",
+        "required": 0,
+        "conditional_logic": 0,
+        "wrapper": {
+          "width": "",
+          "class": "",
+          "id": ""
+        },
+        "show_in_graphql": 1,
+        "graphql_field_name": "historyButtonLink",
+        "post_type": [
+          "page"
+        ],
+        "post_status": [
+          "publish"
+        ],
+        "taxonomy": [],
+        "return_format": "object",
+        "multiple": 0,
+        "allow_null": 1,
+        "bidirectional": 0,
+        "ui": 1,
+        "bidirectional_target": []
+      },
+      {
+        "key": "field_rap_tab_services_r",
+        "label": "Services",
+        "name": "",
+        "aria-label": "",
+        "type": "tab",
+        "instructions": "",
+        "required": 0,
+        "conditional_logic": 0,
+        "wrapper": {
+          "width": "",
+          "class": "",
+          "id": ""
+        },
+        "show_in_graphql": 0,
+        "graphql_field_name": "tabServices",
+        "placement": "top",
+        "endpoint": 0,
+        "selected": 0
+      },
+      {
+        "key": "field_rap_services_heading_s",
+        "label": "Services heading",
+        "name": "services_heading",
+        "aria-label": "",
+        "type": "text",
+        "instructions": "",
+        "required": 0,
+        "conditional_logic": 0,
+        "wrapper": {
+          "width": "",
+          "class": "",
+          "id": ""
+        },
+        "show_in_graphql": 1,
+        "graphql_field_name": "servicesHeading",
+        "default_value": "",
+        "maxlength": "",
+        "placeholder": "",
+        "prepend": "",
+        "append": ""
+      },
+      {
+        "key": "field_rap_services_x",
+        "label": "Services",
+        "name": "services",
+        "aria-label": "",
+        "type": "repeater",
+        "instructions": "",
+        "required": 0,
+        "conditional_logic": 0,
+        "wrapper": {
+          "width": "",
+          "class": "",
+          "id": ""
+        },
+        "show_in_graphql": 1,
+        "graphql_field_name": "services",
+        "layout": "block",
+        "pagination": 0,
+        "min": 0,
+        "max": 4,
+        "collapsed": "field_rap_title_t",
+        "button_label": "Add Service",
+        "rows_per_page": 20,
+        "sub_fields": [
+          {
+            "key": "field_rap_title_t",
+            "label": "Title",
+            "name": "title",
+            "aria-label": "",
+            "type": "text",
+            "instructions": "",
+            "required": 1,
+            "conditional_logic": 0,
+            "wrapper": {
+              "width": "",
+              "class": "",
+              "id": ""
+            },
+            "show_in_graphql": 1,
+            "graphql_field_name": "title",
+            "default_value": "",
+            "maxlength": "",
+            "placeholder": "",
+            "prepend": "",
+            "append": "",
+            "parent_repeater": "field_rap_services_x"
+          },
+          {
+            "key": "field_rap_page_u",
+            "label": "Service page",
+            "name": "page",
+            "aria-label": "",
+            "type": "post_object",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+              "width": "",
+              "class": "",
+              "id": ""
+            },
+            "show_in_graphql": 1,
+            "graphql_field_name": "page",
+            "post_type": [
+              "page"
+            ],
+            "post_status": [
+              "publish"
+            ],
+            "taxonomy": [],
+            "return_format": "object",
+            "multiple": 0,
+            "allow_null": 0,
+            "bidirectional": 0,
+            "ui": 1,
+            "bidirectional_target": [],
+            "parent_repeater": "field_rap_services_x"
+          },
+          {
+            "key": "field_rap_featured_work_v",
+            "label": "Featured project",
+            "name": "featured_work",
+            "aria-label": "",
+            "type": "post_object",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+              "width": "",
+              "class": "",
+              "id": ""
+            },
+            "show_in_graphql": 1,
+            "graphql_field_name": "featuredWork",
+            "post_type": [
+              "work"
+            ],
+            "post_status": [
+              "publish"
+            ],
+            "taxonomy": [],
+            "return_format": "object",
+            "multiple": 0,
+            "allow_null": 1,
+            "bidirectional": 0,
+            "ui": 1,
+            "bidirectional_target": [],
+            "parent_repeater": "field_rap_services_x"
+          },
+          {
+            "key": "field_rap_image_w",
+            "label": "Image",
+            "name": "image",
+            "aria-label": "",
+            "type": "image",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+              "width": "",
+              "class": "",
+              "id": ""
+            },
+            "show_in_graphql": 1,
+            "graphql_field_name": "image",
+            "return_format": "array",
+            "library": "all",
+            "min_width": "",
+            "min_height": "",
+            "min_size": "",
+            "max_width": "",
+            "max_height": "",
+            "max_size": "",
+            "mime_types": "",
+            "preview_size": "medium",
+            "parent_repeater": "field_rap_services_x"
+          }
+        ]
+      },
+      {
+        "key": "field_rap_tab_projects_y",
+        "label": "Projects",
+        "name": "",
+        "aria-label": "",
+        "type": "tab",
+        "instructions": "",
+        "required": 0,
+        "conditional_logic": 0,
+        "wrapper": {
+          "width": "",
+          "class": "",
+          "id": ""
+        },
+        "show_in_graphql": 0,
+        "graphql_field_name": "tabProjects",
+        "placement": "top",
+        "endpoint": 0,
+        "selected": 0
+      },
+      {
+        "key": "field_rap_featured_works_z",
+        "label": "Projects slider",
+        "name": "featured_works",
+        "aria-label": "",
+        "type": "relationship",
+        "instructions": "Projects shown in the slider at the bottom of the home page.",
+        "required": 0,
+        "conditional_logic": 0,
+        "wrapper": {
+          "width": "",
+          "class": "",
+          "id": ""
+        },
+        "show_in_graphql": 1,
+        "graphql_field_name": "featuredWorks",
+        "post_type": [
+          "work"
+        ],
+        "post_status": [
+          "publish"
+        ],
+        "taxonomy": [],
+        "filters": [
+          "search"
+        ],
+        "return_format": "object",
+        "min": "",
+        "max": "",
+        "elements": [],
+        "bidirectional": 0,
+        "bidirectional_target": []
+      }
+    ],
+    "location": [
+      [
+        {
+          "param": "page",
+          "operator": "==",
+          "value": "8"
+        }
+      ]
+    ],
+    "menu_order": 0,
+    "position": "normal",
+    "style": "default",
+    "label_placement": "top",
+    "instruction_placement": "label",
+    "hide_on_screen": [
+      "the_content",
+      "discussion",
+      "comments",
+      "send-trackbacks"
+    ],
+    "active": true,
+    "description": "",
+    "show_in_rest": 1,
+    "display_title": "",
+    "allow_ai_access": false,
+    "ai_description": "",
+    "show_in_graphql": 1,
+    "graphql_field_name": "homeFields",
+    "map_graphql_types_from_location_rules": 0,
+    "graphql_types": ""
+  }
+]
