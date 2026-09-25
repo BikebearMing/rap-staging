@@ -16,6 +16,7 @@ export const PAGE_IDS = {
   works: 13,
   blog: 14,
   contact: 15,
+  about: 381,
 };
 
 export async function wpQuery(query, variables = {}) {
@@ -289,6 +290,64 @@ export async function getContact() {
     formHighlight: c.formHighlight || "",
     formServices: lines(c.formServices),
     where: whereFrom(c),
+  };
+}
+
+export async function getAbout() {
+  const { aboutFields: a = {} } = await getPage(
+    "about",
+    `aboutFields {
+      heroLabel heroHeading heroHighlight heroText heroImage { ${IMAGE} } scrollLabel
+      introHeading introHighlight introText introImage { ${IMAGE} } introCaption
+      timelineLabel timelineItems { year title text }
+      peopleHeading people { name role photo { ${IMAGE} } bio }
+      beliefsHeading beliefs { icon title text }
+      blogsHeading
+    }`
+  );
+  return {
+    hero: {
+      label: a.heroLabel || "",
+      heading: a.heroHeading || "",
+      highlight: a.heroHighlight || "",
+      text: a.heroText || "",
+      image: src(a.heroImage),
+      scrollLabel: a.scrollLabel || "",
+    },
+    intro: {
+      heading: a.introHeading || "",
+      highlight: a.introHighlight || "",
+      text: paragraphs(a.introText),
+      image: src(a.introImage),
+      caption: a.introCaption || "",
+    },
+    timeline: {
+      label: a.timelineLabel || "",
+      items: (a.timelineItems || []).map((item) => ({
+        year: item.year || "",
+        title: item.title || "",
+        text: item.text || "",
+      })),
+    },
+    people: {
+      heading: a.peopleHeading || "",
+      items: (a.people || []).map((person) => ({
+        name: person.name || "",
+        role: person.role || "",
+        photo: src(person.photo),
+        bio: paragraphs(person.bio),
+      })),
+    },
+    beliefs: {
+      heading: a.beliefsHeading || "",
+      // The Icon select names a /public/*.svg (see .icon-* in custom.css)
+      items: (a.beliefs || []).map((belief) => ({
+        icon: `icon-${Array.isArray(belief.icon) ? belief.icon[0] : belief.icon}`,
+        title: belief.title || "",
+        text: belief.text || "",
+      })),
+    },
+    blogsHeading: a.blogsHeading || "",
   };
 }
 

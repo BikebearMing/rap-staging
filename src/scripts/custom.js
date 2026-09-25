@@ -726,6 +726,14 @@ export function initEditorContent() {
    why the yPercent starts are above 100: the piece must begin fully below
    the padded clip region or its top would peek through early.
 
+   Every line has its own trigger, so a long block only animates the lines
+   that have come into view; lines already in view when the element is
+   built come in one after another (lineGap apart). A re-split (resize, or
+   the scrollbar going while a drawer is open) never replays lines that
+   have already shown. The split stays in place once played: reverting it
+   would reflow the copy, because letters in their own clips do not kern,
+   so the plain text runs narrower and words hop between lines.
+
    Re-splits automatically on resize. Waits for fonts so line breaks are right.
    -------------------------------------------------------------------------- */
 const TEXT_REVEAL_MODES = {
@@ -733,13 +741,15 @@ const TEXT_REVEAL_MODES = {
   lines: {
     type: "lines",
     mask: "lines",
-    targets: (self) => self.lines,
-    vars: { yPercent: 130, rotate: 4, scale: 0.9, duration: 1.2, stagger: 0.1, ease: "power4.out" },
+    pieces: (line) => [line],
+    lineGap: 0.1,
+    vars: { yPercent: 130, rotate: 4, scale: 0.9, duration: 1.2, ease: "power4.out" },
   },
   words: {
     type: "lines,words",
     mask: "words",
-    targets: (self) => self.words,
+    pieces: (line) => line.querySelectorAll(".tr-word"),
+    lineGap: 0.12,
     vars: {
       yPercent: 130,
       rotate: 4,
@@ -752,7 +762,8 @@ const TEXT_REVEAL_MODES = {
   chars: {
     type: "lines,words,chars",
     mask: "lines",
-    targets: (self) => self.chars,
+    pieces: (line) => line.querySelectorAll(".tr-char"),
+    lineGap: 0.12,
     vars: {
       yPercent: 140,
       rotate: 8,
@@ -767,13 +778,13 @@ const TEXT_REVEAL_MODES = {
   lift: {
     type: "lines",
     mask: "lines",
-    targets: (self) => self.lines,
+    pieces: (line) => [line],
+    lineGap: 0.18,
     vars: {
       yPercent: 130,
       scale: 0.96,
       transformOrigin: "50% 100%",
       duration: 1.3,
-      stagger: 0.18,
       ease: "back.out(1.4)",
     },
   },
@@ -782,7 +793,8 @@ const TEXT_REVEAL_MODES = {
   shuffle: {
     type: "lines,words,chars",
     mask: "chars",
-    targets: (self) => self.chars,
+    pieces: (line) => line.querySelectorAll(".tr-char"),
+    lineGap: 0.12,
     vars: {
       yPercent: 130,
       duration: 0.6,
@@ -794,7 +806,8 @@ const TEXT_REVEAL_MODES = {
   // easing in from the left. Sweeps left to right, top line first. No mask.
   smog: {
     type: "lines,words,chars",
-    targets: (self) => self.chars,
+    pieces: (line) => line.querySelectorAll(".tr-char"),
+    lineGap: 0.15,
     vars: {
       opacity: 0,
       filter: "blur(16px)",
@@ -813,11 +826,11 @@ const TEXT_REVEAL_MODES = {
   wipe: {
     type: "lines",
     mask: "lines",
-    targets: (self) => self.masks,
+    pieces: (line) => [line.parentElement],
+    lineGap: 0.25,
     vars: {
       "--wipe": "-15%",
       duration: 1.6,
-      stagger: 0.25,
       ease: "power3.inOut",
     },
   },
@@ -825,29 +838,35 @@ const TEXT_REVEAL_MODES = {
   // below it (clipped per letter), with a slight overshoot. Plays once per
   // line when it enters the viewport. Ported from madewithgsap effect 058
   // (minus its swing-out on leave). Has its own per-line timelines and
-  // ScrollTriggers, so it uses build() instead of the shared from-tween.
+  // ScrollTriggers, so it uses build() instead of the shared tween.
   flip: {
     type: "lines,words,chars",
     mask: "chars",
-    build(self, el) {
+    build(self, el, done) {
       return gsap.context(() => {
         const START = el.dataset.textRevealStart || "top 92%";
-        const startPct = (parseFloat((START.match(/(\d+(?:\.\d+)?)%/) || [])[1]) || 92) / 100;
+        const startPct = startFraction(START, 92);
         const LINE_GAP = 0.25; // seconds between lines that are in view together
         const vh = window.innerHeight;
+        const lines = self.lines.filter((line) => line.querySelector(".tr-char"));
+        const fired = firedLines(el);
+        let played = fired.size;
+        if (played >= lines.length) return done();
 
         // Lines already inside the start line at build time come in one after
         // another instead of all at once. Lines entering later by scrolling
         // are naturally spaced by the scroll, so they fire immediately.
         let queued = 0;
 
-        self.lines.forEach((line) => {
+        lines.forEach((line, i) => {
+          if (fired.has(i)) return; // showed before a re-split: leave it
           const chars = line.querySelectorAll(".tr-char");
-          if (!chars.length) return;
-
           gsap.set(chars, { rotate: -80, transformOrigin: "50% 120%" });
 
-          const tl = gsap.timeline({ paused: true });
+          const tl = gsap.timeline({
+            paused: true,
+            onComplete: () => ++played >= lines.length && done(),
+          });
           tl.to(chars, { rotate: 0, duration: 0.8, stagger: 0.018, ease: "back.out(1.1)" });
 
           const inViewNow = line.getBoundingClientRect().top < vh * startPct;
@@ -857,7 +876,10 @@ const TEXT_REVEAL_MODES = {
             trigger: line,
             start: START,
             once: true,
-            onEnter: () => tl.delay(enterDelay).play(),
+            onEnter: () => {
+              fired.add(i);
+              tl.delay(enterDelay).play();
+            },
           });
         });
       });
@@ -866,7 +888,8 @@ const TEXT_REVEAL_MODES = {
   // Blur: words drift up while sharpening from a soft blur, no mask
   blur: {
     type: "lines,words",
-    targets: (self) => self.words,
+    pieces: (line) => line.querySelectorAll(".tr-word"),
+    lineGap: 0.12,
     vars: {
       y: 24,
       opacity: 0,
@@ -898,6 +921,62 @@ function buildInlinePop(el, self, start, delay) {
     .set(line.parentElement, { overflow: "visible" })
     .to(line, { x: offset, duration: 0.8, ease: "power3.inOut" })
     .to(slot, { scale: 1, yPercent: 0, opacity: 1, duration: 0.9, ease: "back.out(1.7)" }, 0.35);
+}
+
+// The viewport fraction in a ScrollTrigger start like "top 90%"
+const startFraction = (start, fallback) =>
+  (parseFloat((start.match(/(\d+(?:\.\d+)?)%/) || [])[1]) || fallback) / 100;
+
+// Indices of the lines whose trigger has fired, kept on the element so a
+// rebuild after a re-split leaves them shown instead of playing them again
+const firedLines = (el) => (el._trFired ||= new Set());
+
+// Shared modes: each line's pieces get their own paused tween and trigger,
+// so a long block only animates the lines that have come into view. Lines
+// already inside the start line when built come in one after another,
+// lineGap apart, as a stagger would; later lines are spaced by the scroll.
+// Calls done once every line has played.
+function buildLineReveal(el, self, mode, start, delay, done) {
+  const startPct = startFraction(start, 90);
+  const vh = window.innerHeight;
+  const groups = self.lines
+    .map((line) => ({ line, targets: Array.from(mode.pieces(line)) }))
+    .filter((g) => g.targets.length);
+  const fired = firedLines(el);
+  let played = fired.size;
+  if (played >= groups.length) return done();
+
+  const vars = {
+    transformOrigin: "0% 100%",
+    ...mode.vars,
+    ...(mode.vars.yPercent && { yPercent: hiddenYPercent(el, self, mode.vars.yPercent) }),
+  };
+  let queued = 0;
+  groups.forEach(({ line, targets }, i) => {
+    if (fired.has(i)) return; // showed before a re-split: leave it
+    const inViewNow = line.getBoundingClientRect().top < vh * startPct;
+    const tween = gsap.from(targets, {
+      ...vars,
+      paused: true,
+      delay: delay + (inViewNow ? queued++ * mode.lineGap : 0),
+      onComplete: () => ++played >= groups.length && done(),
+    });
+    ScrollTrigger.create({
+      trigger: line,
+      start,
+      once: true,
+      onEnter: () => {
+        fired.add(i);
+        tween.play();
+      },
+    });
+  });
+}
+
+// An element's reveal has played through: remember it so a re-split shows
+// it straight away. The split itself is left alone (see the note above).
+function finishReveal(el) {
+  el._trDone = true;
 }
 
 // How far down (in % of a piece's height) a piece must start so no part of
@@ -952,28 +1031,18 @@ export function initTextReveal() {
             // Every element manages a gsap.context so the whole choreography
             // (reveal + inline pop) is reverted together on re-split.
             el._trCtx?.revert();
+            // Re-split after the reveal played through: already shown
+            if (el._trDone) return null;
+
+            const done = () => finishReveal(el);
             if (mode.build) {
-              el._trCtx = mode.build(self, el);
+              el._trCtx = mode.build(self, el, done);
               return null;
             }
 
             el._trCtx = gsap.context(() => {
               buildInlinePop(el, self, start, delay);
-              const targets = mode.targets(self);
-              if (mode.set) gsap.set(targets, mode.set);
-              gsap.from(targets, {
-                transformOrigin: "0% 100%",
-                ...mode.vars,
-                ...(mode.vars.yPercent && {
-                  yPercent: hiddenYPercent(el, self, mode.vars.yPercent),
-                }),
-                delay,
-                scrollTrigger: {
-                  trigger: el,
-                  start,
-                  once: true,
-                },
-              });
+              buildLineReveal(el, self, mode, start, delay, done);
             });
             return null;
           },
@@ -989,8 +1058,10 @@ export function initTextReveal() {
       s.elements?.forEach((el) => {
         el._trCtx?.revert();
         delete el._trCtx;
+        delete el._trDone;
+        delete el._trFired;
       });
-      s.revert();
+      if (s.isSplit) s.revert();
     });
     ctx.revert();
   };
@@ -1749,6 +1820,79 @@ export function initMenu() {
 }
 
 /* --------------------------------------------------------------------------
+   People drawers (about page, see the People section in custom.css)
+   Markup: .about-people holding .people-more buttons and .people-drawer
+   panels that share a data-person index, plus one .people-backdrop.
+   Clicking a + opens that person's drawer: html.people-open shows the
+   backdrop, .is-open slides the panel in (CSS), and its blocks lift in one
+   after another once the slide is under way. The page scroll is stopped
+   while one is open, like the mobile menu. Closes on the backdrop, the
+   close button, Escape, or when the page is left (cleanup).
+   -------------------------------------------------------------------------- */
+export function initPeople() {
+  const html = document.documentElement;
+  const cleanups = live(".about-people").map((root) => {
+    const drawers = Array.from(root.querySelectorAll(".people-drawer"));
+    const buttons = Array.from(root.querySelectorAll(".people-more"));
+    if (!drawers.length) return () => {};
+
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    let open = null;
+    let lift = null;
+
+    const setOpen = (drawer) => {
+      if (drawer === open) return;
+      lift?.kill();
+      open?.classList.remove("is-open");
+      open = drawer;
+      html.classList.toggle("people-open", !!drawer);
+      buttons.forEach((b) => {
+        b.setAttribute(
+          "aria-expanded",
+          String(!!drawer && b.dataset.person === drawer.dataset.person)
+        );
+      });
+
+      if (!drawer) {
+        lenis?.start();
+        return;
+      }
+      drawer.classList.add("is-open");
+      drawer.scrollTop = 0;
+      lenis?.stop();
+      if (reduced) return;
+      lift = gsap.fromTo(
+        drawer.querySelectorAll(".people-drawer-inner > *"),
+        { y: 30, autoAlpha: 0 },
+        { y: 0, autoAlpha: 1, duration: 0.8, stagger: 0.07, delay: 0.3, ease: "power3.out" }
+      );
+    };
+
+    const onClick = (e) => {
+      if (e.target.closest("[data-people-close]")) {
+        setOpen(null);
+        return;
+      }
+      const button = e.target.closest(".people-more");
+      if (!button) return;
+      setOpen(drawers.find((d) => d.dataset.person === button.dataset.person) || null);
+    };
+    const onKey = (e) => {
+      if (e.key === "Escape") setOpen(null);
+    };
+    root.addEventListener("click", onClick);
+    document.addEventListener("keydown", onKey);
+
+    return () => {
+      setOpen(null);
+      root.removeEventListener("click", onClick);
+      document.removeEventListener("keydown", onKey);
+    };
+  });
+  return () => cleanups.forEach((fn) => fn());
+}
+
+/* --------------------------------------------------------------------------
    Boot everything. Returns a cleanup function.
    -------------------------------------------------------------------------- */
 export function initSite() {
@@ -1766,6 +1910,7 @@ export function initSite() {
   const destroyAreas = initAreas();
   const destroyGalleryTabs = initGalleryTabs();
   const destroyFaq = initFaq();
+  const destroyPeople = initPeople();
   initEditorContent();
   const destroyTextReveal = initTextReveal();
   const destroyWindLeaves = initWindLeaves();
@@ -1780,6 +1925,7 @@ export function initSite() {
     destroyHeader();
     destroyWindLeaves();
     destroyTextReveal();
+    destroyPeople();
     destroyFaq();
     destroyGalleryTabs();
     destroyAreas();

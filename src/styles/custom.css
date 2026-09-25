@@ -850,6 +850,39 @@ ol {
   height: 0.903vw; /* 13 */
 }
 
+/* Belief icons (about page), placeholders drawn at 24x24 until the real
+   artwork arrives; picked by the card's Icon field */
+.icon-bulb,
+.icon-wrench,
+.icon-cloud,
+.icon-sprout {
+  width: 1.667vw; /* 24 */
+  height: 1.667vw;
+}
+
+.icon-bulb {
+  --icon: url("/bulb.svg");
+}
+
+.icon-wrench {
+  --icon: url("/wrench.svg");
+}
+
+.icon-cloud {
+  --icon: url("/cloud.svg");
+}
+
+.icon-sprout {
+  --icon: url("/sprout.svg");
+}
+
+/* Hand-drawn curl that points at the plant caption on the about page, 24x30 */
+.icon-curl {
+  --icon: url("/curl-arrow.svg");
+  width: 1.667vw; /* 24 */
+  height: 2.083vw; /* 30 */
+}
+
 /* /public/facebook.svg has its green square baked in; facebook-mark.svg is
    the same file without the square, so the mark can sit in an .icon-button
    of any colour. Sized to the button because the artwork is drawn at 52x52. */
@@ -1552,6 +1585,15 @@ html.is-rendering .site-page {
   .wind-leaf img {
     transform: none !important;
   }
+}
+
+/* About intro: turned so the fronds fan up-right from a stem just below
+   the bottom-left corner, so they reach up under the paragraph columns;
+   the timeline panel hides the rest */
+.about-intro .wind-leaf {
+  --leaf-rotate: 165deg;
+  left: -36vw;
+  bottom: -40vw;
 }
 
 /* --------------------------------------------------------------------------
@@ -2904,6 +2946,484 @@ html.is-rendering .site-page {
 
   & .faq-item.is-open .faq-answer {
     grid-template-rows: 1fr;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   About page (see src/app/about/page.js)
+   Hero with the same bones as the service banner, then the intro beside
+   the plant, the timeline panel, the people cards, the beliefs panel and
+   the three latest posts. Measurements at 1440 from the design.
+   -------------------------------------------------------------------------- */
+.about-hero {
+  position: relative;
+  height: 100svh;
+  width: 100%;
+  border-radius: 0 0 3.472vw 3.472vw;
+  overflow: clip;
+
+  & .about-hero-media {
+    position: absolute;
+    inset: 0;
+
+    /* Same fade as the banners so the white type reads */
+    &::after {
+      content: "";
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 44vh;
+      background: linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.75) 86.61%);
+      z-index: 3;
+    }
+  }
+
+  & .about-hero-title,
+  & .about-hero-text {
+    position: absolute;
+    z-index: 5;
+    display: flex;
+    flex-direction: column;
+    gap: 1.389vw; /* 20px */
+  }
+
+  /* "About Us" over the heading, on the 84px line */
+  & .about-hero-title {
+    left: 5.833vw; /* 84px */
+    bottom: 12.5vw; /* 180px */
+  }
+
+  & .about-hero-text {
+    right: 6.944vw; /* 100px */
+    bottom: 10.417vw; /* 150px */
+    width: 20.139vw; /* 290px */
+  }
+
+  /* "Discover Our Story" with the arrow turned down-right */
+  & .about-scroll {
+    display: flex;
+    align-items: center;
+    gap: 0.417vw;
+
+    & .icon-arrow {
+      transform: rotate(30deg);
+    }
+  }
+}
+
+/* Intro: the plant sits 65px under the hero and its caption 39px off the
+   bottom; the text column is padded so the heading lands 148px under the
+   hero and the paragraphs 242px above the timeline. */
+.about-intro {
+  position: relative; /* anchors the wind leaf */
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1.389vw; /* 20px */
+  padding-inline: 5.833vw; /* 84px */
+  padding-block: 4.514vw 2.708vw; /* 65px, 39px */
+
+  /* Wide enough for "Growing Malaysian Landscapes" on one line */
+  & .about-intro-text {
+    display: flex;
+    flex: 0 1 54.167vw; /* 780px */
+    flex-direction: column;
+    gap: 8.264vw; /* 119px */
+    padding-block: 5.764vw 14.097vw; /* 83px, 203px */
+  }
+
+  /* A narrow first paragraph and a wider second, 74px apart */
+  & .about-intro-columns {
+    display: grid;
+    grid-template-columns: 16.667vw 28.125vw; /* 240px, 405px */
+    gap: 5.139vw; /* 74px */
+  }
+
+  & .about-intro-figure {
+    display: flex;
+    flex: 0 0 auto;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 3.681vw; /* 53px */
+  }
+
+  & .about-plant {
+    width: 30.556vw; /* 440px */
+    height: auto;
+  }
+
+  /* Caption under the plant, 26px in from its right edge, with the curl
+     pointing at its first line */
+  & .about-caption {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.694vw; /* 10px */
+    width: 16.667vw; /* 240px */
+    margin-right: 1.806vw; /* 26px */
+    color: var(--dark-green);
+
+    & .icon-curl {
+      flex: 0 0 auto;
+      margin-top: -0.417vw;
+    }
+  }
+}
+
+/* Timeline: dark panel inset 14px from the page edges, so its 70px padding
+   lands the label, cards and arrows on the 84px line. The cards run off
+   the right edge (the viewport reaches the panel edge) and the arrows sit
+   under them. */
+.about-timeline {
+  padding-inline: 0.972vw; /* 14px */
+}
+
+.timeline-panel {
+  padding-block: 5.069vw 5.694vw; /* 73px, 82px */
+  padding-left: 4.861vw; /* 70px */
+  border-radius: 2.778vw; /* 40px */
+  background: var(--dark-green);
+  overflow: clip;
+
+  & .timeline-label {
+    display: flex;
+    align-items: center;
+    gap: 0.694vw; /* 10px */
+
+    & .icon-arrow {
+      transform: rotate(30deg); /* down-right, like the where panel */
+    }
+  }
+
+  & .embla__viewport {
+    margin-top: 3.056vw; /* 44px */
+  }
+
+  & .embla__container {
+    gap: 2.153vw; /* 31px */
+  }
+
+  & .timeline-card {
+    flex: 0 0 32.639vw; /* 470px */
+    padding: 2.917vw 3.472vw 3.611vw; /* 42px, 50px, 52px */
+    border-radius: 2.778vw; /* 40px */
+    background: var(--white);
+    color: var(--dark-green);
+    list-style: none;
+
+    & .h4 {
+      margin-top: 3.611vw; /* 52px */
+    }
+
+    & .body {
+      margin-top: 0.833vw; /* 12px */
+    }
+  }
+
+  & .timeline-year {
+    font-family: var(--font-otflag);
+    font-size: 3.264vw; /* 47px */
+    font-weight: 600;
+    line-height: 1;
+    letter-spacing: 0.11vw; /* same as the headings */
+  }
+
+  /* The arrow artwork points right */
+  & .timeline-arrows {
+    display: flex;
+    gap: 1.111vw; /* 16px */
+    margin-top: 2.292vw; /* 33px */
+  }
+
+  & .embla__prev .icon-arrow {
+    transform: rotate(180deg);
+  }
+}
+
+/* People: heading beside a row of dark cards, 148px above and below. Each
+   card has a cut-out photo standing on its bottom edge and rising past its
+   top, with a + button in the bottom-left corner. */
+.about-people {
+  display: flex;
+  align-items: flex-start;
+  gap: 6.389vw; /* 92px */
+  padding-inline: 5.833vw; /* 84px */
+  padding-block: 10.278vw; /* 148px */
+
+  & .h2 {
+    flex: 0 0 auto;
+  }
+
+  & .people-cards {
+    display: flex;
+    flex: 1;
+    gap: 1.875vw; /* 27px */
+    list-style: none;
+  }
+}
+
+.people-card {
+  position: relative;
+  flex: 1;
+  min-height: 23.611vw; /* 340px */
+  padding: 1.806vw; /* 26px */
+  border-radius: 2.222vw; /* 32px */
+  background: var(--dark-green);
+
+  /* Name and role keep clear of the photo on the right */
+  & .h4,
+  & .people-role {
+    position: relative;
+    z-index: 1;
+    max-width: 62%;
+  }
+
+  & .people-role {
+    margin-top: 0.417vw; /* 6px */
+    font-size: 0.833vw; /* 12px */
+    opacity: 0.8;
+  }
+
+  /* Photo frame: the card's box grown a fifth upward and clipped only at
+     the bottom corners, so the cut-out overhangs the top edge */
+  & .people-photo {
+    position: absolute;
+    top: -20%;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    overflow: hidden;
+    border-radius: 0 0 2.222vw 2.222vw;
+    pointer-events: none;
+
+    & img {
+      position: absolute;
+      right: 0;
+      bottom: 0;
+      width: auto;
+      height: 100%;
+      max-width: 60%;
+      object-fit: contain;
+      object-position: right bottom;
+    }
+  }
+
+  & .people-more {
+    position: absolute;
+    left: 1.806vw;
+    bottom: 1.806vw;
+    z-index: 1;
+  }
+}
+
+/* The + on a card and, turned into a cross, the close in a drawer: a plus
+   drawn like the FAQ icon inside an .icon-button */
+.people-plus {
+  position: relative;
+
+  &::before,
+  &::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    background: currentColor;
+    transform: translate(-50%, -50%);
+    transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  &::before {
+    width: 1.111vw; /* 16px */
+    height: 0.104vw; /* 1.5px */
+  }
+
+  &::after {
+    width: 0.104vw;
+    height: 1.111vw;
+  }
+
+  &:hover::before,
+  &:hover::after {
+    transform: translate(-50%, -50%) rotate(90deg);
+  }
+}
+
+.people-close::before,
+.people-close::after {
+  transform: translate(-50%, -50%) rotate(45deg);
+}
+
+.people-close:hover::before,
+.people-close:hover::after {
+  transform: translate(-50%, -50%) rotate(135deg);
+}
+
+/* Drawer (see initPeople in custom.js): one per person, fixed to the right
+   edge above the header and slid in over a backdrop like the mobile menu.
+   Cut-out in a beige frame, name and role, then the bio under a rule. */
+.people-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 105;
+  background: rgba(4, 33, 0, 0.5);
+  opacity: 0;
+  pointer-events: none;
+  touch-action: none;
+  transition: opacity 0.5s ease;
+}
+
+.people-drawer {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 110;
+  display: flex;
+  flex-direction: column;
+  width: 38.194vw; /* 550px */
+  padding: 2.222vw 3.472vw 3.472vw; /* 32px, 50px */
+  background: var(--dark-green);
+  color: var(--white);
+  border-radius: 3.472vw 0 0 3.472vw;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  translate: 100% 0;
+  visibility: hidden;
+  transition:
+    translate 0.6s cubic-bezier(0.76, 0, 0.24, 1),
+    visibility 0s linear 0.6s;
+
+  &.is-open {
+    translate: 0 0;
+    visibility: visible;
+    transition: translate 0.6s cubic-bezier(0.76, 0, 0.24, 1);
+  }
+
+  & .people-close {
+    align-self: flex-end;
+    flex: 0 0 auto;
+  }
+
+  & .people-drawer-inner {
+    display: flex;
+    flex-direction: column;
+    margin-top: 1.389vw; /* 20px */
+  }
+
+  /* The cut-out stands on the frame's bottom edge, centred */
+  & .people-drawer-photo {
+    position: relative;
+    height: 22.222vw; /* 320px */
+    border-radius: 2.222vw; /* 32px */
+    background: var(--color-bg);
+    overflow: hidden;
+
+    & img {
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      width: auto;
+      height: 100%;
+      max-width: 90%;
+      object-fit: contain;
+      object-position: bottom;
+      translate: -50% 0;
+    }
+  }
+
+  & .h3 {
+    margin-top: 2.222vw; /* 32px */
+  }
+
+  & .people-role {
+    margin-top: 0.417vw; /* 6px */
+    opacity: 0.8;
+  }
+
+  & .people-bio {
+    display: flex;
+    flex-direction: column;
+    gap: 1.111vw; /* 16px */
+    margin-top: 1.667vw; /* 24px */
+    padding-top: 1.667vw;
+    border-top: 1px solid rgba(255, 255, 255, 0.2);
+    color: rgba(255, 255, 255, 0.85);
+  }
+}
+
+html.people-open .people-backdrop {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* Beliefs: dark panel with a centred heading over a 2x2 grid of beige
+   cards: icon box on the left, title and copy beside it. */
+.about-beliefs {
+  padding-inline: 0.972vw; /* 14px */
+}
+
+.beliefs-panel {
+  padding: 4.167vw 5.417vw 5.417vw; /* 60px, 78px */
+  border-radius: 2.778vw; /* 40px */
+  background: var(--dark-green);
+  text-align: center;
+
+  & .beliefs-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    column-gap: 1.111vw; /* 16px */
+    row-gap: 2.778vw; /* 40px */
+    margin-top: 1.389vw; /* 20px */
+    text-align: left;
+  }
+}
+
+.belief-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 2.778vw; /* 40px */
+  padding: 2.778vw 3.056vw 3.889vw; /* 40px, 44px, 56px */
+  border-radius: 2.778vw; /* 40px */
+  background: var(--color-bg);
+  color: var(--dark-green);
+  list-style: none;
+
+  & .belief-icon {
+    display: grid;
+    flex: 0 0 auto;
+    place-items: center;
+    width: 3.472vw; /* 50px */
+    height: 3.472vw;
+    border-radius: 0.833vw; /* 12px */
+    background: var(--light-green);
+    color: var(--dark-green);
+  }
+
+  & .body {
+    margin-top: 0.417vw; /* 6px */
+  }
+}
+
+/* Latest posts: heading with the blog button opposite, over the blog grid.
+   The date sits 20px under the photo and the title 10px under the date. */
+.about-blogs {
+  padding-inline: 5.833vw; /* 84px */
+  padding-block: 6.944vw 8.542vw; /* 100px, 123px */
+
+  & .about-blogs-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 2.778vw; /* 40px */
+    margin-bottom: 2.778vw; /* 40px */
+  }
+
+  & .blog-card {
+    gap: 0.694vw; /* 10px */
+
+    & .blog-media {
+      margin-bottom: 0.694vw; /* with the gap: 20px to the date */
+    }
   }
 }
 
@@ -4278,6 +4798,260 @@ html.is-rendering .site-page {
     & .faq-answer .body {
       max-width: 100%;
       padding-top: 4vw;
+    }
+  }
+
+  /* ========== ABOUT ========== */
+  .about-hero {
+    border-radius: 0 0 8vw 8vw;
+
+    & .about-hero-title,
+    & .about-hero-text {
+      left: 6vw;
+      right: 6vw;
+      gap: 3vw;
+    }
+
+    /* Text block at the bottom, heading block above it */
+    & .about-hero-title {
+      bottom: 58vw;
+    }
+
+    & .about-hero-text {
+      bottom: 14vw;
+      width: auto;
+    }
+
+    & .about-scroll {
+      gap: 1.5vw;
+    }
+  }
+
+  /* Text first, then the plant with its caption */
+  .about-intro {
+    flex-direction: column;
+    gap: 12vw;
+    padding-inline: 6vw;
+    padding-block: 12vw 16vw;
+
+    & .about-intro-text {
+      flex: none;
+      gap: 8vw;
+      padding-block: 0;
+    }
+
+    & .about-intro-columns {
+      grid-template-columns: 1fr;
+      gap: 5vw;
+    }
+
+    & .about-intro-figure {
+      align-self: stretch;
+      gap: 6vw;
+    }
+
+    & .about-plant {
+      width: 60vw;
+    }
+
+    & .about-caption {
+      width: 56vw;
+      margin-right: 0;
+      gap: 2vw;
+
+      & .icon-curl {
+        margin-top: -1vw;
+      }
+    }
+  }
+
+  .about-intro .wind-leaf {
+    --leaf-width: 90vw;
+    left: -85vw;
+    bottom: 30vw;
+  }
+
+  .icon-bulb,
+  .icon-wrench,
+  .icon-cloud,
+  .icon-sprout {
+    width: 5vw;
+    height: 5vw;
+  }
+
+  .icon-curl {
+    width: 5vw;
+    height: 6.25vw;
+  }
+
+  .about-timeline,
+  .about-beliefs {
+    padding-inline: var(--sidepadding-xs);
+  }
+
+  .timeline-panel {
+    padding-block: 10vw 12vw;
+    padding-left: 6vw;
+    border-radius: 6vw;
+
+    & .timeline-label {
+      gap: 2vw;
+    }
+
+    & .embla__viewport {
+      margin-top: 6vw;
+    }
+
+    & .embla__container {
+      gap: 3vw;
+    }
+
+    & .timeline-card {
+      flex: 0 0 72vw;
+      padding: 8vw 7vw 9vw;
+      border-radius: 6vw;
+
+      & .h4 {
+        margin-top: 8vw;
+      }
+
+      & .body {
+        margin-top: 2.5vw;
+      }
+    }
+
+    & .timeline-year {
+      font-size: 9vw;
+      letter-spacing: 0.3vw;
+    }
+
+    & .timeline-arrows {
+      gap: 3vw;
+      margin-top: 6vw;
+    }
+  }
+
+  /* Heading over the cards, cards stacked with room for the photo overhang */
+  .about-people {
+    flex-direction: column;
+    gap: 14vw;
+    padding-inline: 6vw;
+    padding-block: 16vw;
+
+    & .people-cards {
+      flex-direction: column;
+      align-self: stretch;
+      gap: 14vw;
+    }
+  }
+
+  .people-card {
+    min-height: 60vw;
+    padding: 5vw;
+    border-radius: 6vw;
+
+    & .people-role {
+      margin-top: 1vw;
+      font-size: 3vw;
+    }
+
+    & .people-photo {
+      border-radius: 0 0 6vw 6vw;
+    }
+
+    & .people-more {
+      left: 5vw;
+      bottom: 5vw;
+    }
+  }
+
+  .people-plus {
+    &::before {
+      width: 4vw;
+      height: 0.4vw;
+    }
+
+    &::after {
+      width: 0.4vw;
+      height: 4vw;
+    }
+  }
+
+  .people-drawer {
+    width: 88vw;
+    padding: 6vw 6vw 10vw;
+    border-radius: 8vw 0 0 8vw;
+
+    & .people-drawer-inner {
+      margin-top: 4vw;
+    }
+
+    & .people-drawer-photo {
+      height: 70vw;
+      border-radius: 6vw;
+    }
+
+    & .h3 {
+      margin-top: 6vw;
+    }
+
+    & .people-role {
+      margin-top: 1vw;
+    }
+
+    & .people-bio {
+      gap: 4vw;
+      margin-top: 5vw;
+      padding-top: 5vw;
+    }
+  }
+
+  /* Cards stack */
+  .beliefs-panel {
+    padding: 10vw 5vw 8vw;
+    border-radius: 6vw;
+
+    & .beliefs-grid {
+      grid-template-columns: 1fr;
+      row-gap: 4vw;
+      margin-top: 6vw;
+    }
+  }
+
+  .belief-card {
+    gap: 5vw;
+    padding: 7vw 6vw 8vw;
+    border-radius: 6vw;
+
+    & .belief-icon {
+      width: 11vw;
+      height: 11vw;
+      border-radius: 2.5vw;
+    }
+
+    & .body {
+      margin-top: 1.5vw;
+    }
+  }
+
+  /* Button under the heading */
+  .about-blogs {
+    padding-inline: 6vw;
+    padding-block: 14vw 16vw;
+
+    & .about-blogs-head {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 5vw;
+      margin-bottom: 8vw;
+    }
+
+    & .blog-card {
+      gap: 2.2vw;
+
+      & .blog-media {
+        margin-bottom: 1.5vw;
+      }
     }
   }
 }
