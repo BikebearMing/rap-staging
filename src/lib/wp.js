@@ -58,7 +58,8 @@ export const WHERE_FIELDS = "whereLabel whereGroups { heading note areas rows }"
 // normalisers are packagesFrom and offerFrom below.
 export const PACKAGES_FIELDS =
   "packagesHeading packagesHighlight packagesText packagesListLabel packagesList packages { title plants price note detail }";
-export const OFFER_FIELDS = `offerHeading offerHighlight offerImages { ${IMAGES} }`;
+export const OFFER_FIELDS =
+  "offerHeading offerHighlight offerImages { nodes { sourceUrl altText caption(format: RAW) } }";
 
 const WORK = `
   title slug date
@@ -138,9 +139,11 @@ export const packagesFrom = (fields = {}) => ({
 export const offerFrom = (fields = {}) => ({
   heading: fields.offerHeading || "",
   highlight: fields.offerHighlight || "",
+  // The card label is the image's Caption in the media library
   images: (fields.offerImages?.nodes || []).map((image) => ({
     src: image.sourceUrl || "",
     alt: image.altText || "",
+    label: stripTags(image.caption),
   })),
 });
 
