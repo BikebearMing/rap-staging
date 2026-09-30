@@ -2,17 +2,7 @@ import Faq from "@/components/Faq";
 import ProjectsSlider from "@/components/ProjectsSlider";
 import ServiceAreas from "@/components/ServiceAreas";
 import ServiceBanner from "@/components/ServiceBanner";
-import ServiceCosts from "@/components/ServiceCosts";
-import ServiceWhere from "@/components/ServiceWhere";
-import {
-  COSTS_FIELDS,
-  WHERE_FIELDS,
-  costsFrom,
-  getServicePage,
-  getWorks,
-  whereFrom,
-  worksForService,
-} from "@/lib/wp";
+import { getServicePage, getWorks, worksForService } from "@/lib/wp";
 
 const SERVICE = "maintenance";
 
@@ -23,8 +13,8 @@ export const metadata = {
 };
 
 // Maintenance service page. Content comes from the Service Page Banner,
-// Service Page FAQ and Maintenance Page field groups. Same sections as the other
-// service pages: services as a hover list, pricing, where we work, projects.
+// Service Page FAQ and Maintenance Page field groups. Services as a hover
+// list, then projects.
 export default async function Maintenance() {
   const [page, works] = await Promise.all([
     getServicePage(
@@ -32,7 +22,6 @@ export default async function Maintenance() {
       `maintenanceFields {
         servicesLabel
         services { title description image { node { sourceUrl } } }
-        ${COSTS_FIELDS} ${WHERE_FIELDS}
       }`
     ),
     getWorks(),
@@ -50,10 +39,6 @@ export default async function Maintenance() {
       <ServiceBanner banner={page.banner} />
 
       <ServiceAreas className="maintenance-services" label={fields.servicesLabel} areas={services} />
-
-      <ServiceCosts costs={costsFrom(fields)} />
-
-      <ServiceWhere where={whereFrom(fields)} />
 
       <ProjectsSlider projects={projects} />
 

@@ -2,18 +2,12 @@ import Faq from "@/components/Faq";
 import Heading from "@/components/Heading";
 import ProjectsSlider from "@/components/ProjectsSlider";
 import ServiceBanner from "@/components/ServiceBanner";
-import ServiceCosts from "@/components/ServiceCosts";
 import ServiceProcess from "@/components/ServiceProcess";
-import ServiceWhere from "@/components/ServiceWhere";
 import {
-  COSTS_FIELDS,
   PROCESS_FIELDS,
-  WHERE_FIELDS,
-  costsFrom,
   getServicePage,
   getWorks,
   processFrom,
-  whereFrom,
   worksForService,
 } from "@/lib/wp";
 
@@ -45,7 +39,7 @@ export default async function Landscaping() {
       `landscapingFields {
         galleryHeading galleryHighlight
         sets { title description icon items { title image { node { sourceUrl } } } }
-        ${PROCESS_FIELDS} ${COSTS_FIELDS} ${WHERE_FIELDS}
+        ${PROCESS_FIELDS}
       }`
     ),
     getWorks(),
@@ -138,10 +132,6 @@ export default async function Landscaping() {
       </section>
 
       <ServiceProcess process={processFrom(gallery)} />
-
-      <ServiceCosts costs={costsFrom(gallery)} />
-
-      <ServiceWhere where={whereFrom(gallery)} />
 
       <ProjectsSlider projects={projects} />
 
