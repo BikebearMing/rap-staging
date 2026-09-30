@@ -57,6 +57,7 @@ export const WHERE_FIELDS = "whereLabel whereGroups { heading note areas rows }"
 const WORK = `
   title slug date
   workTags { nodes { name } }
+  featuredImage { ${IMAGE} }
   workFields {
     projectDate description
     variants { service { nodes { name slug } } image { ${IMAGE} } }
@@ -168,6 +169,7 @@ export function normalizeWork(node) {
     date: monthYear(f.projectDate),
     year: year(f.projectDate),
     sortKey: f.projectDate || node.date || "",
+    featuredImage: src(node.featuredImage),
     variants: (f.variants || []).map((v) => ({
       category: first(v.service)?.name || "",
       service: first(v.service)?.slug || "",
@@ -194,14 +196,19 @@ export function normalizePost(node) {
 }
 
 // A work as a slide for ProjectsSlider. `service` picks which variant's
-// photo and tag to show; defaults to the first variant.
+// photo and tag to show. With no service (the homepage slider) the work's
+// own Featured Image wins, so the slider photo is set on the work in
+// wp-admin; either way the other of the two is the fallback.
 export function projectSlide(work, service) {
   const variant = work.variants.find((v) => v.service === service) || work.variants[0] || {};
+  const image = service
+    ? variant.image || work.featuredImage
+    : work.featuredImage || variant.image;
   return {
     title: work.title,
     date: work.date,
     tag: variant.category || "",
-    image: variant.image || "",
+    image: image || "",
     href: `/works/${work.slug}`,
   };
 }
