@@ -2699,16 +2699,167 @@ html.is-rendering .site-page {
   }
 }
 
+/* Packages (plant rental, see ServicePackages.js): heading and copy on the
+   left like the costs section, the package cards stacked on the right. No
+   photos, so each card is a wide dark green row: name and plant count on the
+   first line, the price grown to an h3 under them, what the package holds
+   under a hairline. */
+.service-packages {
+  display: flex;
+  align-items: flex-start;
+  gap: 4.097vw; /* 59px */
+  padding-inline: 5.833vw; /* 84px */
+  padding-block: 9.722vw 10.764vw; /* 140px, 155px */
+
+  & .packages-text {
+    flex: 0 0 33.194vw; /* 478px */
+  }
+
+  & .packages-copy {
+    display: flex;
+    flex-direction: column;
+    gap: 1.389vw; /* one line, 20px */
+    margin-top: 2.292vw; /* 33px */
+  }
+
+  /* The numbered "Our service includes" list; the global reset strips list
+     styles, so the numbers come back here */
+  & .packages-services {
+    display: flex;
+    flex-direction: column;
+    gap: 0.556vw; /* 8px */
+
+    & ol {
+      list-style: decimal;
+      padding-left: 1.3em;
+
+      & li {
+        padding-left: 0.3em;
+      }
+    }
+  }
+
+  & .packages-cards {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: 1.111vw; /* 16px */
+  }
+
+  & .package-card {
+    padding-block: 1.944vw 1.667vw; /* 28px, 24px */
+    padding-inline: 2.222vw; /* 32px */
+    border-radius: 2.222vw; /* 32px */
+    background: var(--dark-green);
+  }
+
+  & .package-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1.389vw; /* 20px */
+  }
+
+  & .package-plants {
+    color: var(--light-green);
+    font-weight: 500;
+  }
+
+  & .package-price {
+    display: flex;
+    align-items: baseline;
+    gap: 0.833vw; /* 12px */
+    margin-top: 0.694vw; /* 10px */
+
+    & .package-note {
+      font-size: 0.972vw; /* 14px */
+      opacity: 0.7;
+    }
+  }
+
+  & .package-detail {
+    margin-top: 1.111vw; /* 16px */
+    padding-top: 1.111vw;
+    border-top: 1px solid rgba(255, 255, 255, 0.16);
+    opacity: 0.8;
+  }
+}
+
+/* Plants we offer (plant rental, see ServiceOffer.js): heading on the left,
+   an autoplaying Embla strip of photos running off the page edge on the
+   right. The dots under the strip carry the autoplay progress (see
+   initProgressDots in custom.js); they sit over images everywhere else, so
+   their white comes down to green here. */
+.service-offer {
+  display: flex;
+  align-items: flex-start;
+  gap: 4.097vw; /* 59px */
+  padding-inline: 5.833vw 0; /* 84px */
+  padding-block: 0 10.764vw; /* the packages section sets the gap above; 155px */
+
+  & .offer-text {
+    flex: 0 0 33.194vw; /* 478px */
+  }
+
+  /* min-width: the strip would otherwise size to its slides and Embla would
+     have nothing to scroll */
+  & .offer-slides {
+    flex: 1;
+    min-width: 0;
+  }
+
+  & .embla__container {
+    gap: 1.111vw; /* 16px */
+  }
+
+  & .offer-slide {
+    flex: 0 0 24.306vw; /* 350px */
+    height: 20.833vw; /* 300px */
+    border-radius: 2.222vw; /* 32px */
+    overflow: hidden;
+
+    & img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+  }
+
+  & .embla__dots {
+    position: static;
+    transform: none;
+    margin-top: 1.667vw; /* 24px */
+  }
+
+  & .embla__dot {
+    background: rgba(4, 33, 0, 0.2);
+  }
+
+  & .embla__dot-bar {
+    background: var(--dark-green);
+  }
+}
+
 /* The pages run these sections in different orders, so the gaps that depend
    on the neighbour live here: an areas list already ends with the gap to
    the costs; costs followed by the process strip (plant rental) close up to
    120px with its 20px; and the process strip, which ends flush with its
-   cards, stands 120px off a where panel. */
-.service-areas + .service-costs {
+   cards, stands 120px off a where panel. The packages section slots in like
+   the costs one, with the offer strip 100px under it. */
+.service-areas + .service-costs,
+.service-areas + .service-packages {
   padding-top: 0;
 }
 
 .service-costs:has(+ .service-process) {
+  padding-bottom: 6.944vw; /* 100px */
+}
+
+.service-packages:has(+ .service-offer) {
+  padding-bottom: 6.944vw; /* 100px */
+}
+
+.service-offer:has(+ .service-process) {
   padding-bottom: 6.944vw; /* 100px */
 }
 
@@ -4635,11 +4786,102 @@ html.people-open .people-backdrop {
     }
   }
 
-  .service-areas + .service-costs {
+  /* Stacked: copy, then the package cards at full width */
+  .service-packages {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10vw;
+    padding-inline: 6vw;
+    padding-block: 16vw 16vw;
+
+    & .packages-text {
+      flex: none;
+    }
+
+    & .packages-copy {
+      gap: 4vw;
+      margin-top: 6vw;
+    }
+
+    & .packages-services {
+      gap: 1.5vw;
+    }
+
+    & .packages-cards {
+      gap: 3vw;
+    }
+
+    & .package-card {
+      padding-block: 5.5vw 5vw;
+      padding-inline: 5.5vw;
+      border-radius: 6vw;
+    }
+
+    & .package-head {
+      gap: 3vw;
+    }
+
+    & .package-price {
+      gap: 2.5vw;
+      margin-top: 1.5vw;
+
+      & .package-note {
+        font-size: 3.2vw;
+      }
+    }
+
+    & .package-detail {
+      margin-top: 3.5vw;
+      padding-top: 3.5vw;
+    }
+  }
+
+  /* Stacked: heading, then the strip of photos */
+  .service-offer {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8vw;
+    padding-inline: 6vw 0;
+    padding-block: 0 16vw;
+
+    & .offer-text {
+      flex: none;
+      padding-right: 6vw;
+    }
+
+    & .offer-slides {
+      flex: none;
+    }
+
+    & .embla__container {
+      gap: 3vw;
+    }
+
+    & .offer-slide {
+      flex: 0 0 68vw;
+      height: 60vw;
+      border-radius: 6vw;
+    }
+
+    & .embla__dots {
+      margin-top: 5vw;
+    }
+  }
+
+  .service-areas + .service-costs,
+  .service-areas + .service-packages {
     padding-top: 0;
   }
 
   .service-costs:has(+ .service-process) {
+    padding-bottom: 12vw;
+  }
+
+  .service-packages:has(+ .service-offer) {
+    padding-bottom: 12vw;
+  }
+
+  .service-offer:has(+ .service-process) {
     padding-bottom: 12vw;
   }
 

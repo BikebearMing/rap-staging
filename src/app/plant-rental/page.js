@@ -3,12 +3,18 @@ import Heading, { Lines } from "@/components/Heading";
 import ProjectsSlider from "@/components/ProjectsSlider";
 import ServiceAreas from "@/components/ServiceAreas";
 import ServiceBanner from "@/components/ServiceBanner";
+import ServiceOffer from "@/components/ServiceOffer";
+import ServicePackages from "@/components/ServicePackages";
 import ServiceProcess from "@/components/ServiceProcess";
 import WindLeaf from "@/components/WindLeaf";
 import {
+  OFFER_FIELDS,
+  PACKAGES_FIELDS,
   PROCESS_FIELDS,
   getServicePage,
   getWorks,
+  offerFrom,
+  packagesFrom,
   processFrom,
   worksForService,
 } from "@/lib/wp";
@@ -32,7 +38,7 @@ export default async function PlantRental() {
       `plantRentalFields {
         introLabel introHeading introHighlight introColumn1 introColumn2
         areasHeading areas { title description image { ${IMAGE} } }
-        ${PROCESS_FIELDS}
+        ${PACKAGES_FIELDS} ${OFFER_FIELDS} ${PROCESS_FIELDS}
       }`
     ),
     getWorks(),
@@ -76,6 +82,10 @@ export default async function PlantRental() {
       </section>
 
       <ServiceAreas heading={intro.areasHeading} areas={areas} />
+
+      <ServicePackages packages={packagesFrom(intro)} />
+
+      <ServiceOffer offer={offerFrom(intro)} />
 
       <ServiceProcess process={processFrom(intro)} />
 

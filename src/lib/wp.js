@@ -54,6 +54,12 @@ export const PROCESS_FIELDS = "processHeading processHighlight processSteps { ti
 export const COSTS_FIELDS = `costsHeading costsHighlight costsText costsCards { title price image { ${IMAGE} } }`;
 export const WHERE_FIELDS = "whereLabel whereGroups { heading note areas rows }";
 
+// Plant rental only: the packages and "Plants we offer" sections; the
+// normalisers are packagesFrom and offerFrom below.
+export const PACKAGES_FIELDS =
+  "packagesHeading packagesHighlight packagesText packagesListLabel packagesList packages { title plants price note detail }";
+export const OFFER_FIELDS = `offerHeading offerHighlight offerImages { ${IMAGES} }`;
+
 const WORK = `
   title slug date
   workTags { nodes { name } }
@@ -111,6 +117,30 @@ export const whereFrom = (fields = {}) => ({
     note: group.note || "",
     areas: lines(group.areas),
     columns: group.rows || 0, // rows deep; 0 is one long column
+  })),
+});
+
+// Props for ServicePackages and ServiceOffer (plant rental page)
+export const packagesFrom = (fields = {}) => ({
+  heading: fields.packagesHeading || "",
+  highlight: fields.packagesHighlight || "",
+  text: paragraphs(fields.packagesText),
+  listLabel: fields.packagesListLabel || "",
+  list: lines(fields.packagesList),
+  items: (fields.packages || []).map((card) => ({
+    title: card.title || "",
+    plants: card.plants || "",
+    price: card.price || "",
+    note: card.note || "",
+    detail: card.detail || "",
+  })),
+});
+export const offerFrom = (fields = {}) => ({
+  heading: fields.offerHeading || "",
+  highlight: fields.offerHighlight || "",
+  images: (fields.offerImages?.nodes || []).map((image) => ({
+    src: image.sourceUrl || "",
+    alt: image.altText || "",
   })),
 });
 
