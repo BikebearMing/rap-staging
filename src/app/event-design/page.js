@@ -2,12 +2,9 @@ import Faq from "@/components/Faq";
 import ProjectsSlider from "@/components/ProjectsSlider";
 import ServiceAreas from "@/components/ServiceAreas";
 import ServiceBanner from "@/components/ServiceBanner";
-import ServiceCosts from "@/components/ServiceCosts";
 import ServiceProcess from "@/components/ServiceProcess";
 import {
-  COSTS_FIELDS,
   PROCESS_FIELDS,
-  costsFrom,
   getServicePage,
   getWorks,
   processFrom,
@@ -33,7 +30,7 @@ export default async function EventDesign() {
       `eventDesignFields {
         categoriesLabel
         categories { title description image { node { sourceUrl } } }
-        ${PROCESS_FIELDS} ${COSTS_FIELDS}
+        ${PROCESS_FIELDS}
       }`
     ),
     getWorks(),
@@ -53,8 +50,6 @@ export default async function EventDesign() {
       <ServiceAreas className="event-categories" label={fields.categoriesLabel} areas={categories} />
 
       <ServiceProcess process={processFrom(fields)} />
-
-      <ServiceCosts costs={costsFrom(fields)} />
 
       <ProjectsSlider projects={projects} />
 
