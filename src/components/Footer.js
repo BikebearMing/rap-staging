@@ -9,7 +9,7 @@ import { getSiteSettings } from "@/lib/wp";
 const footerLinks = [
   {
     heading: "Our Services",
-    links: ["Event Designs", "Landscaping", "Rent a Plant", "Maintainance"],
+    links: ["Event Designs", "Landscaping", "Rent a Plant", "Maintenance"],
   },
   {
     heading: "Customer Service",

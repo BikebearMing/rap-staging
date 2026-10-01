@@ -3886,11 +3886,16 @@ html.people-open .people-backdrop {
 
   .service-card {
     border-radius: 8vw;
+    /* Stack meta and title in flow from the bottom instead of pinning each at
+       a fixed offset — a 2-3 line title would otherwise grow up into the meta */
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
 
     & .service-meta {
-      left: 6vw;
-      right: 6vw;
-      bottom: 42vw; /* TODO: verify */
+      position: relative;
+      inset: auto;
+      margin: 0 6vw 6vw;
 
       & > * {
         max-width: 60vw;
@@ -3908,9 +3913,9 @@ html.people-open .people-backdrop {
 
     /* Left-aligned under the meta instead of centred, so it stacks cleanly */
     & .service-title {
-      left: 6vw;
-      right: 6vw;
-      bottom: 14vw;
+      position: relative;
+      inset: auto;
+      margin: 0 6vw 14vw;
       transform: none;
       gap: 3vw;
       width: auto;
