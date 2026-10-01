@@ -209,7 +209,12 @@ export function normalizeWork(node) {
     variants: (f.variants || []).map((v) => ({
       category: first(v.service)?.name || "",
       service: first(v.service)?.slug || "",
-      image: src(v.image),
+      // Fall back like projectSlide: variant rows often have no photo yet
+      image:
+        src(v.image) ||
+        src(node.featuredImage) ||
+        (f.variants || []).map((o) => src(o.image)).find(Boolean) ||
+        "",
     })),
     tags: (node.workTags?.nodes || []).map((t) => t.name),
     description: f.description || "",
@@ -231,17 +236,15 @@ export function normalizePost(node) {
   };
 }
 
-// A work as a slide for ProjectsSlider. `service` picks which variant's
-// photo and tag to show. With no service (the homepage slider) the work's
-// own Featured Image wins, so the slider photo is set on the work in
-// wp-admin. Either way, rather than a blank slide, fall back to the Featured
-// Image and then to any variant row that has a photo.
+// A work as a slide for ProjectsSlider. `service` picks which variant's tag
+// to show. For now every slide picks its photo like the homepage slider: the
+// work's Featured Image, then any variant row that has a photo. (Per-service
+// photos — the variant row's own image winning on its service page — were
+// benched on request until the content is tidied; restore by putting
+// variant.image back in front for the `service` case.)
 export function projectSlide(work, service) {
   const variant = work.variants.find((v) => v.service === service) || work.variants[0] || {};
-  const anyImage = work.variants.find((v) => v.image)?.image;
-  const image = service
-    ? variant.image || work.featuredImage || anyImage
-    : work.featuredImage || anyImage;
+  const image = work.featuredImage || work.variants.find((v) => v.image)?.image;
   return {
     title: work.title,
     date: work.date,
