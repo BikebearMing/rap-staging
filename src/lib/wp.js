@@ -59,7 +59,10 @@ export const WHERE_FIELDS = "whereLabel whereGroups { heading note areas rows }"
 export const PACKAGES_FIELDS =
   "packagesHeading packagesHighlight packagesText packagesListLabel packagesList packages { title plants price note detail }";
 export const OFFER_FIELDS =
-  "offerHeading offerHighlight offerImages { nodes { sourceUrl altText caption(format: RAW) } }";
+  // caption must be the rendered format: WPGraphQL returns RAW as null to
+  // the public, and the site queries unauthenticated. stripTags in offerFrom
+  // removes the <p> wrapper.
+  "offerHeading offerHighlight offerImages { nodes { sourceUrl altText caption } }";
 
 const WORK = `
   title slug date
