@@ -234,12 +234,14 @@ export function normalizePost(node) {
 // A work as a slide for ProjectsSlider. `service` picks which variant's
 // photo and tag to show. With no service (the homepage slider) the work's
 // own Featured Image wins, so the slider photo is set on the work in
-// wp-admin; either way the other of the two is the fallback.
+// wp-admin. Either way, rather than a blank slide, fall back to the Featured
+// Image and then to any variant row that has a photo.
 export function projectSlide(work, service) {
   const variant = work.variants.find((v) => v.service === service) || work.variants[0] || {};
+  const anyImage = work.variants.find((v) => v.image)?.image;
   const image = service
-    ? variant.image || work.featuredImage
-    : work.featuredImage || variant.image;
+    ? variant.image || work.featuredImage || anyImage
+    : work.featuredImage || anyImage;
   return {
     title: work.title,
     date: work.date,
