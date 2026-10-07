@@ -188,20 +188,24 @@ export const monthYear = (value) => fmt(value, { month: "short", year: "numeric"
 export const year = (value) => fmt(value, { year: "numeric" });
 export const longDate = (value) => fmt(value, { month: "long", day: "numeric", year: "numeric" });
 
+// WordPress "rendered" text (titles, excerpts, captions) comes entity-encoded
+// (&#8216; etc). React prints entities literally, so decode them all here:
+// numeric ones generically, plus the named ones WP emits.
+const NAMED_ENTITIES = { amp: "&", nbsp: " ", quot: '"', lt: "<", gt: ">", hellip: "…", lsquo: "‘", rsquo: "’", ldquo: "“", rdquo: "”", ndash: "–", mdash: "—" }; // prettier-ignore
 const stripTags = (html) =>
   (html || "")
     .replace(/<[^>]+>/g, "")
-    .replace(/&nbsp;/g, " ")
-    .replace(/&#8217;/g, "’")
-    .replace(/&amp;/g, "&")
-    .replace(/\[&hellip;\]|&hellip;/g, "…")
+    .replace(/&#x([0-9a-f]+);/gi, (_, hex) => String.fromCodePoint(parseInt(hex, 16)))
+    .replace(/&#(\d+);/g, (_, num) => String.fromCodePoint(num))
+    .replace(/&([a-z]+);/gi, (match, name) => NAMED_ENTITIES[name.toLowerCase()] ?? match)
+    .replace(/\[…\]/g, "…")
     .trim();
 
 export function normalizeWork(node) {
   const f = node.workFields || {};
   return {
     slug: node.slug,
-    title: node.title,
+    title: stripTags(node.title),
     date: monthYear(f.projectDate),
     year: year(f.projectDate),
     sortKey: f.projectDate || node.date || "",
@@ -226,7 +230,7 @@ export function normalizeWork(node) {
 export function normalizePost(node) {
   return {
     slug: node.slug,
-    title: node.title,
+    title: stripTags(node.title),
     date: longDate(node.date),
     sortKey: node.date || "",
     image: src(node.featuredImage),
