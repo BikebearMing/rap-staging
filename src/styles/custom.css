@@ -13,6 +13,11 @@
   font-display: swap;
 }
 
+
+.justin {
+  display: none;
+}
+
 @font-face {
   font-family: "DM Sans";
   src: url("/fonts/DMSans-Italic-Variable.ttf") format("truetype");

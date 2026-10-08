@@ -4,20 +4,36 @@ import WindLeaf from "@/components/WindLeaf";
 import { getSiteSettings } from "@/lib/wp";
 
 // Site footer. Contact details, social links and copy come from the Site
-// Settings options page in WordPress; the link columns are placeholder
-// until their pages exist. The last column is the address and phone numbers.
+// Settings options page in WordPress. Column entries without an href stay
+// placeholder until their pages exist. The last column is the address and
+// phone numbers.
 const footerLinks = [
   {
     heading: "Our Services",
-    links: ["Event Designs", "Landscaping", "Rent a Plant", "Maintenance"],
+    links: [
+      { label: "Event Designs", href: "/event-design" },
+      { label: "Landscaping", href: "/landscaping" },
+      { label: "Rent a Plant", href: "/plant-rental" },
+      { label: "Maintenance", href: "/maintenance" },
+    ],
   },
   {
     heading: "Customer Service",
-    links: ["FAQ", "Delivery & Refund", "Terms & Conditions", "Privacy Policy"],
+    links: [
+      { label: "FAQ" },
+      { label: "Delivery & Refund" },
+      { label: "Terms & Conditions" },
+      { label: "Privacy Policy" },
+    ],
   },
   {
     heading: "Rent A Pot",
-    links: ["Our Works", "Specialty", "Blog", "Contact"],
+    links: [
+      { label: "Our Works", href: "/works" },
+      { label: "Specialty" },
+      { label: "Blog", href: "/blog" },
+      { label: "Contact", href: "/contact" },
+    ],
   },
 ];
 
@@ -98,11 +114,17 @@ export default async function Footer() {
                 {col.heading}
               </p>
               <ul data-text-reveal="flip">
-                {col.links.map((label) => (
+                {col.links.map(({ label, href }) => (
                   <li key={label}>
-                    <a href="#" className="body">
-                      {label}
-                    </a>
+                    {href ? (
+                      <Link href={href} className="body">
+                        {label}
+                      </Link>
+                    ) : (
+                      <a href="#" className="body">
+                        {label}
+                      </a>
+                    )}
                   </li>
                 ))}
               </ul>
