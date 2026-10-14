@@ -10,9 +10,9 @@ const SERVICE = "event-design";
 
 export const metadata = pageMeta({
   path: "/event-design",
-  title: "Event Design | Rent-A-Pot",
+  title: "Wedding & Event Greenery Decoration in Malaysia | Rent-A-Pot",
   description:
-    "RAP provides end-to-end greenery and floral styling to create event spaces that match each theme and atmosphere.",
+    "Wedding and event greenery decoration in Malaysia. Rent-A-Pot designs, installs and removes greenery and florals for weddings, launches and festive displays.",
 });
 
 // Event design service page. Content comes from the Service Page Banner,

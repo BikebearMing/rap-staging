@@ -9,9 +9,9 @@ const SERVICE = "maintenance";
 
 export const metadata = pageMeta({
   path: "/maintenance",
-  title: "Maintenance | Rent-A-Pot",
+  title: "Garden & Landscape Maintenance Services Malaysia | Rent-A-Pot",
   description:
-    "Our garden and landscape maintenance team keeps your outdoor spaces healthy, tidy and looking their best all year round.",
+    "Garden and landscape maintenance in Malaysia. Our team keeps your outdoor spaces healthy, tidy and looking their best all year round.",
 });
 
 // Maintenance service page. Content comes from the Service Page Banner,

@@ -4,8 +4,9 @@ import { pageMeta } from "@/lib/site";
 
 export const metadata = pageMeta({
   path: "/works",
-  title: "Our Works | Rent-A-Pot",
-  description: "A collection of spaces, details, and moments brought to life.",
+  title: "Our Works | Landscaping & Plant Projects | Rent-A-Pot",
+  description:
+    "Explore Rent-A-Pot's projects across Malaysia: office plant installations, landscaping, event greenery and the spaces we've brought to life.",
 });
 
 // Our Works listing. Heading comes from the Page Header field group; the

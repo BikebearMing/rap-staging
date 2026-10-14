@@ -10,9 +10,9 @@ const SERVICE = "landscaping";
 
 export const metadata = pageMeta({
   path: "/landscaping",
-  title: "Landscaping | Rent-A-Pot",
+  title: "Landscape Design & Construction in Malaysia | Rent-A-Pot",
   description:
-    "Our landscape design team creates beautiful, functional outdoor spaces, providing end-to-end solutions from concept to construction and planting.",
+    "Landscape design and construction in Malaysia. We create beautiful, functional outdoor spaces with end-to-end solutions from concept to planting.",
 });
 
 // Each strip is an Embla slider: no loop, cards run off the right edge and

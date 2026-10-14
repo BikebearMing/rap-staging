@@ -5,8 +5,9 @@ import { pageMeta } from "@/lib/site";
 
 export const metadata = pageMeta({
   path: "/blog",
-  title: "Blog | Rent-A-Pot",
-  description: "A collection of spaces, details, and moments brought to life.",
+  title: "Blog | Plant Care & Greenery Ideas | Rent-A-Pot",
+  description:
+    "Plant care tips, office greenery ideas and landscaping insights from Rent-A-Pot, Malaysia's plant rental and landscaping specialist since 1982.",
 });
 
 // Blog listing. Heading and subtitle come from the Page Header field group;

@@ -8,7 +8,7 @@ import { SITE_NAME, pageMeta } from "@/lib/site";
 // The first hero slide doubles as the image shown when the site is shared
 export async function generateMetadata() {
   const { hero } = await getHome();
-  return pageMeta({ title: SITE_NAME, path: "/", image: hero.slides[0] });
+  return pageMeta({ title: `Plant Rental & Landscape Design in Malaysia | ${SITE_NAME}`, path: "/", image: hero.slides[0] });
 }
 
 // Home page. Content comes from the Home Page field group in WordPress.
