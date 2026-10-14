@@ -3,12 +3,14 @@ import SiteScripts from "@/components/SiteScripts";
 import PageTransition from "@/components/PageTransition";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import { SITE_DESCRIPTION, SITE_NAME, SITE_URL } from "@/lib/site";
 
 const GA_ID = "G-9SSDHVEK3M";
 
 export const metadata = {
-  title: "Rent-A-Pot",
-  description: "Rent-A-Pot",
+  metadataBase: new URL(SITE_URL),
+  title: SITE_NAME,
+  description: SITE_DESCRIPTION,
 };
 
 export default function RootLayout({ children }) {
@@ -16,10 +18,7 @@ export default function RootLayout({ children }) {
     <html lang="en">
       <head>
         {/* Google tag (gtag.js) */}
-        <script
-          async
-          src={`https://www.googletagmanager.com/gtag/js?id=${GA_ID}`}
-        />
+        <script async src={`https://www.googletagmanager.com/gtag/js?id=${GA_ID}`} />
         <script
           dangerouslySetInnerHTML={{
             __html: `

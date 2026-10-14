@@ -2,11 +2,13 @@ import Link from "next/link";
 import Heading, { Lines } from "@/components/Heading";
 import ServiceWhere from "@/components/ServiceWhere";
 import { getContact, getSiteSettings } from "@/lib/wp";
+import { pageMeta } from "@/lib/site";
 
-export const metadata = {
+export const metadata = pageMeta({
+  path: "/contact",
   title: "Contact | Rent-A-Pot",
   description: "Let's grow a greener space together.",
-};
+});
 
 // Contact page. Copy comes from the Contact Page field group and the
 // details from Site Settings; the form is plain HTML until a form plugin

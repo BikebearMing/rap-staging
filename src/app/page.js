@@ -3,6 +3,13 @@ import Heading, { Lines } from "@/components/Heading";
 import ProjectsSlider from "@/components/ProjectsSlider";
 import WindLeaf from "@/components/WindLeaf";
 import { getHome } from "@/lib/wp";
+import { SITE_NAME, pageMeta } from "@/lib/site";
+
+// The first hero slide doubles as the image shown when the site is shared
+export async function generateMetadata() {
+  const { hero } = await getHome();
+  return pageMeta({ title: SITE_NAME, path: "/", image: hero.slides[0] });
+}
 
 // Home page. Content comes from the Home Page field group in WordPress.
 export default async function Home() {
