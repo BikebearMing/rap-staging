@@ -2,6 +2,8 @@ import Button from "@/components/Button";
 import BlogCard from "@/components/BlogCard";
 import { getPageHeader, getPosts } from "@/lib/wp";
 import { pageMeta } from "@/lib/site";
+import JsonLd from "@/components/JsonLd";
+import { breadcrumbSchema } from "@/lib/schema";
 
 export const metadata = pageMeta({
   path: "/blog",
@@ -20,6 +22,7 @@ export default async function Blog() {
 
   return (
     <main className="blog-page">
+      <JsonLd data={breadcrumbSchema([{ name: "Blog", path: "/blog" }])} />
       <section className="blog-header">
         <h1 className="h1" data-text-reveal="lift">
           {header.heading}

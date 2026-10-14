@@ -4,14 +4,18 @@ import ServiceAreas from "@/components/ServiceAreas";
 import ServiceBanner from "@/components/ServiceBanner";
 import { getServicePage, getWorks, worksForService } from "@/lib/wp";
 import { pageMeta } from "@/lib/site";
+import JsonLd from "@/components/JsonLd";
+import { breadcrumbSchema, serviceSchema } from "@/lib/schema";
 
 const SERVICE = "maintenance";
+
+const DESCRIPTION =
+  "Garden and landscape maintenance in Malaysia. Our team keeps your outdoor spaces healthy, tidy and looking their best all year round.";
 
 export const metadata = pageMeta({
   path: "/maintenance",
   title: "Garden & Landscape Maintenance Services Malaysia | Rent-A-Pot",
-  description:
-    "Garden and landscape maintenance in Malaysia. Our team keeps your outdoor spaces healthy, tidy and looking their best all year round.",
+  description: DESCRIPTION,
 });
 
 // Maintenance service page. Content comes from the Service Page Banner,
@@ -38,6 +42,17 @@ export default async function Maintenance() {
 
   return (
     <main className="service-page">
+      <JsonLd
+        data={[
+          serviceSchema({
+            name: "Garden & Landscape Maintenance",
+            serviceType: "Garden and landscape maintenance",
+            description: DESCRIPTION,
+            path: "/maintenance",
+          }),
+          breadcrumbSchema([{ name: "Maintenance", path: "/maintenance" }]),
+        ]}
+      />
       <ServiceBanner banner={page.banner} />
 
       <ServiceAreas

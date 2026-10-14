@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { getPageHeader, getWorks } from "@/lib/wp";
 import { pageMeta } from "@/lib/site";
+import JsonLd from "@/components/JsonLd";
+import { breadcrumbSchema } from "@/lib/schema";
 
 export const metadata = pageMeta({
   path: "/works",
@@ -18,6 +20,7 @@ export default async function Works() {
 
   return (
     <main className="works-page">
+      <JsonLd data={breadcrumbSchema([{ name: "Our Works", path: "/works" }])} />
       <section className="works-header">
         <h1 className="h1" data-text-reveal="lift">
           {header.heading}

@@ -1,6 +1,8 @@
 import { notFound } from "next/navigation";
 import { getWork, getWorks } from "@/lib/wp";
+import JsonLd from "@/components/JsonLd";
 import { pageMeta } from "@/lib/site";
+import { breadcrumbSchema } from "@/lib/schema";
 
 export async function generateStaticParams() {
   const works = await getWorks();
@@ -29,6 +31,12 @@ export default async function Work({ params }) {
 
   return (
     <main className="work-page">
+      <JsonLd
+        data={breadcrumbSchema([
+          { name: "Our Works", path: "/works" },
+          { name: work.title, path: `/works/${slug}` },
+        ])}
+      />
       <section className="work-header has-parallax">
         <div className="work-header-tags">
           {work.variants.map((variant) => (
