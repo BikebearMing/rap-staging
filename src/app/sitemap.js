@@ -1,8 +1,6 @@
 import { getPosts, getWorks } from "@/lib/wp";
 import { SITE_URL, STATIC_ROUTES } from "@/lib/site";
 
-// Served at /sitemap.xml. Blog posts and works are listed from WordPress, so
-// new ones appear once the "wordpress" cache tag is revalidated.
 export default async function sitemap() {
   const [posts, works] = await Promise.all([getPosts(), getWorks()]);
 
@@ -19,7 +17,7 @@ export default async function sitemap() {
     })),
     ...posts.map((post) => ({
       url: `${SITE_URL}/blog/${post.slug}`,
-      lastModified: post.sortKey || undefined,
+      lastModified: post.sortKey ? post.sortKey.slice(0, 10) : undefined,
       changeFrequency: "yearly",
       priority: 0.6,
     })),
