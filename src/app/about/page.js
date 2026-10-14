@@ -3,12 +3,14 @@ import Button from "@/components/Button";
 import Heading, { Lines } from "@/components/Heading";
 import WindLeaf from "@/components/WindLeaf";
 import { getAbout, getPosts } from "@/lib/wp";
+import { pageMeta } from "@/lib/site";
 
-export const metadata = {
+export const metadata = pageMeta({
+  path: "/about",
   title: "About | Rent-A-Pot",
   description:
     "What started as one man's vision to bring nature into commercial spaces has grown into a second generation business shaping how Malaysia experiences plants, landscapes and green spaces.",
-};
+});
 
 // The timeline strip is an Embla slider: no loop, cards run off the right
 // edge and can be dragged freely (see initSliders in custom.js)

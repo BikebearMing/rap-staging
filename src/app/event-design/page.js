@@ -3,21 +3,17 @@ import ProjectsSlider from "@/components/ProjectsSlider";
 import ServiceAreas from "@/components/ServiceAreas";
 import ServiceBanner from "@/components/ServiceBanner";
 import ServiceProcess from "@/components/ServiceProcess";
-import {
-  PROCESS_FIELDS,
-  getServicePage,
-  getWorks,
-  processFrom,
-  worksForService,
-} from "@/lib/wp";
+import { PROCESS_FIELDS, getServicePage, getWorks, processFrom, worksForService } from "@/lib/wp";
+import { pageMeta } from "@/lib/site";
 
 const SERVICE = "event-design";
 
-export const metadata = {
+export const metadata = pageMeta({
+  path: "/event-design",
   title: "Event Design | Rent-A-Pot",
   description:
     "RAP provides end-to-end greenery and floral styling to create event spaces that match each theme and atmosphere.",
-};
+});
 
 // Event design service page. Content comes from the Service Page Banner,
 // Service Page FAQ and Event Design Page field groups. Same sections as the
@@ -47,7 +43,11 @@ export default async function EventDesign() {
     <main className="service-page">
       <ServiceBanner banner={page.banner} />
 
-      <ServiceAreas className="event-categories" label={fields.categoriesLabel} areas={categories} />
+      <ServiceAreas
+        className="event-categories"
+        label={fields.categoriesLabel}
+        areas={categories}
+      />
 
       <ServiceProcess process={processFrom(fields)} />
 

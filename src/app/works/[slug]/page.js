@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { getWork, getWorks } from "@/lib/wp";
+import { pageMeta } from "@/lib/site";
 
 export async function generateStaticParams() {
   const works = await getWorks();
@@ -9,7 +10,13 @@ export async function generateStaticParams() {
 export async function generateMetadata({ params }) {
   const { slug } = await params;
   const work = await getWork(slug);
-  return { title: work ? `${work.title} | Rent-A-Pot` : "Our Works | Rent-A-Pot" };
+  if (!work) return { title: "Our Works | Rent-A-Pot" };
+  return pageMeta({
+    title: `${work.title} | Rent-A-Pot`,
+    description: work.description || work.overview[0] || undefined,
+    path: `/works/${slug}`,
+    image: work.featuredImage || work.gallery[0],
+  });
 }
 
 // A single work, from the Work Details field group. `overview` is one

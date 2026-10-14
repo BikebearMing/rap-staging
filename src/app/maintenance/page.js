@@ -3,14 +3,16 @@ import ProjectsSlider from "@/components/ProjectsSlider";
 import ServiceAreas from "@/components/ServiceAreas";
 import ServiceBanner from "@/components/ServiceBanner";
 import { getServicePage, getWorks, worksForService } from "@/lib/wp";
+import { pageMeta } from "@/lib/site";
 
 const SERVICE = "maintenance";
 
-export const metadata = {
+export const metadata = pageMeta({
+  path: "/maintenance",
   title: "Maintenance | Rent-A-Pot",
   description:
     "Our garden and landscape maintenance team keeps your outdoor spaces healthy, tidy and looking their best all year round.",
-};
+});
 
 // Maintenance service page. Content comes from the Service Page Banner,
 // Service Page FAQ and Maintenance Page field groups. Services as a hover
@@ -38,7 +40,11 @@ export default async function Maintenance() {
     <main className="service-page">
       <ServiceBanner banner={page.banner} />
 
-      <ServiceAreas className="maintenance-services" label={fields.servicesLabel} areas={services} />
+      <ServiceAreas
+        className="maintenance-services"
+        label={fields.servicesLabel}
+        areas={services}
+      />
 
       <ProjectsSlider projects={projects} />
 

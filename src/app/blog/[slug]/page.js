@@ -3,6 +3,7 @@ import Button from "@/components/Button";
 import BlogCard from "@/components/BlogCard";
 import WindLeaf from "@/components/WindLeaf";
 import { getPost, getPosts } from "@/lib/wp";
+import { pageMeta } from "@/lib/site";
 
 export async function generateStaticParams() {
   const posts = await getPosts();
@@ -12,7 +13,16 @@ export async function generateStaticParams() {
 export async function generateMetadata({ params }) {
   const { slug } = await params;
   const post = await getPost(slug);
-  return { title: post ? `${post.title} | Rent-A-Pot` : "Blog | Rent-A-Pot" };
+  if (!post) return { title: "Blog | Rent-A-Pot" };
+  const meta = pageMeta({
+    title: `${post.title} | Rent-A-Pot`,
+    description: post.excerpt || undefined,
+    path: `/blog/${slug}`,
+    image: post.image,
+  });
+  // Shared as an article rather than pageMeta's "website"
+  meta.openGraph = { ...meta.openGraph, type: "article", publishedTime: post.sortKey };
+  return meta;
 }
 
 export default async function BlogPost({ params }) {

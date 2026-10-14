@@ -1,10 +1,12 @@
 import Link from "next/link";
 import { getPageHeader, getWorks } from "@/lib/wp";
+import { pageMeta } from "@/lib/site";
 
-export const metadata = {
+export const metadata = pageMeta({
+  path: "/works",
   title: "Our Works | Rent-A-Pot",
   description: "A collection of spaces, details, and moments brought to life.",
-};
+});
 
 // Our Works listing. Heading comes from the Page Header field group; the
 // works are the Works post type, newest first. A project has one variant per

@@ -18,15 +18,17 @@ import {
   processFrom,
   worksForService,
 } from "@/lib/wp";
+import { pageMeta } from "@/lib/site";
 
 const SERVICE = "plant-rental";
 const IMAGE = "node { sourceUrl }";
 
-export const metadata = {
+export const metadata = pageMeta({
+  path: "/plant-rental",
   title: "Plant Rental | Rent-A-Pot",
   description:
     "From welcoming reception areas to productive workspaces, plants can transform the look and atmosphere of your office.",
-};
+});
 
 // Plant Rental service page. Content comes from the Service Page Banner,
 // Service Page FAQ and Plant Rental Page field groups; the works strip is

@@ -3,21 +3,17 @@ import Heading from "@/components/Heading";
 import ProjectsSlider from "@/components/ProjectsSlider";
 import ServiceBanner from "@/components/ServiceBanner";
 import ServiceProcess from "@/components/ServiceProcess";
-import {
-  PROCESS_FIELDS,
-  getServicePage,
-  getWorks,
-  processFrom,
-  worksForService,
-} from "@/lib/wp";
+import { PROCESS_FIELDS, getServicePage, getWorks, processFrom, worksForService } from "@/lib/wp";
+import { pageMeta } from "@/lib/site";
 
 const SERVICE = "landscaping";
 
-export const metadata = {
+export const metadata = pageMeta({
+  path: "/landscaping",
   title: "Landscaping | Rent-A-Pot",
   description:
     "Our landscape design team creates beautiful, functional outdoor spaces, providing end-to-end solutions from concept to construction and planting.",
-};
+});
 
 // Each strip is an Embla slider: no loop, cards run off the right edge and
 // can be dragged freely (see initSliders in custom.js)
@@ -92,10 +88,18 @@ export default async function Landscaping() {
             </div>
 
             <div className="gallery-arrows">
-              <button type="button" className="icon-button gallery-arrow gallery-prev" aria-label="Previous">
+              <button
+                type="button"
+                className="icon-button gallery-arrow gallery-prev"
+                aria-label="Previous"
+              >
                 <span className="icon icon-arrow" aria-hidden="true" />
               </button>
-              <button type="button" className="icon-button gallery-arrow gallery-next" aria-label="Next">
+              <button
+                type="button"
+                className="icon-button gallery-arrow gallery-next"
+                aria-label="Next"
+              >
                 <span className="icon icon-arrow" aria-hidden="true" />
               </button>
             </div>

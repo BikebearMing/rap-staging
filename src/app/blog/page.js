@@ -1,11 +1,13 @@
 import Button from "@/components/Button";
 import BlogCard from "@/components/BlogCard";
 import { getPageHeader, getPosts } from "@/lib/wp";
+import { pageMeta } from "@/lib/site";
 
-export const metadata = {
+export const metadata = pageMeta({
+  path: "/blog",
   title: "Blog | Rent-A-Pot",
   description: "A collection of spaces, details, and moments brought to life.",
-};
+});
 
 // Blog listing. Heading and subtitle come from the Page Header field group;
 // the posts are WordPress posts, newest first. The sticky post is featured
