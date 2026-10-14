@@ -25,9 +25,9 @@ const IMAGE = "node { sourceUrl }";
 
 export const metadata = pageMeta({
   path: "/plant-rental",
-  title: "Plant Rental | Rent-A-Pot",
+  title: "Plant Rental Malaysia | Offices, Hotels & Malls | Rent-A-Pot",
   description:
-    "From welcoming reception areas to productive workspaces, plants can transform the look and atmosphere of your office.",
+    "Plant rental in Malaysia since 1982. We supply, style and maintain live indoor plants for offices, hotels, malls and showrooms. Get a free quote.",
 });
 
 // Plant Rental service page. Content comes from the Service Page Banner,

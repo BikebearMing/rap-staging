@@ -5,7 +5,7 @@ export const SITE_URL = (process.env.SITE_URL || "https://www.rap.com.my").repla
 
 export const SITE_NAME = "Rent-A-Pot";
 export const SITE_DESCRIPTION =
-  "Plant rental, landscaping, event greenery and garden maintenance across the Klang Valley since 1982.";
+  "Plant rental, landscaping, event greenery and garden maintenance in Malaysia since 1982. Green spaces for offices, homes and events.";
 
 // Full page metadata: title, description, canonical URL and the Open Graph /
 // Twitter tags used when a link is shared. Pages without a photo of their own

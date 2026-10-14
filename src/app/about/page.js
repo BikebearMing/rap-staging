@@ -7,9 +7,9 @@ import { pageMeta } from "@/lib/site";
 
 export const metadata = pageMeta({
   path: "/about",
-  title: "About | Rent-A-Pot",
+  title: "About Rent-A-Pot | Malaysia's Plant & Landscape Specialists",
   description:
-    "What started as one man's vision to bring nature into commercial spaces has grown into a second generation business shaping how Malaysia experiences plants, landscapes and green spaces.",
+    "A second-generation Malaysian business bringing plants into commercial spaces since 1982, with plant rental, landscaping, event greenery and maintenance.",
 });
 
 // The timeline strip is an Embla slider: no loop, cards run off the right

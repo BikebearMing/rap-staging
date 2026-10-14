@@ -6,8 +6,9 @@ import { pageMeta } from "@/lib/site";
 
 export const metadata = pageMeta({
   path: "/contact",
-  title: "Contact | Rent-A-Pot",
-  description: "Let's grow a greener space together.",
+  title: "Contact Us | Rent-A-Pot Malaysia",
+  description:
+    "Contact Rent-A-Pot for plant rental, landscaping, event greenery or garden maintenance in Malaysia. Request a site visit and free quote.",
 });
 
 // Contact page. Copy comes from the Contact Page field group and the
