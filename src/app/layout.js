@@ -3,7 +3,10 @@ import SiteScripts from "@/components/SiteScripts";
 import PageTransition from "@/components/PageTransition";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import JsonLd from "@/components/JsonLd";
 import { SITE_DESCRIPTION, SITE_NAME, SITE_URL } from "@/lib/site";
+import { siteSchema } from "@/lib/schema";
+import { getSiteSettings } from "@/lib/wp";
 
 const GA_ID = "G-9SSDHVEK3M";
 
@@ -13,7 +16,9 @@ export const metadata = {
   description: SITE_DESCRIPTION,
 };
 
-export default function RootLayout({ children }) {
+export default async function RootLayout({ children }) {
+  const site = await getSiteSettings();
+
   return (
     <html lang="en">
       <head>
@@ -31,6 +36,8 @@ export default function RootLayout({ children }) {
         />
       </head>
       <body>
+        {/* Business and website structured data, on every page */}
+        <JsonLd data={siteSchema(site)} />
         <SiteScripts />
         <PageTransition />
         <Header />

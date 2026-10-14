@@ -4,6 +4,8 @@ import Heading, { Lines } from "@/components/Heading";
 import WindLeaf from "@/components/WindLeaf";
 import { getAbout, getPosts } from "@/lib/wp";
 import { pageMeta } from "@/lib/site";
+import JsonLd from "@/components/JsonLd";
+import { breadcrumbSchema } from "@/lib/schema";
 
 export const metadata = pageMeta({
   path: "/about",
@@ -32,6 +34,7 @@ export default async function About() {
 
   return (
     <main className="about-page">
+      <JsonLd data={breadcrumbSchema([{ name: "About", path: "/about" }])} />
       <section className="about-hero has-parallax" data-flatten>
         <div className="about-hero-media parallax-frame">
           <img src={about.hero.image} alt="" className="parallax-image" />

@@ -19,15 +19,19 @@ import {
   worksForService,
 } from "@/lib/wp";
 import { pageMeta } from "@/lib/site";
+import JsonLd from "@/components/JsonLd";
+import { breadcrumbSchema, serviceSchema } from "@/lib/schema";
 
 const SERVICE = "plant-rental";
 const IMAGE = "node { sourceUrl }";
 
+const DESCRIPTION =
+  "Plant rental in Malaysia since 1982. We supply, style and maintain live indoor plants for offices, hotels, malls and showrooms. Get a free quote.";
+
 export const metadata = pageMeta({
   path: "/plant-rental",
   title: "Plant Rental Malaysia | Offices, Hotels & Malls | Rent-A-Pot",
-  description:
-    "Plant rental in Malaysia since 1982. We supply, style and maintain live indoor plants for offices, hotels, malls and showrooms. Get a free quote.",
+  description: DESCRIPTION,
 });
 
 // Plant Rental service page. Content comes from the Service Page Banner,
@@ -55,6 +59,17 @@ export default async function PlantRental() {
 
   return (
     <main className="service-page">
+      <JsonLd
+        data={[
+          serviceSchema({
+            name: "Plant Rental",
+            serviceType: "Plant rental",
+            description: DESCRIPTION,
+            path: "/plant-rental",
+          }),
+          breadcrumbSchema([{ name: "Plant Rental", path: "/plant-rental" }]),
+        ]}
+      />
       <ServiceBanner banner={page.banner} />
 
       <section className="service-intro">

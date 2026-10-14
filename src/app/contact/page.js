@@ -3,6 +3,8 @@ import Heading, { Lines } from "@/components/Heading";
 import ServiceWhere from "@/components/ServiceWhere";
 import { getContact, getSiteSettings } from "@/lib/wp";
 import { pageMeta } from "@/lib/site";
+import JsonLd from "@/components/JsonLd";
+import { breadcrumbSchema } from "@/lib/schema";
 
 export const metadata = pageMeta({
   path: "/contact",
@@ -19,6 +21,7 @@ export default async function Contact() {
 
   return (
     <main className="contact-page">
+      <JsonLd data={breadcrumbSchema([{ name: "Contact", path: "/contact" }])} />
       <section className="contact-hero has-parallax">
         <div className="contact-hero-bg parallax-frame">
           <img src={contact.heroImage} alt="" className="parallax-image" />

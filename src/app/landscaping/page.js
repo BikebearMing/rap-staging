@@ -5,14 +5,18 @@ import ServiceBanner from "@/components/ServiceBanner";
 import ServiceProcess from "@/components/ServiceProcess";
 import { PROCESS_FIELDS, getServicePage, getWorks, processFrom, worksForService } from "@/lib/wp";
 import { pageMeta } from "@/lib/site";
+import JsonLd from "@/components/JsonLd";
+import { breadcrumbSchema, serviceSchema } from "@/lib/schema";
 
 const SERVICE = "landscaping";
+
+const DESCRIPTION =
+  "Landscape design and construction in Malaysia. We create beautiful, functional outdoor spaces with end-to-end solutions from concept to planting.";
 
 export const metadata = pageMeta({
   path: "/landscaping",
   title: "Landscape Design & Construction in Malaysia | Rent-A-Pot",
-  description:
-    "Landscape design and construction in Malaysia. We create beautiful, functional outdoor spaces with end-to-end solutions from concept to planting.",
+  description: DESCRIPTION,
 });
 
 // Each strip is an Embla slider: no loop, cards run off the right edge and
@@ -54,6 +58,17 @@ export default async function Landscaping() {
 
   return (
     <main className="service-page">
+      <JsonLd
+        data={[
+          serviceSchema({
+            name: "Landscape Design & Construction",
+            serviceType: "Landscape design and construction",
+            description: DESCRIPTION,
+            path: "/landscaping",
+          }),
+          breadcrumbSchema([{ name: "Landscaping", path: "/landscaping" }]),
+        ]}
+      />
       <ServiceBanner banner={page.banner} />
 
       {/* Tabs switch which strip of cards shows (see initGalleryTabs in custom.js) */}

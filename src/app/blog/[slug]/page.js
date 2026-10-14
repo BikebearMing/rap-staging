@@ -3,7 +3,9 @@ import Button from "@/components/Button";
 import BlogCard from "@/components/BlogCard";
 import WindLeaf from "@/components/WindLeaf";
 import { getPost, getPosts } from "@/lib/wp";
+import JsonLd from "@/components/JsonLd";
 import { pageMeta } from "@/lib/site";
+import { breadcrumbSchema } from "@/lib/schema";
 
 export async function generateStaticParams() {
   const posts = await getPosts();
@@ -34,6 +36,12 @@ export default async function BlogPost({ params }) {
 
   return (
     <main className="post-page">
+      <JsonLd
+        data={breadcrumbSchema([
+          { name: "Blog", path: "/blog" },
+          { name: post.title, path: `/blog/${slug}` },
+        ])}
+      />
       <section className="post-header has-parallax">
         <WindLeaf />
         <Button href="/blog" className="is-reverse post-back">
