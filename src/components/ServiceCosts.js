@@ -1,4 +1,5 @@
 import Heading, { Lines } from "@/components/Heading";
+import Img from "@/components/Img";
 
 // No loop, cards run off the right edge and can be dragged freely
 // (see initSliders in custom.js)
@@ -38,7 +39,11 @@ export default function ServiceCosts({ costs }) {
             {costs.cards.map((card) => (
               <article className="embla__slide gallery-card cost-card" key={card.title}>
                 <div className="gallery-card-media">
-                  <img src={card.image} alt="" />
+                  <Img
+                    image={card.image}
+                    alt={card.title.replace(/\s+/g, " ").trim()}
+                    sizes="(max-width: 768px) 68vw, 22vw"
+                  />
                 </div>
                 <div className="cost-card-text dark">
                   <p className="h4">

@@ -1,9 +1,16 @@
 // WordPress data layer. Everything on the site comes from the headless
-// WordPress at WORDPRESS_GRAPHQL_URL (WPGraphQL + Secure Custom Fields, see
-// the field groups under SCF in wp-admin). Responses are cached for a minute
-// and tagged "wordpress" so POST /api/revalidate can flush them on demand.
+// WordPress at WORDPRESS_GRAPHQL_URL, cms.rap.com.my by default (WPGraphQL +
+// Secure Custom Fields, see the field groups under SCF in wp-admin, and Yoast
+// SEO for each post's and work's SEO title and meta description). Responses
+// are cached for a minute and tagged "wordpress" so POST /api/revalidate can
+// flush them on demand.
 
-const ENDPOINT = process.env.WORDPRESS_GRAPHQL_URL || "https://rap.mydemobb.com/graphql";
+import { getImageProps } from "next/image";
+
+// index.php?graphql rather than the pretty /graphql on purpose: the CMS
+// server's firewall answers 403 to some query bodies on /graphql (the posts
+// list among them) and lets the identical request through on this form.
+const ENDPOINT = process.env.WORDPRESS_GRAPHQL_URL || "https://cms.rap.com.my/index.php?graphql";
 
 // wp-admin page IDs. The SCF field groups are attached to these IDs, so they
 // only change if the pages are recreated in WordPress.
@@ -41,8 +48,12 @@ export async function wpQuery(query, variables = {}) {
 
 // ---- Selections ----------------------------------------------------------
 
-const IMAGE = "node { sourceUrl altText }";
-const IMAGES = "nodes { sourceUrl altText }";
+// A media item as the site renders it: the file, its Alt text and the
+// original's size (see imageFrom). The service pages use IMAGE in their own
+// page selections.
+const MEDIA = "sourceUrl altText mediaDetails { width height }";
+export const IMAGE = `node { ${MEDIA} }`;
+const IMAGES = `nodes { ${MEDIA} }`;
 
 export const SERVICE_BANNER = `serviceBannerFields { bannerHeading bannerHighlight bannerText bannerImage { ${IMAGE} } }`;
 export const SERVICE_FAQ = "serviceFaqFields { faqs { question answer } }";
@@ -62,10 +73,11 @@ export const OFFER_FIELDS =
   // caption must be the rendered format: WPGraphQL returns RAW as null to
   // the public, and the site queries unauthenticated. stripTags in offerFrom
   // removes the <p> wrapper.
-  "offerHeading offerHighlight offerImages { nodes { sourceUrl altText caption } }";
+  `offerHeading offerHighlight offerImages { nodes { caption ${MEDIA} } }`;
 
 const WORK = `
   title slug date
+  seo { title metaDesc }
   workTags { nodes { name } }
   featuredImage { ${IMAGE} }
   workFields {
@@ -73,14 +85,25 @@ const WORK = `
     variants { service { nodes { name slug } } image { ${IMAGE} } }
   }
 `;
-const WORK_FULL = `${WORK} workFields { overview { paragraph } gallery { ${IMAGES} } }`;
+const WORK_FULL = `${WORK} workFields { overview { paragraph } gallery { ${IMAGES} } projectStory }`;
 
-const POST = `title slug date excerpt isSticky featuredImage { ${IMAGE} }`;
+const POST = `title slug date excerpt isSticky seo { title metaDesc } featuredImage { ${IMAGE} } categories { nodes { slug } }`;
 
 // ---- Normalisers ---------------------------------------------------------
 
-const src = (edge) => edge?.node?.sourceUrl || "";
-const srcs = (conn) => (conn?.nodes || []).map((n) => n.sourceUrl).filter(Boolean);
+// An image field as { src, alt, width, height }, the shape <Img> renders.
+// alt is the media item's Alt text, "" when none was entered (each caller
+// then supplies its own fallback). width and height are the uploaded
+// file's, 0 when WordPress doesn't know them (e.g. HEIC uploads). A field
+// with no image gives src "" and renders nothing.
+const image = (node) => ({
+  src: node?.sourceUrl || "",
+  alt: node?.altText || "",
+  width: node?.mediaDetails?.width || 0,
+  height: node?.mediaDetails?.height || 0,
+});
+export const imageFrom = (edge) => image(edge?.node);
+const imagesFrom = (conn) => (conn?.nodes || []).filter((n) => n.sourceUrl).map(image);
 const first = (conn) => conn?.nodes?.[0] || null;
 
 // A textarea with one entry per line, or paragraphs split by an empty line
@@ -111,7 +134,7 @@ export const costsFrom = (fields = {}) => ({
   cards: (fields.costsCards || []).map((card) => ({
     title: card.title || "",
     price: card.price || "",
-    image: src(card.image),
+    image: imageFrom(card.image),
   })),
 });
 export const whereFrom = (fields = {}) => ({
@@ -143,10 +166,9 @@ export const offerFrom = (fields = {}) => ({
   heading: fields.offerHeading || "",
   highlight: fields.offerHighlight || "",
   // The card label is the image's Caption in the media library
-  images: (fields.offerImages?.nodes || []).map((image) => ({
-    src: image.sourceUrl || "",
-    alt: image.altText || "",
-    label: stripTags(image.caption),
+  images: (fields.offerImages?.nodes || []).map((node) => ({
+    ...image(node),
+    label: stripTags(node.caption),
   })),
 });
 
@@ -203,29 +225,97 @@ const stripTags = (html) =>
 
 export function normalizeWork(node) {
   const f = node.workFields || {};
+  const featuredImage = imageFrom(node.featuredImage);
+  const variantImages = (f.variants || []).map((v) => imageFrom(v.image));
   return {
     slug: node.slug,
     title: stripTags(node.title),
     date: monthYear(f.projectDate),
     year: year(f.projectDate),
     sortKey: f.projectDate || node.date || "",
-    featuredImage: src(node.featuredImage),
-    variants: (f.variants || []).map((v) => ({
+    featuredImage,
+    variants: (f.variants || []).map((v, i) => ({
       category: first(v.service)?.name || "",
       service: first(v.service)?.slug || "",
       // Fall back like projectSlide: variant rows often have no photo yet
       image:
-        src(v.image) ||
-        src(node.featuredImage) ||
-        (f.variants || []).map((o) => src(o.image)).find(Boolean) ||
-        "",
+        [variantImages[i], featuredImage, ...variantImages].find((img) => img.src) ||
+        variantImages[i],
     })),
+    seoTitle: stripTags(node.seo?.title),
+    seoDescription: stripTags(node.seo?.metaDesc),
     tags: (node.workTags?.nodes || []).map((t) => t.name),
     description: f.description || "",
     overview: (f.overview || []).map((o) => o.paragraph).filter(Boolean),
-    gallery: srcs(f.gallery),
+    gallery: imagesFrom(f.gallery),
+    // Editor HTML (the Project Story field), "" when not written yet. Its
+    // images are as wide as .work-story.
+    story: optimiseImages(httpsCms(f.projectStory || ""), "(max-width: 768px) 88vw, 66vw"),
   };
 }
+
+// Editor HTML can carry http:// links to the CMS's own uploads (the image
+// block keeps whatever address the media library had when it was inserted).
+// On the https site those are mixed content, so point them at https; links
+// to any other site are left alone.
+const CMS_HOST = new URL(ENDPOINT).host;
+const httpsCms = (html) => html.replaceAll(`http://${CMS_HOST}/`, `https://${CMS_HOST}/`);
+
+// Editor HTML's <img> tags load the WordPress originals (a post's one photo
+// was a 773 KB PNG). This sends every one from the CMS's uploads through the
+// image optimiser, like <Img>: getImageProps builds src/srcset from
+// next.config.mjs, so the widths and quality are always ones the optimiser
+// accepts. sizes is how wide the images show (the content column). The tag
+// keeps every other attribute as written (alt, class, width, height...);
+// loading/decoding become lazy/async.
+//
+// Not a full HTML parser: WordPress writes regular <img> tags, so the
+// attributes are read with a strict pattern, and a tag that doesn't read
+// cleanly, or isn't from the uploads, is left exactly as it was. Checked by
+// scripts/check-wp-images.mjs (node scripts/check-wp-images.mjs).
+const UPLOADS = `https://${CMS_HOST}/wp-content/uploads/`;
+const IMG_TAG = /<img\b(?:[^>"']|"[^"]*"|'[^']*')*>/gi;
+const ATTR = /\s+([a-z][\w:-]*)(?:\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s"'=<>`]+)))?/iy;
+const fromUploads = (url) => url.startsWith(UPLOADS) && !/[\s"'<>&,]/.test(url);
+const escapeAttr = (value) => value.replaceAll("&", "&amp;").replaceAll('"', "&quot;");
+
+const optimiseImg = (tag, sizes) => {
+  const inner = tag.slice(4).replace(/\s*\/?>$/, "");
+  const attrs = new Map();
+  const kept = [];
+  ATTR.lastIndex = 0;
+  while (ATTR.lastIndex < inner.length) {
+    const m = ATTR.exec(inner);
+    if (!m) return tag;
+    const name = m[1].toLowerCase();
+    if (attrs.has(name)) return tag;
+    attrs.set(name, m[2] ?? m[3] ?? m[4] ?? "");
+    if (!["src", "srcset", "sizes", "loading", "decoding"].includes(name)) kept.push(m[0]);
+  }
+
+  const src = attrs.get("src") || "";
+  if (!fromUploads(src)) return tag;
+
+  // WordPress lists the sizes it made in srcset, the original among them.
+  // The widest is the best source: the optimiser can only scale down.
+  let best = { url: src, w: 0 };
+  for (const candidate of (attrs.get("srcset") || "").split(",").filter((c) => c.trim())) {
+    const parts = candidate.trim().split(/\s+/);
+    const w = /^(\d+)w$/.exec(parts[1] || "")?.[1];
+    if (parts.length !== 2 || !w || !fromUploads(parts[0])) return tag;
+    if (+w > best.w) best = { url: parts[0], w: +w };
+  }
+
+  // width/height only shape the box, which the tag's own attributes still
+  // set; getImageProps just needs numbers.
+  const width = parseInt(attrs.get("width"), 10) || 1920;
+  const height = parseInt(attrs.get("height"), 10) || 1080;
+  const { props } = getImageProps({ src: best.url, alt: "", width, height, sizes });
+  const added = { src: props.src, srcset: props.srcSet, sizes: props.sizes };
+  const out = Object.entries(added).map(([k, v]) => ` ${k}="${escapeAttr(v)}"`);
+  return `<img${kept.join("")}${out.join("")} loading="lazy" decoding="async"${tag.endsWith("/>") ? " />" : ">"}`;
+};
+const optimiseImages = (html, sizes) => html.replace(IMG_TAG, (tag) => optimiseImg(tag, sizes));
 
 export function normalizePost(node) {
   return {
@@ -233,10 +323,15 @@ export function normalizePost(node) {
     title: stripTags(node.title),
     date: longDate(node.date),
     sortKey: node.date || "",
-    image: src(node.featuredImage),
+    image: imageFrom(node.featuredImage),
     excerpt: stripTags(node.excerpt),
+    // Category slugs; the categories are named after the services
+    categories: (node.categories?.nodes || []).map((c) => c.slug),
     featured: !!node.isSticky,
-    content: node.content || "",
+    seoTitle: stripTags(node.seo?.title),
+    seoDescription: stripTags(node.seo?.metaDesc),
+    // Editor HTML; its images are as wide as .post-body's column
+    content: optimiseImages(httpsCms(node.content || ""), "(max-width: 768px) 88vw, 74vw"),
   };
 }
 
@@ -248,12 +343,12 @@ export function normalizePost(node) {
 // variant.image back in front for the `service` case.)
 export function projectSlide(work, service) {
   const variant = work.variants.find((v) => v.service === service) || work.variants[0] || {};
-  const image = work.featuredImage || work.variants.find((v) => v.image)?.image;
+  const image = work.featuredImage.src ? work.featuredImage : work.variants[0]?.image;
   return {
     title: work.title,
     date: work.date,
     tag: variant.category || "",
-    image: image || "",
+    image: image || work.featuredImage,
     href: `/works/${work.slug}`,
   };
 }
@@ -287,11 +382,11 @@ export async function getHome() {
       heading: h.heroHeading || "",
       highlight: h.heroHighlight || "",
       text: h.heroText || "",
-      slides: srcs(h.heroSlides),
+      slides: imagesFrom(h.heroSlides),
     },
     history: {
       label: h.historyLabel || "",
-      image: src(h.historyImage),
+      image: imageFrom(h.historyImage),
       heading: h.historyHeading || "",
       highlight: h.historyHighlight || "",
       text: paragraphs(h.historyText),
@@ -302,7 +397,7 @@ export async function getHome() {
     services: (h.services || []).map((s) => ({
       title: s.title || "",
       project: first(s.featuredWork)?.title || "",
-      image: src(s.image),
+      image: imageFrom(s.image),
       href: localPath(first(s.page)?.uri),
     })),
     projects: (h.featuredWorks?.nodes || []).map((w) => projectSlide(normalizeWork(w))),
@@ -318,7 +413,7 @@ export async function getServicePage(slug, selection = "") {
       heading: b.bannerHeading || "",
       highlight: b.bannerHighlight || "",
       text: b.bannerText || "",
-      image: src(b.bannerImage),
+      image: imageFrom(b.bannerImage),
     },
     faqs: page.serviceFaqFields?.faqs || [],
   };
@@ -336,7 +431,7 @@ export async function getContact() {
   );
   return {
     heroHeading: c.heroHeading || "",
-    heroImage: src(c.heroImage),
+    heroImage: imageFrom(c.heroImage),
     scrollLabel: c.scrollLabel || "",
     formHeading: c.formHeading || "",
     formHighlight: c.formHighlight || "",
@@ -363,14 +458,14 @@ export async function getAbout() {
       heading: a.heroHeading || "",
       highlight: a.heroHighlight || "",
       text: a.heroText || "",
-      image: src(a.heroImage),
+      image: imageFrom(a.heroImage),
       scrollLabel: a.scrollLabel || "",
     },
     intro: {
       heading: a.introHeading || "",
       highlight: a.introHighlight || "",
       text: paragraphs(a.introText),
-      image: src(a.introImage),
+      image: imageFrom(a.introImage),
       caption: a.introCaption || "",
     },
     timeline: {
@@ -386,7 +481,7 @@ export async function getAbout() {
       items: (a.people || []).map((person) => ({
         name: person.name || "",
         role: person.role || "",
-        photo: src(person.photo),
+        photo: imageFrom(person.photo),
         bio: paragraphs(person.bio),
       })),
     },
@@ -444,6 +539,14 @@ export const worksForService = (works, service) =>
   works
     .filter((w) => w.variants.some((v) => v.service === service))
     .map((w) => projectSlide(w, service));
+
+// Three posts for a service page: the ones in the service's category (its
+// slug) first, then the newest others to fill up. `posts` is getPosts()'s
+// date order, so the picks only change when the posts do.
+export const postsForService = (posts, service) => {
+  const inService = (p) => p.categories.includes(service);
+  return [...posts.filter(inService), ...posts.filter((p) => !inService(p))].slice(0, 3);
+};
 
 export async function getPosts() {
   const data = await wpQuery(`{ posts(first: 100) { nodes { ${POST} } } }`);

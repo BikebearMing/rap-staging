@@ -684,13 +684,26 @@ export function initWipes() {
    data-* hooks, so stamp the text reveal on it before initTextReveal runs:
    headings lift, everything else reveals per line. Attributes already set
    by hand are left alone.
+   A list item's text reveals from a block inside it, not from the li itself.
+   A split element becomes a flex column to keep its height, and an li that
+   is not a list item loses its bullet or number. Splitting the li would
+   also tear apart any nested list inside it, so only the text before a
+   nested list goes in the block.
    -------------------------------------------------------------------------- */
 export function initEditorContent() {
   live(".blog-content").forEach((root) => {
     root.querySelectorAll("h2, h3, h4, h5").forEach((el) => {
       if (!el.hasAttribute("data-text-reveal")) el.setAttribute("data-text-reveal", "lift");
     });
-    root.querySelectorAll("p, li, blockquote, figcaption").forEach((el) => {
+    root.querySelectorAll("li").forEach((li) => {
+      if (li.hasAttribute("data-text-reveal") || li.querySelector(":scope > .li-text")) return;
+      const text = document.createElement("div");
+      text.className = "li-text";
+      while (li.firstChild && !li.firstChild.matches?.("ul, ol, p")) text.append(li.firstChild);
+      if (text.textContent.trim()) li.prepend(text);
+      else li.prepend(...text.childNodes);
+    });
+    root.querySelectorAll("p, .li-text, blockquote, figcaption").forEach((el) => {
       if (!el.hasAttribute("data-text-reveal")) el.setAttribute("data-text-reveal", "");
     });
   });

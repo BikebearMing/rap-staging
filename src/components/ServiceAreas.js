@@ -1,3 +1,5 @@
+import Img from "@/components/Img";
+
 // List of names beside a tall photo (.service-areas in custom.css), on the
 // plant rental, event design and maintenance pages. Hovering a name swaps the copy and
 // the photo (see initAreas in custom.js). areas is [{ title, description,
@@ -44,11 +46,14 @@ export default function ServiceAreas({ heading, label, areas, className = "" }) 
         </div>
       </div>
 
+      {/* The frame is tall, so a landscape photo is cropped to it and shows
+          wider than the frame, most of all on a phone */}
       <div className="areas-media parallax-frame">
         {areas.map((area, i) => (
-          <img
-            src={area.image}
-            alt=""
+          <Img
+            image={area.image}
+            alt={area.title}
+            sizes="(max-width: 768px) 106vw, 42vw"
             className={`parallax-image areas-image${i === 0 ? " is-active" : ""}`}
             data-area={i}
             key={area.title}

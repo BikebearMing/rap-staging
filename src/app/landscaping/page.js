@@ -1,9 +1,21 @@
 import Faq from "@/components/Faq";
 import Heading from "@/components/Heading";
+import Img from "@/components/Img";
 import ProjectsSlider from "@/components/ProjectsSlider";
+import RelatedPosts from "@/components/RelatedPosts";
 import ServiceBanner from "@/components/ServiceBanner";
 import ServiceProcess from "@/components/ServiceProcess";
-import { PROCESS_FIELDS, getServicePage, getWorks, processFrom, worksForService } from "@/lib/wp";
+import {
+  IMAGE,
+  PROCESS_FIELDS,
+  getPosts,
+  getServicePage,
+  getWorks,
+  imageFrom,
+  postsForService,
+  processFrom,
+  worksForService,
+} from "@/lib/wp";
 import { pageMeta } from "@/lib/site";
 import JsonLd from "@/components/JsonLd";
 import { breadcrumbSchema, serviceSchema } from "@/lib/schema";
@@ -33,16 +45,17 @@ const emblaOptions = JSON.stringify({
 // per set with a strip of cards each; icons are /public/*.svg (see .icon-*
 // in custom.css) picked by the set's Icon field.
 export default async function Landscaping() {
-  const [page, works] = await Promise.all([
+  const [page, works, posts] = await Promise.all([
     getServicePage(
       SERVICE,
       `landscapingFields {
         galleryHeading galleryHighlight
-        sets { title description icon items { title image { node { sourceUrl } } } }
+        sets { title description icon items { title image { ${IMAGE} } } }
         ${PROCESS_FIELDS}
       }`
     ),
     getWorks(),
+    getPosts(),
   ]);
   const gallery = page.landscapingFields || {};
   const sets = (gallery.sets || []).map((set) => ({
@@ -51,7 +64,7 @@ export default async function Landscaping() {
     icon: `icon-${Array.isArray(set.icon) ? set.icon[0] : set.icon}`,
     items: (set.items || []).map((item) => ({
       title: item.title,
-      image: item.image?.node?.sourceUrl || "",
+      image: imageFrom(item.image),
     })),
   }));
   const projects = worksForService(works, SERVICE);
@@ -73,7 +86,18 @@ export default async function Landscaping() {
 
       {/* Tabs switch which strip of cards shows (see initGalleryTabs in custom.js) */}
       <section className="service-gallery" data-gallery>
-        <img src="/hanging-plant.png" alt="" className="gallery-plant" />
+        {/* Lazy: below the fold, and a non-lazy <img> is preloaded by every
+            page that prefetches this one (see Img.js). The size gives it a
+            box before it loads; without one it sits wholly in the cropped
+            strip above the section and is never seen to load. */}
+        <img
+          src="/hanging-plant.png"
+          alt=""
+          className="gallery-plant"
+          loading="lazy"
+          width="164"
+          height="280"
+        />
 
         <Heading
           className="h2"
@@ -137,7 +161,11 @@ export default async function Landscaping() {
                     {set.items.map((item) => (
                       <article className="embla__slide gallery-card" key={item.title}>
                         <div className="gallery-card-media">
-                          <img src={item.image} alt="" />
+                          <Img
+                            image={item.image}
+                            alt={item.title}
+                            sizes="(max-width: 768px) 68vw, 22vw"
+                          />
                         </div>
                         <p className="h4 dark gallery-card-title">{item.title}</p>
                       </article>
@@ -153,6 +181,8 @@ export default async function Landscaping() {
       <ServiceProcess process={processFrom(gallery)} />
 
       <ProjectsSlider projects={projects} />
+
+      <RelatedPosts posts={postsForService(posts, SERVICE)} />
 
       <Faq items={page.faqs} />
     </main>

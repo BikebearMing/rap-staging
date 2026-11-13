@@ -1,9 +1,20 @@
 import Faq from "@/components/Faq";
 import ProjectsSlider from "@/components/ProjectsSlider";
+import RelatedPosts from "@/components/RelatedPosts";
 import ServiceAreas from "@/components/ServiceAreas";
 import ServiceBanner from "@/components/ServiceBanner";
 import ServiceProcess from "@/components/ServiceProcess";
-import { PROCESS_FIELDS, getServicePage, getWorks, processFrom, worksForService } from "@/lib/wp";
+import {
+  IMAGE,
+  PROCESS_FIELDS,
+  getPosts,
+  getServicePage,
+  getWorks,
+  imageFrom,
+  postsForService,
+  processFrom,
+  worksForService,
+} from "@/lib/wp";
 import { pageMeta } from "@/lib/site";
 import JsonLd from "@/components/JsonLd";
 import { breadcrumbSchema, serviceSchema } from "@/lib/schema";
@@ -24,22 +35,23 @@ export const metadata = pageMeta({
 // landscaping page, with the categories as a hover list like plant rental's
 // areas.
 export default async function EventDesign() {
-  const [page, works] = await Promise.all([
+  const [page, works, posts] = await Promise.all([
     getServicePage(
       SERVICE,
       `eventDesignFields {
         categoriesLabel
-        categories { title description image { node { sourceUrl } } }
+        categories { title description image { ${IMAGE} } }
         ${PROCESS_FIELDS}
       }`
     ),
     getWorks(),
+    getPosts(),
   ]);
   const fields = page.eventDesignFields || {};
   const categories = (fields.categories || []).map((category) => ({
     title: category.title,
     description: category.description || "",
-    image: category.image?.node?.sourceUrl || "",
+    image: imageFrom(category.image),
   }));
   const projects = worksForService(works, SERVICE);
 
@@ -67,6 +79,8 @@ export default async function EventDesign() {
       <ServiceProcess process={processFrom(fields)} />
 
       <ProjectsSlider projects={projects} />
+
+      <RelatedPosts posts={postsForService(posts, SERVICE)} />
 
       <Faq items={page.faqs} />
     </main>

@@ -1,5 +1,6 @@
 import Button from "@/components/Button";
 import Heading, { Lines } from "@/components/Heading";
+import Img from "@/components/Img";
 import ProjectsSlider from "@/components/ProjectsSlider";
 import WindLeaf from "@/components/WindLeaf";
 import { getHome } from "@/lib/wp";
@@ -8,12 +9,18 @@ import { SITE_NAME, pageMeta } from "@/lib/site";
 // The first hero slide doubles as the image shown when the site is shared
 export async function generateMetadata() {
   const { hero } = await getHome();
-  return pageMeta({ title: `Plant Rental & Landscape Design in Malaysia | ${SITE_NAME}`, path: "/", image: hero.slides[0] });
+  return pageMeta({
+    title: `Plant Rental & Landscape Design in Malaysia | ${SITE_NAME}`,
+    path: "/",
+    image: hero.slides[0]?.src,
+  });
 }
 
 // Home page. Content comes from the Home Page field group in WordPress.
 export default async function Home() {
   const { hero, history, servicesHeading, services, projects } = await getHome();
+  // Slides without Alt text of their own are described by the hero heading
+  const heroAlt = [SITE_NAME, hero.heading.replace(/\s+/g, " ").trim()].filter(Boolean).join(": ");
 
   return (
     <main>
@@ -36,9 +43,23 @@ export default async function Home() {
 
           <div className="embla__viewport">
             <div className="embla__container">
-              {hero.slides.map((src) => (
-                <div className="embla__slide" key={src}>
-                  <img src={src} alt="" className="parallax-image" />
+              {/* Each slide fills the screen at 120% height (parallax). On a
+                  phone that crops a landscape photo to its middle fifth, so
+                  the photo shows about 2.5x the screen's width. The slides
+                  after the first sit off to the side, where a lazy image
+                  would only start loading as autoplay slides it in, so they
+                  load straight away, behind the first. */}
+              {hero.slides.map((slide, i) => (
+                <div className="embla__slide" key={slide.src}>
+                  <Img
+                    image={slide}
+                    alt={heroAlt}
+                    sizes="(max-width: 768px) 255vw, 100vw"
+                    priority={i === 0}
+                    loading={i === 0 ? undefined : "eager"}
+                    fetchPriority={i === 0 ? undefined : "low"}
+                    className="parallax-image"
+                  />
                 </div>
               ))}
             </div>
@@ -62,7 +83,11 @@ export default async function Home() {
                 data-parallax-trigger=".home-history"
                 aria-hidden="true"
               >
-                <img src={history.image} alt="" className="parallax-image" />
+                <Img
+                  image={history.image}
+                  sizes="(max-width: 768px) 23vw, 9vw"
+                  className="parallax-image"
+                />
               </span>
               <Heading
                 as="h4"
@@ -101,7 +126,14 @@ export default async function Home() {
             <div className="service-slide" key={service.title}>
               <div className="service-pin" data-parallax-pinned>
                 <article className="service-card has-parallax">
-                  <img src={service.image} alt="" className="parallax-image" />
+                  {/* A full-screen card: on a phone the photo shows about 3x
+                      the screen's width (see the hero) */}
+                  <Img
+                    image={service.image}
+                    alt={service.title}
+                    sizes="(max-width: 768px) 295vw, 98vw"
+                    className="parallax-image"
+                  />
 
                   <div
                     className="service-meta dark"

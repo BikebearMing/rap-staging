@@ -1,6 +1,7 @@
 import BlogCard from "@/components/BlogCard";
 import Button from "@/components/Button";
 import Heading, { Lines } from "@/components/Heading";
+import Img from "@/components/Img";
 import WindLeaf from "@/components/WindLeaf";
 import { getAbout, getPosts } from "@/lib/wp";
 import { pageMeta } from "@/lib/site";
@@ -37,7 +38,15 @@ export default async function About() {
       <JsonLd data={breadcrumbSchema([{ name: "About", path: "/about" }])} />
       <section className="about-hero has-parallax" data-flatten>
         <div className="about-hero-media parallax-frame">
-          <img src={about.hero.image} alt="" className="parallax-image" />
+          {/* Full screen at 120% height: on a phone the photo shows about
+              1.7x the screen's width */}
+          <Img
+            image={about.hero.image}
+            alt={about.hero.heading.replace(/\s+/g, " ").trim()}
+            sizes="(max-width: 768px) 175vw, 100vw"
+            priority
+            className="parallax-image"
+          />
         </div>
 
         <div className="about-hero-title dark">
@@ -87,7 +96,12 @@ export default async function About() {
         </div>
 
         <div className="about-intro-figure">
-          <img src={about.intro.image} alt="" className="about-plant" />
+          <Img
+            image={about.intro.image}
+            alt={about.intro.heading.replace(/\s+/g, " ").trim()}
+            sizes="(max-width: 768px) 60vw, 31vw"
+            className="about-plant"
+          />
           <div className="about-caption">
             <span className="icon icon-curl" aria-hidden="true" />
             <p className="body" data-text-reveal="flip">
@@ -138,9 +152,9 @@ export default async function About() {
         <ul className="people-cards">
           {about.people.items.map((person, i) => (
             <li className="people-card dark" key={person.name}>
-              {person.photo && (
+              {person.photo.src && (
                 <span className="people-photo" aria-hidden="true">
-                  <img src={person.photo} alt="" />
+                  <Img image={person.photo} sizes="(max-width: 768px) 53vw, 21vw" />
                 </span>
               )}
               <h3 className="h4" data-text-reveal="lift">
@@ -179,9 +193,13 @@ export default async function About() {
               data-people-close
             />
             <div className="people-drawer-inner">
-              {person.photo && (
+              {person.photo.src && (
                 <div className="people-drawer-photo">
-                  <img src={person.photo} alt="" />
+                  <Img
+                    image={person.photo}
+                    alt={person.name}
+                    sizes="(max-width: 768px) 80vw, 32vw"
+                  />
                 </div>
               )}
               <h3 className="h3">{person.name}</h3>

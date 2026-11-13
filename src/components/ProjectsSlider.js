@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Img from "@/components/Img";
 
 // Projects slider (see initProjectsSlider in custom.js and .home-projects in
 // custom.css). Used on the home page and as the works strip on the service
@@ -45,7 +46,14 @@ export default function ProjectsSlider({ projects, heading = "Our Projects" }) {
               key={project.title}
             >
               <div className="project-media parallax-frame">
-                <img src={project.image} alt="" className="parallax-image" />
+                {/* Sized for the main card: any card grows into it when
+                    the slider moves on */}
+                <Img
+                  image={project.image}
+                  alt={project.title}
+                  sizes="(max-width: 768px) 88vw, 66vw"
+                  className="parallax-image"
+                />
                 <span className="project-tag">{project.tag}</span>
               </div>
               <div className="project-caption">

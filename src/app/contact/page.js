@@ -1,5 +1,6 @@
 import Link from "next/link";
 import Heading, { Lines } from "@/components/Heading";
+import Img from "@/components/Img";
 import ServiceWhere from "@/components/ServiceWhere";
 import { getContact, getSiteSettings } from "@/lib/wp";
 import { pageMeta } from "@/lib/site";
@@ -24,13 +25,21 @@ export default async function Contact() {
       <JsonLd data={breadcrumbSchema([{ name: "Contact", path: "/contact" }])} />
       <section className="contact-hero has-parallax">
         <div className="contact-hero-bg parallax-frame">
-          <img src={contact.heroImage} alt="" className="parallax-image" />
+          {/* Fills the hero at 120% height: on a phone the photo shows about
+              1.8x the screen's width */}
+          <Img
+            image={contact.heroImage}
+            alt={contact.heroHeading.replace(/\s+/g, " ").trim()}
+            sizes="(max-width: 768px) 176vw, 100vw"
+            priority
+            className="parallax-image"
+          />
         </div>
 
         <div className="contact-card">
-          <p className="h4" data-text-reveal="lift">
+          <h1 className="h4" data-text-reveal="lift">
             {contact.heroHeading}
-          </p>
+          </h1>
           <a href={`mailto:${site.email}`} className="footer-email" data-text-reveal="lift">
             {site.email}
           </a>
@@ -83,10 +92,19 @@ export default async function Contact() {
         </p>
       </section>
 
-      {/* The hanging plant overlaps the panel's top-right corner */}
+      {/* The hanging plant overlaps the panel's top-right corner. It and the
+          leaves are lazy: below the fold, and a non-lazy <img> is preloaded
+          by every page that prefetches this one (see Img.js). */}
       <div className="contact-where">
         <ServiceWhere where={contact.where} />
-        <img src="/hanging-plant.png" alt="" className="contact-plant" />
+        <img
+          src="/hanging-plant.png"
+          alt=""
+          className="contact-plant"
+          loading="lazy"
+          width="164"
+          height="280"
+        />
       </div>
 
       <section className="contact-form-section">
@@ -100,19 +118,40 @@ export default async function Contact() {
         {/* A form plugin will replace this markup */}
         <form className="contact-form" method="post">
           <div className="form-row">
-            <input type="text" name="name" placeholder="Name" className="contact-field" required />
-            <input type="text" name="company" placeholder="Company" className="contact-field" />
-            <input type="tel" name="phone" placeholder="Phone" className="contact-field" />
+            <input
+              type="text"
+              name="name"
+              placeholder="Name"
+              aria-label="Name"
+              className="contact-field"
+              required
+            />
+            <input
+              type="text"
+              name="company"
+              placeholder="Company"
+              aria-label="Company"
+              className="contact-field"
+            />
+            <input
+              type="tel"
+              name="phone"
+              placeholder="Phone"
+              aria-label="Phone"
+              className="contact-field"
+            />
             <input
               type="email"
               name="email"
               placeholder="Email"
+              aria-label="Email"
               className="contact-field"
               required
             />
             {/* required + an empty first option: :invalid styles it as a placeholder */}
             <select
               name="service"
+              aria-label="Service needed"
               className="contact-field contact-select"
               defaultValue=""
               required
@@ -128,12 +167,14 @@ export default async function Contact() {
               type="text"
               name="location"
               placeholder="Site Location"
+              aria-label="Site Location"
               className="contact-field"
             />
           </div>
           <textarea
             name="message"
             placeholder="Message"
+            aria-label="Message"
             className="contact-field contact-message"
             rows="1"
             required
@@ -144,7 +185,14 @@ export default async function Contact() {
           </button>
         </form>
 
-        <img src="/bottom-right-leaves.png" alt="" className="contact-leaves" />
+        <img
+          src="/bottom-right-leaves.png"
+          alt=""
+          className="contact-leaves"
+          loading="lazy"
+          width="264"
+          height="288"
+        />
       </section>
     </main>
   );

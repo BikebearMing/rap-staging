@@ -1,5 +1,6 @@
 import Button from "@/components/Button";
 import BlogCard from "@/components/BlogCard";
+import Img from "@/components/Img";
 import { getPageHeader, getPosts } from "@/lib/wp";
 import { pageMeta } from "@/lib/site";
 import JsonLd from "@/components/JsonLd";
@@ -36,7 +37,13 @@ export default async function Blog() {
         {featured && (
           <article className="blog-featured has-parallax">
             <div className="featured-media parallax-frame">
-              <img src={featured.image} alt="" className="parallax-image" />
+              <Img
+                image={featured.image}
+                alt={featured.title}
+                sizes="(max-width: 768px) 78vw, 39vw"
+                priority
+                className="parallax-image"
+              />
             </div>
 
             <div className="featured-content">

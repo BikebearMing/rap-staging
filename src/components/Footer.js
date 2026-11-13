@@ -92,7 +92,10 @@ export default async function Footer() {
               className="social-button social-facebook"
               aria-label="Facebook"
             >
-              <img src="/facebook.svg" alt="" />
+              {/* Lazy so React doesn't preload this 85 KB icon on every page
+                  (it is always below the fold); the size is the artwork's own,
+                  so it keeps its box before it loads. CSS sets the real size. */}
+              <img src="/facebook.svg" alt="" loading="lazy" width="52" height="52" />
             </a>
             <a
               href={site.instagramUrl}

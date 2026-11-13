@@ -2227,6 +2227,35 @@ html.is-rendering .site-page {
   }
 }
 
+/* Project story: in the gallery's column, so it reads on from the photos at
+   a line length close to a post's, with the overview's heading (arrow and
+   spacing). The same 94px to the footer as the gallery had. */
+.work-story {
+  width: 65.556vw;
+  margin-left: auto;
+  margin-right: 5.833vw;
+  padding-bottom: calc(6.528vw - 2.222vw);
+  color: var(--dark-green);
+
+  & .work-overview-heading {
+    display: flex;
+    align-items: center;
+    gap: 0.972vw;
+    margin-bottom: 2.222vw;
+  }
+
+  & .icon-arrow {
+    transform: rotate(30deg);
+  }
+}
+
+/* "More Projects" slider at the foot of a work page (the home slider). Its
+   squiggle is placed for "Our Projects"; "More" is wider, so move it along
+   to start under the P again. */
+.work-page .projects-scribble {
+  left: 6.896vw; /* 99px */
+}
+
 /* --------------------------------------------------------------------------
    Service page (see src/app/plant-rental/page.js)
    Same bones as the home page: a full-height banner with rounded bottom
@@ -4580,6 +4609,21 @@ html.people-open .people-backdrop {
     & .work-gallery-item {
       border-radius: 4vw;
     }
+  }
+
+  .work-story {
+    width: auto;
+    margin-inline: 6vw;
+    padding-bottom: 10vw;
+
+    & .work-overview-heading {
+      gap: 2.5vw;
+      margin-bottom: 6vw;
+    }
+  }
+
+  .work-page .projects-scribble {
+    left: 16.8vw;
   }
 
   /* ========== SERVICE PAGE ========== */

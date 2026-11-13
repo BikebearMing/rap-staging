@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Img from "@/components/Img";
 import { getPageHeader, getWorks } from "@/lib/wp";
 import { pageMeta } from "@/lib/site";
 import JsonLd from "@/components/JsonLd";
@@ -28,13 +29,16 @@ export default async function Works() {
       </section>
 
       <section className="works-list">
-        {works.map((work) => (
+        {works.map((work, n) => (
           <article className="work-card has-parallax" key={work.slug} data-work-toggle>
             <div className="work-media parallax-frame">
+              {/* The first card's photo is the first thing painted, so it is priority */}
               {work.variants.map((variant, i) => (
-                <img
-                  src={variant.image}
-                  alt=""
+                <Img
+                  image={variant.image}
+                  alt={work.title}
+                  sizes="(max-width: 768px) 88vw, 66vw"
+                  priority={n === 0 && i === 0}
                   className={`parallax-image work-image${i === 0 ? " is-active" : ""}`}
                   data-variant={i}
                   key={variant.category}

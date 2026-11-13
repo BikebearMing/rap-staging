@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import Button from "@/components/Button";
 import BlogCard from "@/components/BlogCard";
+import Img from "@/components/Img";
 import WindLeaf from "@/components/WindLeaf";
 import { getPost, getPosts } from "@/lib/wp";
 import JsonLd from "@/components/JsonLd";
@@ -16,11 +17,13 @@ export async function generateMetadata({ params }) {
   const { slug } = await params;
   const post = await getPost(slug);
   if (!post) return { title: "Blog | Rent-A-Pot" };
+  // The Yoast fields win when set; otherwise only the post's own excerpt,
+  // never the site-wide description (null leaves the tag out).
   const meta = pageMeta({
-    title: `${post.title} | Rent-A-Pot`,
-    description: post.excerpt || undefined,
+    title: post.seoTitle || `${post.title} | Rent-A-Pot`,
+    description: post.seoDescription || post.excerpt || null,
     path: `/blog/${slug}`,
-    image: post.image,
+    image: post.image.src,
   });
   // Shared as an article rather than pageMeta's "website"
   meta.openGraph = { ...meta.openGraph, type: "article", publishedTime: post.sortKey };
@@ -32,7 +35,11 @@ export default async function BlogPost({ params }) {
   const [post, posts] = await Promise.all([getPost(slug), getPosts()]);
   if (!post) notFound();
 
-  const related = posts.filter((p) => p.slug !== slug).slice(0, 3);
+  // The three posts after this one in date order, wrapping round to the
+  // newest, so each post is linked from three others instead of every post
+  // linking the same newest three.
+  const at = posts.findIndex((p) => p.slug === slug);
+  const related = [...posts.slice(at + 1), ...posts.slice(0, Math.max(at, 0))].slice(0, 3);
 
   return (
     <main className="post-page">
@@ -58,7 +65,13 @@ export default async function BlogPost({ params }) {
         </div>
 
         <div className="post-media parallax-frame">
-          <img src={post.image} alt="" className="parallax-image" />
+          <Img
+            image={post.image}
+            alt={post.title}
+            sizes="(max-width: 768px) 88vw, 74vw"
+            priority
+            className="parallax-image"
+          />
         </div>
       </section>
 

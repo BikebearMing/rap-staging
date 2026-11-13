@@ -1,8 +1,17 @@
 import Faq from "@/components/Faq";
 import ProjectsSlider from "@/components/ProjectsSlider";
+import RelatedPosts from "@/components/RelatedPosts";
 import ServiceAreas from "@/components/ServiceAreas";
 import ServiceBanner from "@/components/ServiceBanner";
-import { getServicePage, getWorks, worksForService } from "@/lib/wp";
+import {
+  IMAGE,
+  getPosts,
+  getServicePage,
+  getWorks,
+  imageFrom,
+  postsForService,
+  worksForService,
+} from "@/lib/wp";
 import { pageMeta } from "@/lib/site";
 import JsonLd from "@/components/JsonLd";
 import { breadcrumbSchema, serviceSchema } from "@/lib/schema";
@@ -22,21 +31,22 @@ export const metadata = pageMeta({
 // Service Page FAQ and Maintenance Page field groups. Services as a hover
 // list, then projects.
 export default async function Maintenance() {
-  const [page, works] = await Promise.all([
+  const [page, works, posts] = await Promise.all([
     getServicePage(
       SERVICE,
       `maintenanceFields {
         servicesLabel
-        services { title description image { node { sourceUrl } } }
+        services { title description image { ${IMAGE} } }
       }`
     ),
     getWorks(),
+    getPosts(),
   ]);
   const fields = page.maintenanceFields || {};
   const services = (fields.services || []).map((service) => ({
     title: service.title,
     description: service.description || "",
-    image: service.image?.node?.sourceUrl || "",
+    image: imageFrom(service.image),
   }));
   const projects = worksForService(works, SERVICE);
 
@@ -62,6 +72,8 @@ export default async function Maintenance() {
       />
 
       <ProjectsSlider projects={projects} />
+
+      <RelatedPosts posts={postsForService(posts, SERVICE)} />
 
       <Faq items={page.faqs} />
     </main>

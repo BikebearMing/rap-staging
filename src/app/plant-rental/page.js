@@ -1,6 +1,7 @@
 import Faq from "@/components/Faq";
 import Heading, { Lines } from "@/components/Heading";
 import ProjectsSlider from "@/components/ProjectsSlider";
+import RelatedPosts from "@/components/RelatedPosts";
 import ServiceAreas from "@/components/ServiceAreas";
 import ServiceBanner from "@/components/ServiceBanner";
 import ServiceOffer from "@/components/ServiceOffer";
@@ -10,11 +11,15 @@ import WindLeaf from "@/components/WindLeaf";
 import {
   OFFER_FIELDS,
   PACKAGES_FIELDS,
+  IMAGE,
   PROCESS_FIELDS,
+  getPosts,
   getServicePage,
   getWorks,
+  imageFrom,
   offerFrom,
   packagesFrom,
+  postsForService,
   processFrom,
   worksForService,
 } from "@/lib/wp";
@@ -23,7 +28,6 @@ import JsonLd from "@/components/JsonLd";
 import { breadcrumbSchema, serviceSchema } from "@/lib/schema";
 
 const SERVICE = "plant-rental";
-const IMAGE = "node { sourceUrl }";
 
 const DESCRIPTION =
   "Plant rental in Malaysia since 1982. We supply, style and maintain live indoor plants for offices, hotels, malls and showrooms. Get a free quote.";
@@ -38,7 +42,7 @@ export const metadata = pageMeta({
 // Service Page FAQ and Plant Rental Page field groups; the works strip is
 // every work delivered as plant rental.
 export default async function PlantRental() {
-  const [page, works] = await Promise.all([
+  const [page, works, posts] = await Promise.all([
     getServicePage(
       SERVICE,
       `plantRentalFields {
@@ -48,12 +52,13 @@ export default async function PlantRental() {
       }`
     ),
     getWorks(),
+    getPosts(),
   ]);
   const intro = page.plantRentalFields || {};
   const areas = (intro.areas || []).map((area) => ({
     title: area.title,
     description: area.description,
-    image: area.image?.node?.sourceUrl || "",
+    image: imageFrom(area.image),
   }));
   const projects = worksForService(works, SERVICE);
 
@@ -107,6 +112,8 @@ export default async function PlantRental() {
       <ServiceProcess process={processFrom(intro)} />
 
       <ProjectsSlider projects={projects} />
+
+      <RelatedPosts posts={postsForService(posts, SERVICE)} />
 
       <Faq items={page.faqs} />
     </main>

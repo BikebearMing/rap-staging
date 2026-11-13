@@ -1,5 +1,5 @@
 // The public address of the Next.js site (not the WordPress backend at
-// rap.mydemobb.com). Used for the sitemap, robots.txt, llms.txt and canonical
+// cms.rap.com.my). Used for the sitemap, robots.txt, llms.txt and canonical
 // URLs. Set SITE_URL on a staging deploy so links point there instead.
 export const SITE_URL = (process.env.SITE_URL || "https://www.rap.com.my").replace(/\/+$/, "");
 
@@ -9,7 +9,9 @@ export const SITE_DESCRIPTION =
 
 // Full page metadata: title, description, canonical URL and the Open Graph /
 // Twitter tags used when a link is shared. Pages without a photo of their own
-// share the homepage banner.
+// share the homepage banner. Leaving out the description gives the site-wide
+// one; pass null for no description at all (a post or work with nothing of
+// its own should say nothing rather than repeat the site's).
 const DEFAULT_IMAGE = "/hp-banner-1.jpg";
 
 export function pageMeta({ title, description = SITE_DESCRIPTION, path = "/", image }) {

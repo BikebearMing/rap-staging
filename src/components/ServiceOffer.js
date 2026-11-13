@@ -1,4 +1,5 @@
 import Heading from "@/components/Heading";
+import Img from "@/components/Img";
 
 // No loop, cards run off the right edge and can be dragged freely
 // (see initSliders in custom.js)
@@ -13,8 +14,8 @@ const emblaOptions = JSON.stringify({
 // the left, an Embla strip of labelled plant cards running off the page edge
 // on the right (.service-offer in custom.css). The section is the .embla
 // root, so initSliders wires the arrows. offer is { heading, highlight,
-// images: [{ src, alt, label }] }; a card's label is the image's Caption in
-// the media library, empty until the content is filled in.
+// images: [image + label] }; a card's label is the image's Caption in the
+// media library, empty until the content is filled in.
 export default function ServiceOffer({ offer }) {
   if (!offer.images.length) return null;
   return (
@@ -42,7 +43,7 @@ export default function ServiceOffer({ offer }) {
             {offer.images.map((image, i) => (
               <article className="embla__slide gallery-card offer-slide" key={`${image.src}-${i}`}>
                 <div className="gallery-card-media">
-                  <img src={image.src} alt={image.alt} />
+                  <Img image={image} alt={image.label} sizes="(max-width: 768px) 68vw, 25vw" />
                 </div>
                 <p className="h4 dark gallery-card-title">{image.label}</p>
               </article>
