@@ -47,13 +47,16 @@ export default function ServiceAreas({ heading, label, areas, className = "" }) 
       </div>
 
       {/* The frame is tall, so a landscape photo is cropped to it and shows
-          wider than the frame, most of all on a phone */}
+          wider than the frame, most of all on a phone; sizes allows 1.2x
+          the frame. Quality 60: the portrait photos here are as heavy as
+          the banners (400 KB at 1920 wide at 75). */}
       <div className="areas-media parallax-frame">
         {areas.map((area, i) => (
           <Img
             image={area.image}
             alt={area.title}
             sizes="(max-width: 768px) 106vw, 42vw"
+            quality={60}
             className={`parallax-image areas-image${i === 0 ? " is-active" : ""}`}
             data-area={i}
             key={area.title}

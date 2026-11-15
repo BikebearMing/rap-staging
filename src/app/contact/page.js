@@ -25,12 +25,14 @@ export default async function Contact() {
       <JsonLd data={breadcrumbSchema([{ name: "Contact", path: "/contact" }])} />
       <section className="contact-hero has-parallax">
         <div className="contact-hero-bg parallax-frame">
-          {/* Fills the hero at 120% height: on a phone the photo shows about
-              1.8x the screen's width */}
+          {/* Fills the hero at 120% height: on a phone the photo is cropped
+              and would show about 3.5x the screen's width; 1.5x at quality
+              60, as on the service banners */}
           <Img
             image={contact.heroImage}
             alt={contact.heroHeading.replace(/\s+/g, " ").trim()}
-            sizes="(max-width: 768px) 176vw, 100vw"
+            sizes="(max-width: 768px) 150vw, 100vw"
+            quality={60}
             priority
             className="parallax-image"
           />

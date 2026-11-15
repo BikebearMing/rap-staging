@@ -729,6 +729,12 @@ export function initEditorContent() {
    data-text-reveal-start="top 100%" -> ScrollTrigger start override (default
    "top 90%", flip uses "top 92%"); use it for elements at the very end of
    the page that never reach the default line.
+   data-text-reveal-painted    -> first-screen heading: shown by custom.css
+   from the first paint, so the page's main text never waits for the
+   scripts (and counts as the page's largest paint). On a fresh load it is
+   left as painted, never split; on an in-site visit it lifts in like the
+   rest. Its squiggle (data-wipe="var") still draws in either way.
+   Only for headings in the first screen.
 
    A sibling placed right before the element and marked data-inline-pop (see
    .history-image) is a picture slot: after the lift, the first line slides
@@ -1008,6 +1014,32 @@ function hiddenYPercent(el, self, base) {
   return Math.max(base, Math.ceil(((lineHeight + spare + overhang) / lineHeight) * 100) + 5);
 }
 
+// Screen reader text for a split element; call from onSplit. By default
+// SplitText hides the pieces and puts the text in an aria-label on the
+// element, but a label is not allowed on a plain p/span/div, so it moves
+// into a visually hidden child. Elements holding links or buttons are split
+// with aria: "none" (see splitAria) so those stay reachable and are not
+// hidden; each one gets its text as a label instead, or it would be read
+// letter by letter.
+const splitAria = (el) => (el.querySelector("a, button") ? "none" : "auto");
+function moveSplitLabel(el) {
+  if (splitAria(el) === "none") {
+    el.querySelectorAll("a, button").forEach((link) => {
+      if (!link.hasAttribute("aria-label")) {
+        link.setAttribute("aria-label", link.textContent.trim());
+      }
+    });
+    return;
+  }
+  const label = el.getAttribute("aria-label");
+  if (!label) return;
+  el.removeAttribute("aria-label");
+  const text = document.createElement("span");
+  text.className = "visually-hidden";
+  text.textContent = label;
+  el.append(text);
+}
+
 export function initTextReveal() {
   const ctx = gsap.context(() => {});
   const splits = [];
@@ -1015,10 +1047,21 @@ export function initTextReveal() {
 
   const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
+  // Headings custom.css shows from the first paint (data-text-reveal-painted).
+  // Fresh load: already on screen, so they are left exactly as painted, not
+  // even split (new nodes from a split would count as a later, larger paint
+  // once the font has swapped in). In-site visit (html.is-changing, see Page
+  // transitions): the new page stays hidden until it is swapped in, so they
+  // are hidden here too and lift in like any other heading.
+  const visiting = document.documentElement.classList.contains("is-changing");
+  const painted = live("[data-text-reveal-painted]");
+  if (visiting) painted.forEach((el) => (el.style.visibility = "hidden"));
+
   document.fonts.ready.then(() => {
     if (cancelled) return;
     ctx.add(() => {
       live("[data-text-reveal]").forEach((el) => {
+        if (!visiting && painted.includes(el)) return;
         const modeName =
           el.dataset.textReveal in TEXT_REVEAL_MODES ? el.dataset.textReveal : "lines";
         const mode = TEXT_REVEAL_MODES[modeName];
@@ -1034,12 +1077,14 @@ export function initTextReveal() {
         const split = SplitText.create(el, {
           type: mode.type,
           mask: mode.mask,
+          aria: splitAria(el),
           autoSplit: true,
           linesClass: "tr-line",
           wordsClass: "tr-word",
           charsClass: "tr-char",
           onSplit(self) {
             gsap.set(el, { visibility: "visible" });
+            moveSplitLabel(el);
 
             // Every element manages a gsap.context so the whole choreography
             // (reveal + inline pop) is reverted together on re-split.
@@ -1192,11 +1237,13 @@ export function initFaq() {
           const split = SplitText.create(copy, {
             type: "lines,words,chars",
             mask: "chars",
+            aria: splitAria(copy),
             autoSplit: true,
             linesClass: "tr-line",
             wordsClass: "tr-word",
             charsClass: "tr-char",
             onSplit(self) {
+              moveSplitLabel(copy);
               // Re-splits on resize: park the letters where the item's state wants them
               gsap.set(self.chars, isOpen(item) ? { rotate: 0 } : FAQ_FLIP);
               return null;

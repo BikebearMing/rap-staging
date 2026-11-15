@@ -38,12 +38,14 @@ export default async function About() {
       <JsonLd data={breadcrumbSchema([{ name: "About", path: "/about" }])} />
       <section className="about-hero has-parallax" data-flatten>
         <div className="about-hero-media parallax-frame">
-          {/* Full screen at 120% height: on a phone the photo shows about
-              1.7x the screen's width */}
+          {/* Full screen at 120% height: on a phone the photo is cropped
+              and would show about 3x the screen's width; 1.5x at quality
+              60, as on the service banners */}
           <Img
             image={about.hero.image}
             alt={about.hero.heading.replace(/\s+/g, " ").trim()}
-            sizes="(max-width: 768px) 175vw, 100vw"
+            sizes="(max-width: 768px) 150vw, 100vw"
+            quality={60}
             priority
             className="parallax-image"
           />
@@ -60,6 +62,7 @@ export default async function About() {
             highlight={about.hero.highlight}
             trigger=".about-hero"
             delay="1.5"
+            data-text-reveal-painted
           />
         </div>
 

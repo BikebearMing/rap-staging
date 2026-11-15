@@ -1,4 +1,5 @@
 import "@/styles/custom.css";
+import { preload } from "react-dom";
 import SiteScripts from "@/components/SiteScripts";
 import PageTransition from "@/components/PageTransition";
 import Header from "@/components/Header";
@@ -18,6 +19,12 @@ export const metadata = {
 
 export default async function RootLayout({ children }) {
   const site = await getSiteSettings();
+
+  // The heading font, fetched with the stylesheet rather than after it: the
+  // first-screen headings are painted before the scripts run
+  // (data-text-reveal-painted), so the sooner it is in, the less often they
+  // show in the fallback first. React puts the hint at the top of <head>.
+  preload("/fonts/OtflagSans-Medium.otf", { as: "font", type: "font/otf", crossOrigin: "" });
 
   return (
     <html lang="en">

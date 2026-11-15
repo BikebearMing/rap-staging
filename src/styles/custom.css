@@ -34,6 +34,24 @@
   font-display: swap;
 }
 
+/* Stand-in for Otflag Sans while it loads: a system sans scaled down to
+   Otflag's narrower letters, so headings shown before the swap (see
+   data-text-reveal-painted) break onto the same lines and nothing jumps
+   when it arrives. size-adjust is calibrated on the hero headings at 412
+   and 1440 wide (Arial runs a few % narrower than Otflag on every line);
+   the overrides are Otflag's own ascent/descent/line gap (750/250/100 per
+   1000) divided by it, so the text sits at the same height and baseline. */
+@font-face {
+  font-family: "Otflag Sans Fallback";
+  src: local("Arial"), local("Helvetica Neue"), local("Liberation Sans"), local("Roboto");
+  font-weight: 500;
+  font-style: normal;
+  size-adjust: 80%;
+  ascent-override: 93.75%;
+  descent-override: 31.25%;
+  line-gap-override: 12.5%;
+}
+
 /* --------------------------------------------------------------------------
    Variables
    -------------------------------------------------------------------------- */
@@ -46,7 +64,7 @@
   --sidepadding-m: 5.625vw;
 
   --font-dm-sans: "DM Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-  --font-otflag: "Otflag Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-otflag: "Otflag Sans", "Otflag Sans Fallback", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
 }
 
 .dark,
@@ -59,7 +77,7 @@
 }
 
 .grey {
-  color: #859383 !important;
+  color: #657263 !important;
 }
 
 /* --------------------------------------------------------------------------
@@ -125,6 +143,17 @@ button {
 ul,
 ol {
   list-style: none;
+}
+
+/* Read by screen readers (and counted as link text) but never drawn */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
 }
 
 .h1,
@@ -1063,7 +1092,10 @@ ol {
     gap: 0.417vw;
   }
 
+  /* Inline-block so the text reveal splits the link's own text instead of
+     slicing the link, which left an empty copy of it in front */
   & a {
+    display: inline-block;
     color: rgba(255, 255, 255, 0.85);
   }
 }
@@ -1148,6 +1180,14 @@ ol {
    -------------------------------------------------------------------------- */
 [data-text-reveal] {
   visibility: hidden;
+}
+
+/* First-screen headings opted in with data-text-reveal-painted are shown
+   from the first paint instead (see the Text reveal notes in custom.js).
+   Before Otflag Sans arrives they are set in "Otflag Sans Fallback", sized
+   so the lines break in the same places. */
+[data-text-reveal][data-text-reveal-painted] {
+  visibility: visible;
 }
 
 /* Once SplitText has wrapped lines in block-level masks, lay them out as a
@@ -4297,6 +4337,17 @@ html.people-open .people-backdrop {
     --leaf-width: 90vw;
     top: 4vw;
     right: -12vw;
+  }
+
+  /* The fronds' tips reach up under the banner, where the photo hides
+     them. Clipped at the section's top edge so that hidden strip is not
+     painted at all: otherwise it counts as the largest thing on the first
+     screen and outranks the banner heading. The leaf ends inside the
+     section on phones, so only the hidden strip goes; overflow (not
+     clip-path) keeps the leaf's paint order. */
+  .home-history,
+  .service-intro {
+    overflow-y: clip;
   }
 
   /* ========== BLOG POST ========== */

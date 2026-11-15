@@ -7,13 +7,29 @@ const nextConfig = {
   // the 2048/3840 defaults would only add weight. 1440 fills the jump from
   // 1200 for photos around 600-700px wide at 2x. Optimised files are kept a
   // year: WordPress gives a re-uploaded photo a new file name, so a cached
-  // copy never goes stale.
+  // copy never goes stale. 75 is the default quality; 60 is for the
+  // full-screen photos (quality={60} on the hero and banner images), which
+  // are the heaviest files and look the same at 60.
   images: {
     remotePatterns: [new URL("https://cms.rap.com.my/wp-content/uploads/**")],
     formats: ["image/avif", "image/webp"],
     deviceSizes: [640, 750, 828, 1080, 1200, 1440, 1920],
-    qualities: [75],
+    qualities: [60, 75],
     minimumCacheTTL: 31536000,
+  },
+
+  // The artwork and fonts in public/ are cached for a year (Next serves
+  // public/ files with max-age=0 otherwise). Their URLs carry no hash, so a
+  // changed file must be saved under a new name or visitors keep the old
+  // one. Only top-level images and /fonts: icon.png and apple-icon.png are
+  // left out (Next builds them from src/app), and pages, robots.txt,
+  // sitemap.xml and /_next/* never match.
+  async headers() {
+    const cache = [{ key: "Cache-Control", value: "public, max-age=31536000, immutable" }];
+    return [
+      { source: "/:file((?!icon\\.png$|apple-icon\\.png$)[^/]+\\.(?:svg|png|jpg))", headers: cache },
+      { source: "/fonts/:file*", headers: cache },
+    ];
   },
 
   // Permanent (308) redirects from the old WordPress / WooCommerce site so its

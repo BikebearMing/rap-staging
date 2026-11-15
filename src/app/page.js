@@ -33,6 +33,7 @@ export default async function Home() {
             highlight={hero.highlight}
             trigger=".home-banner"
             delay="1.5"
+            data-text-reveal-painted
           />
 
           <h2 className="body dark" data-text-reveal="flip">
@@ -45,7 +46,10 @@ export default async function Home() {
             <div className="embla__container">
               {/* Each slide fills the screen at 120% height (parallax). On a
                   phone that crops a landscape photo to its middle fifth, so
-                  the photo shows about 2.5x the screen's width. The slides
+                  the full photo would be about 4x the screen's width; sizes
+                  asks for just the screen's width (a little soft on phones,
+                  but PageSpeed counts the cropped-off part as waste), at
+                  quality 60 like every full-screen photo. The slides
                   after the first sit off to the side, where a lazy image
                   would only start loading as autoplay slides it in, so they
                   load straight away, behind the first. */}
@@ -54,7 +58,8 @@ export default async function Home() {
                   <Img
                     image={slide}
                     alt={heroAlt}
-                    sizes="(max-width: 768px) 255vw, 100vw"
+                    sizes="100vw"
+                    quality={60}
                     priority={i === 0}
                     loading={i === 0 ? undefined : "eager"}
                     fetchPriority={i === 0 ? undefined : "low"}
@@ -126,12 +131,13 @@ export default async function Home() {
             <div className="service-slide" key={service.title}>
               <div className="service-pin" data-parallax-pinned>
                 <article className="service-card has-parallax">
-                  {/* A full-screen card: on a phone the photo shows about 3x
-                      the screen's width (see the hero) */}
+                  {/* A full-screen card: sized to the card, not the cropped
+                      photo, at quality 60 (see the hero) */}
                   <Img
                     image={service.image}
                     alt={service.title}
-                    sizes="(max-width: 768px) 295vw, 98vw"
+                    sizes="(max-width: 768px) 94vw, 98vw"
+                    quality={60}
                     className="parallax-image"
                   />
 
@@ -151,7 +157,11 @@ export default async function Home() {
                     <h3 className="h2" data-text-reveal="lift">
                       {service.title}
                     </h3>
-                    <Button href={service.href}>LEARN MORE</Button>
+                    {/* The hidden words make the link say where it goes
+                        for search engines and screen readers */}
+                    <Button href={service.href}>
+                      LEARN MORE<span className="visually-hidden"> about {service.title}</span>
+                    </Button>
                   </div>
 
                   <p className="body service-scroll dark" data-text-reveal="flip">

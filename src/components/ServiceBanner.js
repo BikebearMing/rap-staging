@@ -8,12 +8,16 @@ export default function ServiceBanner({ banner }) {
   return (
     <section className="service-banner has-parallax" data-flatten>
       <div className="service-banner-media parallax-frame">
-        {/* Full screen at 120% height: on a phone the photo shows about
-            2.3x the screen's width. The page's first paint, so priority. */}
+        {/* Full screen at 120% height: on a phone the photo is cropped to
+            its middle and would show about 3x the screen's width. sizes
+            allows 1.5x, the most PageSpeed accepts before it counts the
+            cropped-off part as waste; quality 60 like every full-screen
+            photo. The page's first paint, so priority. */}
         <Img
           image={banner.image}
           alt={banner.heading.replace(/\s+/g, " ").trim()}
-          sizes="(max-width: 768px) 230vw, 100vw"
+          sizes="(max-width: 768px) 150vw, 100vw"
+          quality={60}
           priority
           className="parallax-image"
         />
@@ -26,6 +30,7 @@ export default function ServiceBanner({ banner }) {
         highlight={banner.highlight}
         trigger=".service-banner"
         delay="1.5"
+        data-text-reveal-painted
       />
 
       <p className="body dark" data-text-reveal="flip">

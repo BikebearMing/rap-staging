@@ -116,9 +116,11 @@ export default async function Footer() {
               <p className="button-label" data-text-reveal="lift">
                 {col.heading}
               </p>
-              <ul data-text-reveal="flip">
+              {/* Revealed per item: splitting the ul would wrap its li in
+                  line divs, which is not a valid list */}
+              <ul>
                 {col.links.map(({ label, href }) => (
-                  <li key={label}>
+                  <li key={label} data-text-reveal="flip">
                     {href ? (
                       <Link href={href} className="body">
                         {label}

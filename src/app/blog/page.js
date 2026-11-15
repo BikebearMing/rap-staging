@@ -56,7 +56,7 @@ export default async function Blog() {
                 {featured.excerpt}
               </p>
               <Button href={`/blog/${featured.slug}`} className="featured-link">
-                READ MORE
+                READ MORE<span className="visually-hidden">: {featured.title}</span>
               </Button>
             </div>
           </article>
