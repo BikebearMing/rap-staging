@@ -1971,6 +1971,7 @@ html.is-rendering .site-page {
 }
 
 .contact-form {
+  --form-error: #b3261e;
   position: relative; /* above the leaves */
   display: flex;
   flex-direction: column;
@@ -2068,6 +2069,43 @@ html.is-rendering .site-page {
   &:hover .icon-arrow {
     transform: rotate(-60deg);
   }
+}
+
+/* While the form is being sent (see initContactForm) */
+.contact-form.is-sending .contact-submit {
+  opacity: 0.6;
+  cursor: progress;
+}
+
+/* A field the server rejected, until it is edited */
+.contact-field.is-invalid {
+  border-color: var(--form-error);
+}
+
+/* The reply under the button; takes no space until there is one. Raised
+   over the corner leaves, which would otherwise cover the end of a line. */
+.contact-status {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+  color: var(--dark-green);
+
+  &:empty {
+    display: none;
+  }
+
+  &.is-error {
+    color: var(--form-error);
+  }
+}
+
+/* Honeypot field: off-screen rather than display: none, which bots skip */
+.contact-trap {
+  position: absolute;
+  left: -9999px;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
 }
 
 /* --------------------------------------------------------------------------

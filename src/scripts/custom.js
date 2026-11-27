@@ -1953,6 +1953,78 @@ export function initPeople() {
 }
 
 /* --------------------------------------------------------------------------
+   Contact form (see src/app/contact/page.js)
+   Markup: form[data-contact-form] > .contact-field..., .contact-submit,
+   .contact-status
+   Sends the fields as JSON to /api/contact, which passes them to Gravity
+   Forms. While sending the form has .is-sending (button disabled); the reply
+   goes in .contact-status, with .is-error when it failed, and a field the
+   server rejected gets .is-invalid until it is edited. On success the form
+   is emptied.
+   -------------------------------------------------------------------------- */
+export function initContactForm() {
+  const cleanups = live("[data-contact-form]").map((form) => {
+    const status = form.querySelector(".contact-status");
+    const button = form.querySelector(".contact-submit");
+
+    const say = (message, isError = false) => {
+      status.textContent = message;
+      status.classList.toggle("is-error", isError);
+      // The page is taller or shorter by the message's line
+      ScrollTrigger.refresh();
+    };
+
+    const onSubmit = async (e) => {
+      e.preventDefault();
+      if (form.classList.contains("is-sending")) return;
+      form.classList.add("is-sending");
+      button.disabled = true;
+      say("Sending…");
+
+      let ok = false;
+      let reply = {};
+      try {
+        const res = await fetch("/api/contact", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(Object.fromEntries(new FormData(form))),
+        });
+        reply = await res.json();
+        ok = res.ok && reply.ok;
+      } catch {
+        // Offline or the server is down: falls through to the error message
+      }
+
+      form.classList.remove("is-sending");
+      button.disabled = false;
+      if (ok) {
+        form.reset();
+        say("Thank you. We have received your message and will be in touch soon.");
+        return;
+      }
+      Object.keys(reply.errors || {}).forEach((name) => {
+        form.elements[name]?.classList.add("is-invalid");
+      });
+      say(
+        reply.message ||
+          "Sorry, your message could not be sent. Please try again or email us directly.",
+        true
+      );
+    };
+
+    const onInput = (e) => e.target.classList.remove("is-invalid");
+
+    form.addEventListener("submit", onSubmit);
+    form.addEventListener("input", onInput);
+    return () => {
+      form.removeEventListener("submit", onSubmit);
+      form.removeEventListener("input", onInput);
+    };
+  });
+  return () => cleanups.forEach((fn) => fn());
+}
+
+/* --------------------------------------------------------------------------
    Boot everything. Returns a cleanup function.
    -------------------------------------------------------------------------- */
 export function initSite() {
@@ -1971,6 +2043,7 @@ export function initSite() {
   const destroyGalleryTabs = initGalleryTabs();
   const destroyFaq = initFaq();
   const destroyPeople = initPeople();
+  const destroyContactForm = initContactForm();
   initEditorContent();
   const destroyTextReveal = initTextReveal();
   const destroyWindLeaves = initWindLeaves();
@@ -1985,6 +2058,7 @@ export function initSite() {
     destroyHeader();
     destroyWindLeaves();
     destroyTextReveal();
+    destroyContactForm();
     destroyPeople();
     destroyFaq();
     destroyGalleryTabs();

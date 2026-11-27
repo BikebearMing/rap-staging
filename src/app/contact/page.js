@@ -15,8 +15,8 @@ export const metadata = pageMeta({
 });
 
 // Contact page. Copy comes from the Contact Page field group and the
-// details from Site Settings; the form is plain HTML until a form plugin
-// replaces it.
+// details from Site Settings. The form is sent by initContactForm in
+// custom.js to /api/contact, which hands it to Gravity Forms.
 export default async function Contact() {
   const [contact, site] = await Promise.all([getContact(), getSiteSettings()]);
 
@@ -117,8 +117,8 @@ export default async function Contact() {
           trigger=".contact-form-section"
         />
 
-        {/* A form plugin will replace this markup */}
-        <form className="contact-form" method="post">
+        {/* The field names are the ones /api/contact maps to Gravity Forms */}
+        <form className="contact-form" method="post" data-contact-form>
           <div className="form-row">
             <input
               type="text"
@@ -181,10 +181,20 @@ export default async function Contact() {
             rows="1"
             required
           />
+          {/* Honeypot: hidden from people, filled in by bots (see /api/contact) */}
+          <input
+            type="text"
+            name="website"
+            className="contact-trap"
+            tabIndex={-1}
+            autoComplete="off"
+            aria-hidden="true"
+          />
           <button type="submit" className="contact-submit">
             <span>Let&rsquo;s Connect</span>
             <span className="icon icon-arrow" aria-hidden="true" />
           </button>
+          <p className="contact-status body" role="status" aria-live="polite" />
         </form>
 
         <img
