@@ -14,8 +14,19 @@ export const SITE_DESCRIPTION =
 // its own should say nothing rather than repeat the site's).
 const DEFAULT_IMAGE = "/hp-banner-1.jpg";
 
+// Search results cut a description at about 160 characters. One that falls
+// back to a post's excerpt can run to several sentences, so it ends at the
+// last whole word that fits, with an ellipsis.
+const DESCRIPTION_MAX = 160;
+function clipDescription(text) {
+  if (!text || text.length <= DESCRIPTION_MAX) return text;
+  const cut = text.slice(0, DESCRIPTION_MAX);
+  return cut.slice(0, cut.lastIndexOf(" ")).replace(/[\s,;:.—–-]+$/, "") + "…";
+}
+
 export function pageMeta({ title, description = SITE_DESCRIPTION, path = "/", image }) {
   const images = [image || DEFAULT_IMAGE];
+  description = clipDescription(description);
   return {
     title,
     description,
